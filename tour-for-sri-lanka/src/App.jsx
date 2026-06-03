@@ -1,10 +1,17 @@
 import './App.css'
+import AdminPage from './pages/admin/AdminPage';
+import {BrowserRouter, Route ,Routes} from "react-router-dom"
+import HomePage from './pages/homePage';
+
 
 function App() {
   return (
-    <>
-      wdfsdgfhgc
-    </>
+    <BrowserRouter>
+      <Routes path="/*">
+        <Route path="admin/*" element={<AdminPage/>}/>
+        <Route path="/*" element={<HomePage/>}/>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
