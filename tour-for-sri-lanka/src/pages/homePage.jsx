@@ -15,7 +15,7 @@ export default function HomePage(){
             <Header/>
             <div className="w-full h-[calc(100vh-80px)] bg-gradient-to-r from-[#06141B] to-[#253745]">
                 <Routes path="/*">
-                    <Route path="/home" element={<Home/>}/>
+                    <Route path="/" element={<Home/>}/>
                     <Route path="/hotels" element={<Hotels/>}/>
                     <Route path="/transport" element={<Transport/>}/>
                     <Route path="/tours" element={<Tours/>}/>
