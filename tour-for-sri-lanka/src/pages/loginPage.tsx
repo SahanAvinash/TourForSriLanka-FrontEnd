@@ -3,10 +3,12 @@ import { MdEmail, MdLock} from "react-icons/md";
 import axios from "axios"
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import {Link} from "react-router-dom"
 
 export default function LoginPage(){
     const [email,setEmail] = useState("")
     const [password,setPassword] = useState("")
+    const [rememberMe,setRememberMe] =useState(false)
     const navigate = useNavigate()
 
     function handleOnSubmit(e: React.FormEvent<HTMLFormElement>){
@@ -16,12 +18,20 @@ export default function LoginPage(){
        axios.post("http://localhost:3000/api/traveler/login",
         {
             email : email,
-            password : password
+            password : password,
+            rememberMe
         }
        ).then((res)=>{
         console.log(res)
         toast.success("Login Success")
         const user = res.data.user
+
+        if(rememberMe){
+            localStorage.setItem("token",res.data.token)
+        }else{
+            sessionStorage.setItem("token", res.data.token)
+        }
+        localStorage.getItem("token")
         if(user.role == "traveler"){
            navigate("/")
         }
@@ -38,7 +48,7 @@ export default function LoginPage(){
             <div className="absolute left-[80px]">
                 <img src="/main_logo.png" alt="main_logo.png"/>
             </div>
-            <div className="w-[500px] h-[500px] bg-[#253745] text-[#CCD0CF] absolute right-[80px] rounded-[20px] flex flex-col items-center">
+            <div className="w-[500px] h-[450px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
                 <h1 className="text-[25px] mt-[20px] font-bold">Sign in</h1>
                 <span>Welcome back! Please signin </span>
                 <span>to continue your journey.</span>
@@ -58,7 +68,17 @@ export default function LoginPage(){
                         }}
                     />
                 </div>
+                <div className="w-[400px] mt-[10px] flex justify-between">
+                    <div>
+                        <input type="checkbox" id="rememberMe" className="cursor-pointer" checked={rememberMe} onChange={(e)=> setRememberMe(e.target.checked)}/>
+                        <label className="text-[12px] text-[#CCD0CF] pl-[5px]">Remember Me</label>
+                    </div>
+                    <label className="text-[12px] text-[#CCD0CF] mt-[5px] hover:text-[#00C896]/50 transition-all duration-300 cursor-pointer hover:underline">Forget Password?</label>
+                </div>
                 <button className="w-[400px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] text-[#CCD0CF] text-[20px] font-bold hover:bg-[#00C896]/80 transition-all duration-300 cursor-pointer">Sign in</button>
+                <div className=" mt-[10px] w-[400px] flex justify-end">
+                    <label className="text-[12px] text-[#CCD0CF]">Don't have an account? <Link to="/register-role" className="cursor-pointer hover:underline hover:text-[#00C896]/50 transition-all duration-300">Sign up</Link></label>
+                </div>
             </div>
         </div>
         </form>

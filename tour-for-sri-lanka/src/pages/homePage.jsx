@@ -8,6 +8,7 @@ import Guides from "./guides/guides";
 import AboutUs from "./aboutus/aboutus";
 import ContactUs from "./contactus/contactus";
 import ErrorNotFound from "./error";
+import RegisterRole from "./register/registerRole";
 
 export default function HomePage(){
     return(
@@ -23,6 +24,7 @@ export default function HomePage(){
                     <Route path="/aboutus" element={<AboutUs/>}/>
                     <Route path="/contactus" element={<ContactUs/>}/>
                     <Route path="/*" element={<ErrorNotFound/>}/>
+                    <Route path="/register" element={<RegisterRole/>}/>
                 </Routes>
             </div>
         </>
