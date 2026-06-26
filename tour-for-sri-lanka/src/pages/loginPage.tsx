@@ -13,7 +13,6 @@ export default function LoginPage(){
 
     function handleOnSubmit(e: React.FormEvent<HTMLFormElement>){
        e.preventDefault()
-       console.log(email, password)
 
        axios.post("http://localhost:3000/api/traveler/login",
         {

@@ -69,30 +69,24 @@ export default function TravelerProfilePhoto(){
                 setErr("Something went wrong")
                 return
             }
-            let imageBase64 = null
+            const formData = new FormData()
+            
+            formData.append("role",saved.role)
+            formData.append("firstName",saved.firstName)
+            formData.append("lastName",saved.lastName)
+            formData.append("email",saved.email)
+            formData.append("password",saved.password)
+            formData.append("NIC",saved.NIC)
+            formData.append("country",saved.country)
+            formData.append("mobile",saved.mobile)
+
             if(photoFile){
-                imageBase64 = await new Promise((resolve, reject)=>{
-                    const reader = new FileReader()
-                    reader.onload = () => resolve(reader.result)
-                    reader.onerror = reject
-                    reader.readAsDataURL(photoFile)
-                })
+                formData.append("image",photoFile)
             }
-            const travelData = {
-                role : saved.role,
-                firstName : saved.firstName,
-                lastName : saved.lastName,
-                email : saved.email,
-                password : saved.password,
-                NIC : saved.NIC,
-                country : String(saved.country),
-                mobile : saved.mobile,
-                image : imageBase64
-            }
+
             const response = await fetch("http://localhost:3000/api/traveler/register",{
                 method : "POST",
-                headers: { "Content-Type": "application/json" },
-                body : JSON.stringify(travelData)
+                body : formData
             })
             const data = await response.json()
 

@@ -6,10 +6,12 @@ import LoginPage from './pages/loginPage';
 import {Toaster} from "react-hot-toast"
 import RegisterRole from './pages/register/registerRole';
 import TravelerRegister from './pages/register/traveler_register/travelerRegister';
-import VehicleOwnerRegister from './pages/register/vehicleOwnerRegister';
+import VehicleOwnerRegister from './pages/register/vehicle_owner_register/vehicleOwnerAccount';
 import GuideRegister from './pages/register/guideRegister';
 import HotelOwnerRegister from './pages/register/hotelOwnerRegister';
 import TravelerProfilePhoto from './pages/register/traveler_register/travelerProfilePhoto';
+import VehicleOwnerInformation from './pages/register/vehicle_owner_register/vehicleOwnerInformation';
+
 
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
         <Route path="/traveler-register" element={<TravelerRegister/>}/>
         <Route path="/travelerprofilephoto" element={<TravelerProfilePhoto/>}/>
         <Route path="/vehicle-register" element={<VehicleOwnerRegister/>}/>
+        <Route path="/vehicleownerinformation" element={<VehicleOwnerInformation/>}/>
         <Route path="/guide-register" element={<GuideRegister/>}/>
         <Route path="/hotel-register" element={<HotelOwnerRegister/>}/>
         <Route path="admin/*" element={<AdminPage/>}/>
