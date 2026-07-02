@@ -5,6 +5,7 @@ import COUNTRIES from "../../../data/countryCode";
 import { useNavigate } from "react-router-dom";
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 
 export default function VehicleOwnerRegister(){
     const navigate = useNavigate()
@@ -46,7 +47,7 @@ export default function VehicleOwnerRegister(){
     }
 
     const handleNext = () =>{
-        if(!firstName || !lastName || !email || !password || !NIC || !country || !mobile){
+        if(!firstName || !lastName || !email || !password || !confirmPassword || !NIC || !country || !mobile){
             setErr("Please fill all required fields")
             return;
         }
@@ -62,13 +63,13 @@ export default function VehicleOwnerRegister(){
             setErr("Password must be a least 8 characters")
             return
         }
+        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
         const formData = {
+            ...oldData,
             role,
             firstName,
             lastName,
             email,
-            password,
-            confirmPassword,
             NIC,
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
@@ -107,7 +108,7 @@ export default function VehicleOwnerRegister(){
             country,
             mobile
         }
-        sessionStorage.setItem("VehicleOwner",JSON.stringify(formData))
+        sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
         navigate(-1)
     }
     return(
@@ -115,25 +116,38 @@ export default function VehicleOwnerRegister(){
                     <div className="absolute left-[80px]">
                         <img src="/main_logo.png" alt="main_logo.png"/>
                     </div>  
-                    <div className="h-full absolute left-0 w-[40%] flex left-[50px] top-[50px]">
-                        <div className="flex h-[30px] items-center">
-                            <div className="bg-[#00C896]/80 w-[30px] h-[30px] rounded-[50%] flex justify-center items-center">
-                                <span className="text-[#CCD0CF] text-[12px]">1</span>
+                    <div className="h-full absolute left-[50px] top-[50px] w-[40%]">
+                        <div className="flex items-start">
+                            <div className="flex flex-col items-center w-[70px]">
+                                <div className="w-[30px] h-[30px] rounded-full bg-[#00C896]/80 flex items-center justify-center">
+                                    <span className="text-[#CCD0CF] text-[12px]"><FaCheck/></span>
+                                </div>
+                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Account</span>
                             </div>
-                            <div className="w-[120px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
-                            <div className="bg-[#4A5C6A]/80 w-[30px] h-[30px] rounded-[50%] flex justify-center items-center">
-                                <span className="text-[#CCD0CF] text-[12px]">2</span>
-                            </div>
-                            <div className="w-[120px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
+                            <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
+                                <div className="flex flex-col items-center w-[95px]">
+                                    <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
+                                        <span className="text-[#CCD0CF] text-[12px]"><FaCheck/></span>
+                                    </div>
+                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center leading-4">Vehicle Information</span>
+                                </div>
+                                <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
+                                    <div className="flex flex-col items-center w-[70px]">
+                                        <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
+                                            <span className="text-[#CCD0CF] text-[12px]">3</span>
+                                        </div>
 
-                            <div className="bg-[#4A5C6A]/80 w-[30px] h-[30px] rounded-[50%] flex justify-center items-center">
-                                <span className="text-[#CCD0CF] text-[12px]">3</span>
-                            </div>
-                            <div className="w-[120px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
-                            <div className="bg-[#4A5C6A]/80 w-[30px] h-[30px] rounded-[50%] flex justify-center items-center">
-                                <span className="text-[#CCD0CF] text-[12px]">4</span>
-                            </div>
-                            </div>
+                                        <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Facilities</span></div>
+                                    <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
+                                        <div className="flex flex-col items-center w-[80px]">
+                                            <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
+                                                <span className="text-[#CCD0CF] text-[12px]">4</span>
+                                            </div>
+
+                                            <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Verification</span>
+                                        </div>
+
+                        </div>
                     </div>
             <div className="w-[500px] h-[540px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
                 <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Vehicle Owner</h1>

@@ -11,6 +11,9 @@ import GuideRegister from './pages/register/guideRegister';
 import HotelOwnerRegister from './pages/register/hotelOwnerRegister';
 import TravelerProfilePhoto from './pages/register/traveler_register/travelerProfilePhoto';
 import VehicleOwnerInformation from './pages/register/vehicle_owner_register/vehicleOwnerInformation';
+import VehicleFacilities from './pages/register/vehicle_owner_register/vehicleFacilities';
+import Verification from './pages/register/vehicle_owner_register/vehicleVerification';
+import VehicleVerification from './pages/register/vehicle_owner_register/vehicleVerification';
 
 
 
@@ -26,6 +29,8 @@ function App() {
         <Route path="/travelerprofilephoto" element={<TravelerProfilePhoto/>}/>
         <Route path="/vehicle-register" element={<VehicleOwnerRegister/>}/>
         <Route path="/vehicleownerinformation" element={<VehicleOwnerInformation/>}/>
+        <Route path="/vehiclefacilities" element={<VehicleFacilities/>}/>
+        <Route path="vehicleverification" element={<VehicleVerification/>}/>
         <Route path="/guide-register" element={<GuideRegister/>}/>
         <Route path="/hotel-register" element={<HotelOwnerRegister/>}/>
         <Route path="admin/*" element={<AdminPage/>}/>
