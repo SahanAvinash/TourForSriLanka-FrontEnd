@@ -16,10 +16,10 @@ export default function VehicleOwnerInformation(){
     const [vehicleBrand,setVehicleBrand] = useState(null)
     const [vehicleModel,setVehicleModel] = useState(null)
 
-    const [shortDescreption,setShortDescreption] = useState(null)
-    const [registrationNo,setRegistrationNo] = useState(null)
+    const [shortDescription,setShortDescription] = useState("")
+    const [registrationNo,setRegistrationNo] = useState("")
     const [manufactureYear,setManufactureYear] = useState(null)
-    const [chassisNumber,setChassisNumber] = useState(null)
+    const [chassisNumber,setChassisNumber] = useState("")
     const [vehicleColor, setVehicleColor] = useState(null)
 
     const years = Array.from({length : 50}, (_,i) =>{
@@ -151,10 +151,10 @@ export default function VehicleOwnerInformation(){
             setVehicleType(data.vehicleType || null)
             setVehicleBrand(data.vehicleBrand || null)
             setVehicleModel(data.vehicleModel || null)
-            setShortDescreption(data.shortDescreption || null)
-            setRegistrationNo(data.registrationNo || null)
+            setShortDescription(data.shortDescription || "")
+            setRegistrationNo(data.registrationNo || "")
             setManufactureYear(data.manufactureYear || null)
-            setChassisNumber(data.chassisNumber || null)
+            setChassisNumber(data.chassisNumber || "")
             setVehicleColor(data.vehicleColor || null)
         }
     },[])
@@ -168,7 +168,7 @@ export default function VehicleOwnerInformation(){
             vehicleType,
             vehicleBrand,
             vehicleModel,
-            shortDescreption,
+            shortDescription,
             registrationNo,
             manufactureYear,
             chassisNumber,
@@ -178,7 +178,7 @@ export default function VehicleOwnerInformation(){
         navigate(-1)
     }
     const handleNext = () => {
-        if(!vehicleType || !vehicleBrand || !vehicleModel || !shortDescreption || !registrationNo || !manufactureYear || !chassisNumber || !vehicleColor){
+        if(!vehicleType || !vehicleBrand || !vehicleModel || !shortDescription || !registrationNo || !manufactureYear || !chassisNumber || !vehicleColor){
             setErr("Please fill all required fields")
             return;
         }
@@ -189,7 +189,7 @@ export default function VehicleOwnerInformation(){
             vehicleType,
             vehicleBrand,
             vehicleModel,
-            shortDescreption,
+            shortDescription,
             registrationNo,
             manufactureYear,
             chassisNumber,
@@ -391,9 +391,9 @@ export default function VehicleOwnerInformation(){
                         </div>
                         <div className="mt-[20px]">
                             <div className="relative w-[465px]">
-                                <textarea placeholder="Short descreption" value={shortDescreption} maxLength={200} onChange={(e)=> setShortDescreption(e.target.value)} className="resize-none overflow-hidden w-[465px] h-[100px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pt-[10px]"/>
+                                <textarea placeholder="Short descreption" value={shortDescription} maxLength={200} onChange={(e)=> setShortDescription(e.target.value)} className="resize-none overflow-hidden w-[465px] h-[100px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pt-[10px]"/>
                                 <div className="text-[10px] text-[#CCD0CF]/60 w-[465px] bottom-3 right-3 flex justify-end absolute">
-                                    {shortDescreption?.length || 0} / 200
+                                    {shortDescription?.length || 0} / 200
                                 </div>
                             </div>
                         </div>

@@ -11,6 +11,7 @@ export default function VehicleOwnerRegister(){
     const navigate = useNavigate()
 
     const role = sessionStorage.getItem("role")
+    const [checkingEmail,setCheckingEmail] = useState(false)
 
     const [country, setCountry] = useState(null)
     const [mobile,setMobile] = useState("")
@@ -46,7 +47,7 @@ export default function VehicleOwnerRegister(){
         }
     }
 
-    const handleNext = () =>{
+    const handleNext = async () =>{
         if(!firstName || !lastName || !email || !password || !confirmPassword || !NIC || !country || !mobile){
             setErr("Please fill all required fields")
             return;
@@ -63,6 +64,26 @@ export default function VehicleOwnerRegister(){
             setErr("Password must be a least 8 characters")
             return
         }
+
+        setErr("")
+        setCheckingEmail(true)
+
+        try{
+            const res = await fetch(`http://localhost:3000/api/transport/check-email?email=${encodeURIComponent(email)}`)
+            const result = await res.json()
+
+            if(result.exists){
+                setErr("This email is already registered")
+                setCheckingEmail(false)
+                return
+            }
+        } catch (error){
+            setErr("Could not verify email, please try again")
+            setCheckingEmail(false)
+            return
+        }
+        setCheckingEmail(false)
+
         const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
         const formData = {
             ...oldData,
@@ -70,6 +91,8 @@ export default function VehicleOwnerRegister(){
             firstName,
             lastName,
             email,
+            password,
+            confirmPassword,
             NIC,
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
@@ -88,16 +111,29 @@ export default function VehicleOwnerRegister(){
             setPassword(data.password || "");
             setConfirmPassword(data.confirmPassword || "");
             setNIC(data.NIC || "");
-            setMobile(data.mobile || "");
             
             if(data.country){
                 const match = options.find(o => o.label === data.country)
                 setCountry(match || null)
+
+                if(data.mobile){
+                    const foundCountry = COUNTRIES.find(c => c.code === match?.value)
+                    if(foundCountry && data.mobile.startsWith(foundCountry.dial)){
+                        setDialCode(foundCountry.dial)
+                        setMobile(data.mobile.slice(foundCountry.dial.length))
+                    } else {
+                        setMobile(data.mobile)
+                    }
+                }
+            } else if(data.mobile){
+                setMobile(data.mobile)
             }
         }
     },[])
     const handlePrevious = () =>{
+        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
         const formData = {
+            ...oldData,
             role,
             firstName,
             lastName,
@@ -105,8 +141,8 @@ export default function VehicleOwnerRegister(){
             password,
             confirmPassword,
             NIC,
-            country,
-            mobile
+            country: country?.label,
+            mobile: dialCode ? `${dialCode}${mobile}` : mobile
         }
         sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
         navigate(-1)
@@ -163,7 +199,7 @@ export default function VehicleOwnerRegister(){
                 <div className="w-[500px] h-full mt-[10px] flex flex-col items-center">
                     <input type="email" value={email} placeholder="E-Mail" onChange={(e)=> setEmail(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
                     <div className="flex flex-col relative w-[465px]">
-                        <input type={showPassword? "text" : "password"} placeholder="Password" onChange={(e)=> setPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                        <input type={showPassword? "text" : "password"} value={password} placeholder="Password" onChange={(e)=> setPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
                         {showPassword ? (
                             <IoEye className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowPassword(false)}/>
                         ) : (
@@ -171,7 +207,7 @@ export default function VehicleOwnerRegister(){
                         )}
                     </div>
                     <div className="flex flex-col relative w-[465px]">
-                        <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" onChange={(e)=> setConfirmPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                        <input type={showConfirmPassword ? "text" : "password"} value={confirmPassword} placeholder="Confirm Password" onChange={(e)=> setConfirmPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
                         {showConfirmPassword ? (
                             <IoEye className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowConfirmPassword(false)}/>
                         ) : (
@@ -244,7 +280,9 @@ export default function VehicleOwnerRegister(){
                     </div>
                     <div className="mt-[20px] w-full flex justify-evenly">
                         <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
+                        <button onClick={handleNext} disabled={checkingEmail} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+    {checkingEmail ? "Checking..." : (<>Next <GrFormNextLink className="font-bold text-[20px]"/></>)}
+</button>
                     </div>
                 </div>
             </div>

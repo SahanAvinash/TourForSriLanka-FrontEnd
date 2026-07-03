@@ -6,6 +6,18 @@ import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
 
 export default function VehicleFacilities(){
+    const navigate = useNavigate()
+
+    const [passengerCapacity,setPassengerCapacity] = useState(null)
+    const [luggageCapacity,setLuggageCapacity] = useState(null)
+    const [fuelType,setFuelType] = useState(null)
+
+    const [availableArea,setAvailableArea] = useState([])
+
+    const [photos,setPhotos] = useState([])
+
+    const [err,setErr] = useState(null)
+
     const luggageByVehicle = {
         car: [
             { value: 1, label: "Small (1 bag)" },
@@ -23,7 +35,7 @@ export default function VehicleFacilities(){
             { value: 1, label: "Small (1–2 bags)" }
         ]
     };
-    const fuelType = [
+    const fuelTypes = [
         {value: "petrole", label: "Petrole"},
         {value: "diesel", label: "Diesel"},
         {value: "electric", label: "Electric"}
@@ -75,30 +87,54 @@ export default function VehicleFacilities(){
         label: `${i + 1}`
     }))
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const files = Array.from(e.target.files || [])
 
-        const newFiles = files.filter((file) =>{
-            return !photos.some(
-                (photo) =>
-                    photo.name === file.name &&
-                    photo.size === file.size &&
-                    photo.lastModified === file.lastModified
-            )
+        const newFiles = files.filter((file) => {
+            return !photos.some((photo) => photo.name === file.name)
         })
         if(newFiles.length !== files.length){
             setErr("This photo has already been selected")
+            e.target.value = ""
             return
         }
-        const updatePhotos = [...photos, ...newFiles]
-
-        if(updatePhotos.length>5){
+        if(photos.length + newFiles.length > 5){
             setErr("You can upload a maximum of 5 photos")
+            e.target.value = ""
             return
         }
         setErr("")
-        setPhotos(updatePhotos)
-        e.target.value = ""
+        e.target.value =""
+
+        for(const file of newFiles){
+            const tempEntry = {name: file.name, url:null, uploading:true}
+            setPhotos((prev) => [...prev, tempEntry])
+
+            try{
+                const uploadFormData = new FormData()
+                uploadFormData.append("photo",file)
+
+                const res = await fetch("http://localhost:3000/api/transport/upload-photo",{
+                    method: "POST",
+                    body: uploadFormData
+                })
+                const result = await res.json()
+
+                if(!res.ok){
+                    setErr(result.error || "Photo upload failed")
+                    setPhotos((prev) => prev.filter((p) => p.name !== file.name))
+                    continue
+                }
+                setPhotos((prev) =>
+                    prev.map((p) =>
+                        p.name === file.name ? {...p, url: result.url, uploading: false} : p
+                    )
+                )
+            }catch(error){
+                setErr("Photo upload failed, please try again later")
+                setPhotos((prev) => prev.filter((p) => p.name !== file.name))
+            }
+        }
     }
 
     const removePhoto = (index) =>{
@@ -112,15 +148,11 @@ export default function VehicleFacilities(){
         )
         const formData = {
             ...previousData,
-            districtSelected,
-            capacity,
-            luggage,
-            fuel,
-            photos : photos.map(p => ({
-                name : p.name,
-                size : p.size,
-                type : p.type 
-            }))
+            availableArea,
+            passengerCapacity,
+            luggageCapacity,
+            fuelType,
+            addVehiclePhotos: photos.filter(p => p.url).map(p => p.url)
         }
         sessionStorage.setItem(
             "VehicleOwnerRegister",
@@ -129,49 +161,45 @@ export default function VehicleFacilities(){
         navigate(-1)
     }
     const handleNext = () => {
-        if(districtSelected.length === 0 || !capacity || !luggage || !fuel || photos.length === 0){
+        if(availableArea.length === 0 || !passengerCapacity || !luggageCapacity || !fuelType || photos.length === 0){
             setErr("Please fill all required fields")
             return;
+        }
+        if(photos.some(p => p.uploading)){
+            setErr("Please wait,photos are still uploading")
+            return
         }
         const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister")) || {}
         const formData = {
             ...oldData,
 
-            districtSelected,
-            capacity,
-            luggage,
-            fuel,
-            photos: photos.map((p) =>{
-                return{
-                    name: p.name,
-                    size: p.size,
-                    type: p.type
-                }
-            })
+            availableArea,
+            passengerCapacity,
+            luggageCapacity,
+            fuelType,
+            addVehiclePhotos: photos.filter(p => p.url).map(p => p.url)
         }
         sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
         navigate("/vehicleverification")
     }
 
-
-    const [capacity,setCapacity] = useState(null)
-    const [luggage,setLuggage] = useState(null)
-    const [fuel,setFuel] = useState(null)
-
-    const [districtSelected,setDistrictSelected] = useState([])
-
-    const [photos,setPhotos] = useState([])
-
-    const [err,setErr] = useState(null)
-    const navigate = useNavigate()
-
     useEffect(()=>{
         const data = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister")||"{}")
 
-        setCapacity(data.capacity || null)
-        setLuggage(data.luggage || null)
-        setFuel(data.fuel || null)
-        setDistrictSelected(data.districtSelected || [])
+        setPassengerCapacity(data.passengerCapacity || null)
+        setLuggageCapacity(data.luggageCapacity || null)
+        setFuelType(data.fuelType || null)
+        setAvailableArea(data.availableArea || [])
+
+        if(data.addVehiclePhotos && data.addVehiclePhotos.length > 0){
+            setPhotos(
+                data.addVehiclePhotos.map((url) => ({
+                    name: url.split("/").pop(),
+                    url,
+                    uploading: false
+                }))
+            )
+        }
     },[])
 
     return(
@@ -221,9 +249,9 @@ export default function VehicleFacilities(){
                     <Select
                         options={districts}
                         isMulti
-                        value={districtSelected}
+                        value={availableArea}
                         onChange={(selected) => {
-                            setDistrictSelected(selected || [])
+                            setAvailableArea(selected || [])
                         }}
                         placeholder="Available Districts"
                         styles={{
@@ -294,8 +322,8 @@ export default function VehicleFacilities(){
                                 </div>
                                 <Select 
                                     options={capacityOptions}
-                                    value={capacity}
-                                    onChange={setCapacity}
+                                    value={passengerCapacity}
+                                    onChange={setPassengerCapacity}
                                     placeholder="0"
                                     styles={{
                                         control: (base) => ({
@@ -353,8 +381,8 @@ export default function VehicleFacilities(){
                                 </div>
                                 <Select 
                                     options={luggageOptions}
-                                    value={luggage}
-                                    onChange={setLuggage}
+                                    value={luggageCapacity}
+                                    onChange={setLuggageCapacity}
                                     placeholder="Select"
                                     styles={{
                                         control: (base) => ({
@@ -411,9 +439,9 @@ export default function VehicleFacilities(){
                                     Fuel <br/> Type
                                 </div>
                                 <Select 
-                                    options={fuelType}
-                                    value={fuel}
-                                    onChange={setFuel}
+                                    options={fuelTypes}
+                                    value={fuelType}
+                                    onChange={setFuelType}
                                     placeholder="Select"
                                     styles={{
                                         control: (base) => ({
@@ -493,11 +521,18 @@ export default function VehicleFacilities(){
                             <div className="grid grid-cols-5 gap-2 h-full">
                                 {photos.map((photo, index) => (
                                     <div key={index} className="relative w-[65px] h-[65px]">
-                                        <img
-                                            src={URL.createObjectURL(photo)}
-                                            alt={`preview-${index}`}
-                                            className="w-[65px] h-[65px] object-cover rounded-lg"
-                                        />
+                                        {photo.uploading ? (
+                                            <div className="w-[65px] h-[65px] rounded-lg bg-[#4A5C6A] flex items-center justify-center text-[8px] text-[#CCD0CF]/80">
+                                                Uploading...
+                                            </div>
+                                        ) : (
+                                                <img
+                                                    src={photo.url}
+                                                    alt={`preview-${index}`}
+                                                    className="w-[65px] h-[65px] object-cover rounded-lg"
+                                                />
+                                        )}
+                                        
                                         <button
                                             type="button"
                                             onClick={(e) => {
