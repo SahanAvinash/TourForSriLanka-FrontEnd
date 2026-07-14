@@ -7,14 +7,19 @@ import {Toaster} from "react-hot-toast"
 import RegisterRole from './pages/register/registerRole';
 import TravelerRegister from './pages/register/traveler_register/travelerRegister';
 import VehicleOwnerRegister from './pages/register/vehicle_owner_register/vehicleOwnerAccount';
-import GuideRegister from './pages/register/guideRegister';
-import HotelOwnerRegister from './pages/register/hotelOwnerRegister';
+import GuideRegister from './pages/register/guide_register/guideRegister';
+import HotelOwnerRegister from './pages/register/hotel_register/hotelOwnerRegister';
 import TravelerProfilePhoto from './pages/register/traveler_register/travelerProfilePhoto';
 import VehicleOwnerInformation from './pages/register/vehicle_owner_register/vehicleOwnerInformation';
 import VehicleFacilities from './pages/register/vehicle_owner_register/vehicleFacilities';
 import Verification from './pages/register/vehicle_owner_register/vehicleVerification';
 import VehicleVerification from './pages/register/vehicle_owner_register/vehicleVerification';
-
+import VerifyOtp from './pages/register/traveler_register/verifyOtp';
+import VerifyOtpTransport from './pages/register/vehicle_owner_register/VerifyOtpTransport';
+import GuideInformation from './pages/register/guide_register/guideInfo';
+import GuideLanguageSkills from './pages/register/guide_register/guideSkils';
+import GuidePricing from './pages/register/guide_register/guidePricing';
+import VerifyOtpGuide from './pages/register/guide_register/verifyOtpGuide';
 
 
 function App() {
@@ -32,8 +37,14 @@ function App() {
         <Route path="/vehiclefacilities" element={<VehicleFacilities/>}/>
         <Route path="vehicleverification" element={<VehicleVerification/>}/>
         <Route path="/guide-register" element={<GuideRegister/>}/>
+        <Route path="/guideInformation" element={<GuideInformation/>}/>
+        <Route path="/guidelanguageskills" element={<GuideLanguageSkills/>}/>
+        <Route path="/guidepricing" element={<GuidePricing/>}/>
         <Route path="/hotel-register" element={<HotelOwnerRegister/>}/>
         <Route path="admin/*" element={<AdminPage/>}/>
+        <Route path="/verify-otp" element={<VerifyOtp/>}/>
+        <Route path="/verify-otp-transport" element={<VerifyOtpTransport/>}/>
+        <Route path="/verify-otp-guide" element={<VerifyOtpGuide/>}/>
       </Routes>
     </BrowserRouter>
   )

@@ -254,6 +254,7 @@ export default function VehicleOwnerInformation(){
                                     setVehicleModel(null)
                                 }}
                                 placeholder="Vehicle Type"
+                                menuPosition="fixed"
                                 styles={{
                                     control : (base) => ({
                                         ...base,
@@ -304,6 +305,7 @@ export default function VehicleOwnerInformation(){
                                 }}
                                 placeholder="Vehicle Brand"
                                 isDisabled={!vehicleType}
+                                menuPosition="fixed"
                                 styles={{
                                     control : (base) => ({
                                         ...base,
@@ -349,6 +351,7 @@ export default function VehicleOwnerInformation(){
                                 onChange={setVehicleModel}
                                 placeholder="Vehicle Model"
                                 isDisabled={!vehicleBrand}
+                                menuPosition="fixed"
                                 styles={{
                                     control : (base) => ({
                                         ...base,
@@ -405,6 +408,7 @@ export default function VehicleOwnerInformation(){
                                 onChange={setManufactureYear}
                                 placeholder="Manufacture Year"
                                 isDisabled={!vehicleModel}
+                                menuPosition="fixed"
                                 styles={{
                                     control: (base) => ({
                                         ...base,
@@ -452,6 +456,7 @@ export default function VehicleOwnerInformation(){
                                 onChange={setVehicleColor}
                                 placeholder="Vehicle Color"
                                 isDisabled={!vehicleType}
+                                menuPosition="fixed"
                                 styles={{
                                     control: (base) => ({
                                         ...base,

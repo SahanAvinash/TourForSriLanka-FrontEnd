@@ -26,59 +26,34 @@ const handleSignUp = async () => {
             setErr("Fill all required data")
             return
         }
-        const formData = new FormData()
+        if(!data.email){
+            setErr("Email not found. Please fill account details again")
+            return
+        }
 
-        // Plain (non-object) fields: firstName, lastName, email, password, NIC, etc.
-        Object.entries(data).forEach(([key,value]) => {
-            if(typeof value !== "object" || value === null){
-                formData.append(key,value)
-            }
-        })
-
-        // Fields saved as {value, label} Select objects — send the underlying value
-        formData.append("vehicleType", data.vehicleType?.value ?? "")
-        formData.append("vehicleBrand", data.vehicleBrand?.value ?? "")
-        formData.append("vehicleModel", data.vehicleModel?.value ?? "")
-        formData.append("vehicleColor", data.vehicleColor?.value ?? "")
-        formData.append("manufactureYear", data.manufactureYear?.value ?? "")
-        formData.append("passengerCapacity", data.passengerCapacity?.value ?? "")
-        formData.append("luggageCapacity", data.luggageCapacity?.value ?? "")
-        formData.append("fuelType", data.fuelType?.value ?? "")
-
-        // availableArea is an array of {value, label} objects — send each district value
-        ;(data.availableArea || []).forEach((district) => {
-            formData.append("availableArea", district?.value ?? district)
-        })
-        ;(data.addVehiclePhotos || []).forEach((url) => {
-            formData.append("addVehiclePhotos", url)
-        })
-
-        drivingLicense && formData.append("drivingLicense", drivingLicense)
-        vehicleRegistrationCertificate && formData.append("vehicleRegistrationCertificate", vehicleRegistrationCertificate)
-        insuranceCertificate && formData.append("insuranceCertificate", insuranceCertificate)
-        revenueLicense && formData.append("revenueLicense", revenueLicense)
-        profilePhoto && formData.append("profilePhoto", profilePhoto)
-
-        // TODO: addVehiclePhotos (from VehicleFacilities step) still needs to be
-        // attached here — those File objects don't survive sessionStorage, so
-        // this page currently has no way to re-collect them. Needs a decision:
-        // either re-upload vehicle photos on this page, or persist them earlier
-        // (e.g. upload-as-you-go to the backend and store returned URLs instead
-        // of File objects in sessionStorage).
-
-        const res = await fetch("http://localhost:3000/api/transport", {
+        const res = await fetch("http://localhost:3000/api/transport/send-otp", {
             method: "POST",
-            body: formData
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: data.email })
         })
 
         const result = await res.json()
 
-        if (!res.ok) {
-            setErr(result.message || "Signup failed");
-            return;
+        if(!res.ok){
+            setErr(result.error || "Failed to send OTP")
+            return
         }
-        sessionStorage.removeItem("VehicleOwnerRegister");
-        navigate("/login");
+
+        navigate("/verify-otp-transport", {
+            state: {
+                drivingLicense,
+                vehicleRegistrationCertificate,
+                insuranceCertificate,
+                revenueLicense,
+                profilePhoto
+            }
+        })
+
     }catch (err) {
         setErr(err.message);
     }

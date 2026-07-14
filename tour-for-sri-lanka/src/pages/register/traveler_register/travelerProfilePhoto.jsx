@@ -69,38 +69,69 @@ export default function TravelerProfilePhoto(){
                 setErr("Something went wrong")
                 return
             }
-            const formData = new FormData()
-            
-            formData.append("role",saved.role)
-            formData.append("firstName",saved.firstName)
-            formData.append("lastName",saved.lastName)
-            formData.append("email",saved.email)
-            formData.append("password",saved.password)
-            formData.append("NIC",saved.NIC)
-            formData.append("country",saved.country)
-            formData.append("mobile",saved.mobile)
+            const requiredFields = ["role","firstName","lastName","email","password","NIC","country","mobile"]
+            const missing = requiredFields.filter((field)=> !saved[field] || saved[field].toString().trim() === "")
 
-            if(photoFile){
-                formData.append("image",photoFile)
+            if(missing.length > 0){
+                setErr("Please fill all required fields before continuing")
+                return
             }
-
-            const response = await fetch("http://localhost:3000/api/traveler/register",{
-                method : "POST",
-                body : formData
+            const response = await fetch("http://localhost:3000/api/traveler/send-otp",{
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body : JSON.stringify({email: saved.email})
             })
             const data = await response.json()
 
             if(!response.ok){
-                setErr(data.message || "Signup failed.  Please try again later")
+                setErr(data.error || "Failed to send OTP")
                 return
             }
-            localStorage.setItem("token",data.token)
-            sessionStorage.removeItem("TravelerRegister")
-            navigate("/login")
+            navigate("/verify-otp",{state: {photoFile}})
         }catch(error){
-            setErr("Somthing went wrong. Please try again"+ error.message)
+            setErr("Something went wrong. Please try again"+error.message)
         }
     }
+    // const handleSignUp = async () =>{
+    //     try{
+    //         const saved = JSON.parse(sessionStorage.getItem("TravelerRegister"))
+
+    //         if(!saved){
+    //             setErr("Something went wrong")
+    //             return
+    //         }
+    //         const formData = new FormData()
+            
+    //         formData.append("role",saved.role)
+    //         formData.append("firstName",saved.firstName)
+    //         formData.append("lastName",saved.lastName)
+    //         formData.append("email",saved.email)
+    //         formData.append("password",saved.password)
+    //         formData.append("NIC",saved.NIC)
+    //         formData.append("country",saved.country)
+    //         formData.append("mobile",saved.mobile)
+
+    //         if(photoFile){
+    //             formData.append("image",photoFile)
+    //         }
+
+    //         const response = await fetch("http://localhost:3000/api/traveler/register",{
+    //             method : "POST",
+    //             body : formData
+    //         })
+    //         const data = await response.json()
+
+    //         if(!response.ok){
+    //             setErr(data.message || "Signup failed.  Please try again later")
+    //             return
+    //         }
+    //         localStorage.setItem("token",data.token)
+    //         sessionStorage.removeItem("TravelerRegister")
+    //         navigate("/login")
+    //     }catch(error){
+    //         setErr("Somthing went wrong. Please try again"+ error.message)
+    //     }
+    // }
     
     return(
 

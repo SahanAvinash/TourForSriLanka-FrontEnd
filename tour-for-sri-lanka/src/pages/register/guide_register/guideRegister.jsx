@@ -7,7 +7,7 @@ import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 
-export default function VehicleOwnerRegister(){
+export default function GuideRegister(){
     const navigate = useNavigate()
 
     const role = sessionStorage.getItem("role")
@@ -48,7 +48,7 @@ export default function VehicleOwnerRegister(){
     }
 
     const handleNext = async () =>{
-        if(!firstName || !lastName || !email || !password || !confirmPassword || !NIC || !country || !mobile){
+        if(!firstName || !lastName || !email || !password || !confirmPassword || !country || !mobile){
             setErr("Please fill all required fields")
             return;
         }
@@ -69,7 +69,7 @@ export default function VehicleOwnerRegister(){
         setCheckingEmail(true)
 
         try{
-            const res = await fetch(`http://localhost:3000/api/transport/check-email?email=${encodeURIComponent(email)}`)
+            const res = await fetch(`http://localhost:3000/api/guide/check-email?email=${encodeURIComponent(email)}`)
             const result = await res.json()
 
             if(result.exists){
@@ -84,7 +84,7 @@ export default function VehicleOwnerRegister(){
         }
         setCheckingEmail(false)
 
-        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
+        const oldData = JSON.parse(sessionStorage.getItem("GuideRegister"))|| {}
         const formData = {
             ...oldData,
             role,
@@ -97,11 +97,11 @@ export default function VehicleOwnerRegister(){
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
         }
-        sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
-        navigate("/vehicleownerinformation")
+        sessionStorage.setItem("GuideRegister",JSON.stringify(formData))
+        navigate("/guideinformation")
     }
     useEffect(()=>{
-        const saved = sessionStorage.getItem("VehicleOwnerRegister")
+        const saved = sessionStorage.getItem("GuideRegister")
         if(saved){
             const data = JSON.parse(saved)
 
@@ -131,7 +131,7 @@ export default function VehicleOwnerRegister(){
         }
     },[])
     const handlePrevious = () =>{
-        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
+        const oldData = JSON.parse(sessionStorage.getItem("GuideRegister"))|| {}
         const formData = {
             ...oldData,
             role,
@@ -144,7 +144,7 @@ export default function VehicleOwnerRegister(){
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
         }
-        sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
+        sessionStorage.setItem("GuideRegister",JSON.stringify(formData))
         navigate(-1)
     }
     return(
@@ -165,7 +165,7 @@ export default function VehicleOwnerRegister(){
                                     <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
                                         <span className="text-[#CCD0CF] text-[12px]">2</span>
                                     </div>
-                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center leading-4">Vehicle Information</span>
+                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center leading-4">Personal Info</span>
                                 </div>
                                 <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
                                     <div className="flex flex-col items-center w-[70px]">
@@ -173,20 +173,20 @@ export default function VehicleOwnerRegister(){
                                             <span className="text-[#CCD0CF] text-[12px]">3</span>
                                         </div>
 
-                                        <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Facilities</span></div>
+                                        <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Language & Skils</span></div>
                                     <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
                                         <div className="flex flex-col items-center w-[80px]">
                                             <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
                                                 <span className="text-[#CCD0CF] text-[12px]">4</span>
                                             </div>
 
-                                            <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Verification</span>
+                                            <span className="mt-2 text-[#CCD0CF] text-[12px] text-center whitespace-nowrap">Pricing</span>
                                         </div>
 
                         </div>
                     </div>
-            <div className="w-[500px] h-[540px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
-                <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Vehicle Owner</h1>
+            <div className="w-[500px] h-[480px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
+                <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Guide</h1>
                 {err && (
                     <div className="text-[#9E4444] text-[12px]">
                         {err}
@@ -214,7 +214,6 @@ export default function VehicleOwnerRegister(){
                             <FaEyeSlash className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowConfirmPassword(true)}/>
                         )}
                     </div>
-                    <input  placeholder="Passport Number/NIC" value={NIC} onChange={(e)=> setNIC(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
 
                     <div className="mt-[10px] w-full flex justify-evenly">
                         <div className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px]">

@@ -7,7 +7,7 @@ import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 
-export default function VehicleOwnerRegister(){
+export default function HotelOwnerRegister(){
     const navigate = useNavigate()
 
     const role = sessionStorage.getItem("role")
@@ -48,7 +48,7 @@ export default function VehicleOwnerRegister(){
     }
 
     const handleNext = async () =>{
-        if(!firstName || !lastName || !email || !password || !confirmPassword || !NIC || !country || !mobile){
+        if(!firstName || !lastName || !email || !password || !confirmPassword || !country || !mobile){
             setErr("Please fill all required fields")
             return;
         }
@@ -69,7 +69,7 @@ export default function VehicleOwnerRegister(){
         setCheckingEmail(true)
 
         try{
-            const res = await fetch(`http://localhost:3000/api/transport/check-email?email=${encodeURIComponent(email)}`)
+            const res = await fetch(`http://localhost:3000/api/hotel/check-email?email=${encodeURIComponent(email)}`)
             const result = await res.json()
 
             if(result.exists){
@@ -84,7 +84,7 @@ export default function VehicleOwnerRegister(){
         }
         setCheckingEmail(false)
 
-        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
+        const oldData = JSON.parse(sessionStorage.getItem("HotelOwnerRegister"))|| {}
         const formData = {
             ...oldData,
             role,
@@ -97,11 +97,11 @@ export default function VehicleOwnerRegister(){
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
         }
-        sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
-        navigate("/vehicleownerinformation")
+        sessionStorage.setItem("HotelOwnerRegister",JSON.stringify(formData))
+        navigate("/hotelinformation")
     }
     useEffect(()=>{
-        const saved = sessionStorage.getItem("VehicleOwnerRegister")
+        const saved = sessionStorage.getItem("HotelOwnerRegister")
         if(saved){
             const data = JSON.parse(saved)
 
@@ -131,7 +131,7 @@ export default function VehicleOwnerRegister(){
         }
     },[])
     const handlePrevious = () =>{
-        const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister"))|| {}
+        const oldData = JSON.parse(sessionStorage.getItem("HotelOwnerRegister"))|| {}
         const formData = {
             ...oldData,
             role,
@@ -144,7 +144,7 @@ export default function VehicleOwnerRegister(){
             country: country?.label,
             mobile: dialCode ? `${dialCode}${mobile}` : mobile
         }
-        sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
+        sessionStorage.setItem("HotelOwnerRegister",JSON.stringify(formData))
         navigate(-1)
     }
     return(
@@ -165,7 +165,7 @@ export default function VehicleOwnerRegister(){
                                     <div className="w-[30px] h-[30px] rounded-full bg-[#4A5C6A]/80 flex items-center justify-center">
                                         <span className="text-[#CCD0CF] text-[12px]">2</span>
                                     </div>
-                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center leading-4">Vehicle Information</span>
+                                    <span className="mt-2 text-[#CCD0CF] text-[12px] text-center leading-4">Hotel Information</span>
                                 </div>
                                 <div className="w-[170px] mt-[15px] border-t-2 border-dashed border-[#CCD0CF]/50"></div>
                                     <div className="flex flex-col items-center w-[70px]">
@@ -186,7 +186,7 @@ export default function VehicleOwnerRegister(){
                         </div>
                     </div>
             <div className="w-[500px] h-[540px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
-                <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Vehicle Owner</h1>
+                <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Hotel Owner</h1>
                 {err && (
                     <div className="text-[#9E4444] text-[12px]">
                         {err}
