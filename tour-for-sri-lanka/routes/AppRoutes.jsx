@@ -1,14 +1,14 @@
 import { Route, Routes } from "react-router-dom";
-import Header from "../components/header";
-import Home from "./home/home";
-import Hotels from "./hotels/hotels";
-import Transport from "./transport/transport";
-import Tours from "./tours/tours";
-import Guides from "./guides/guides";
-import AboutUs from "./aboutus/aboutus";
-import ContactUs from "./contactus/contactus";
-import ErrorNotFound from "./error";
-import RegisterRole from "./register/registerRole";
+import Header from "../src/components/header";
+import Home from "../src/pages/home/home";
+import Hotels from "../src/pages/hotels/hotels";
+import Transport from "../src/pages/transport/transport";
+import Tours from "../src/pages/tours/tours";
+import Guides from "../src/pages/guides/guides";
+import AboutUs from "../src/pages/aboutus/aboutus";
+import ContactUs from "../src/pages/contactus/contactus";
+import ErrorNotFound from "../src/pages/error";
+import RegisterRole from "../src/pages/register/registerRole";
 
 export default function HomePage(){
     return(

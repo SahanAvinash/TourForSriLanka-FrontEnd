@@ -1,7 +1,7 @@
 import './App.css'
 import AdminPage from './pages/admin/AdminPage';
 import {BrowserRouter, Route ,Routes} from "react-router-dom"
-import HomePage from './pages/homePage';
+import HomePage from '../routes/AppRoutes';
 import LoginPage from './pages/loginPage';
 import {Toaster} from "react-hot-toast"
 import RegisterRole from './pages/register/registerRole';
@@ -20,6 +20,10 @@ import GuideInformation from './pages/register/guide_register/guideInfo';
 import GuideLanguageSkills from './pages/register/guide_register/guideSkils';
 import GuidePricing from './pages/register/guide_register/guidePricing';
 import VerifyOtpGuide from './pages/register/guide_register/verifyOtpGuide';
+import HotelInformation from './pages/register/hotel_register/hotelInformation';
+import HotelFacilities from './pages/register/hotel_register/hotelFacilities';
+import HotelVerification from './pages/register/hotel_register/hotelVerification';
+import VerifyOtpHotel from './pages/register/hotel_register/verifyOtpHotel';
 
 
 function App() {
@@ -41,10 +45,14 @@ function App() {
         <Route path="/guidelanguageskills" element={<GuideLanguageSkills/>}/>
         <Route path="/guidepricing" element={<GuidePricing/>}/>
         <Route path="/hotel-register" element={<HotelOwnerRegister/>}/>
+        <Route path="/hotelinformation" element={<HotelInformation/>}/>
+        <Route path="/hotelfacilities" element={<HotelFacilities/>}/>
+        <Route path='/hotelverification' element={<HotelVerification/>}/>
         <Route path="admin/*" element={<AdminPage/>}/>
         <Route path="/verify-otp" element={<VerifyOtp/>}/>
         <Route path="/verify-otp-transport" element={<VerifyOtpTransport/>}/>
         <Route path="/verify-otp-guide" element={<VerifyOtpGuide/>}/>
+        <Route path="/verify-otp-hotel" element={<VerifyOtpHotel/>}/>
       </Routes>
     </BrowserRouter>
   )
