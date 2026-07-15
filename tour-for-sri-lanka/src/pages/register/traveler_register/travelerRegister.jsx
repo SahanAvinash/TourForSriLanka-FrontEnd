@@ -45,23 +45,36 @@ export default function TravelerRegister(){
         }
     }
 
-    const handleNext = () =>{
-        if(!firstName || !lastName || !email || !password || !NIC || !country || !mobile){
-            setErr("Please fill all required fields")
+    const handleNext = async () => {
+    if (!firstName || !lastName || !email || !password || !NIC || !country || !mobile) {
+        setErr("Please fill all required fields");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        setErr("Passwords do not match");
+        return;
+    }
+
+    if (!emailRegex.test(email)) {
+        setErr("Please enter a valid email address");
+        return;
+    }
+
+    if (password.length < 8) {
+        setErr("Password must be at least 8 characters");
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/traveler/check-email/${email}`);
+        const data = await res.json();
+
+        if (data.exists) {
+            setErr("Email already exists");
             return;
         }
-        if (password !== confirmPassword){
-            setErr("Password do not matched")
-            return
-        }
-        if(!emailRegex.test(email)){
-            setErr("Please enter a valid email address")
-            return
-        }
-        if(password.length<8){
-            setErr("Password must be a least 8 characters")
-            return
-        }
+
         const formData = {
             role,
             firstName,
@@ -71,11 +84,17 @@ export default function TravelerRegister(){
             confirmPassword,
             NIC,
             country: country?.label,
-            mobile: dialCode ? `${dialCode}${mobile}` : mobile
-        }
-        sessionStorage.setItem("TravelerRegister",JSON.stringify(formData))
-        navigate("/travelerprofilephoto")
+            mobile: dialCode ? `${dialCode}${mobile}` : mobile,
+        };
+
+        sessionStorage.setItem("TravelerRegister", JSON.stringify(formData));
+        navigate("/travelerprofilephoto");
+
+    } catch (error) {
+        console.log(error);
+        setErr("Something went wrong");
     }
+};
     useEffect(()=>{
         const saved = sessionStorage.getItem("TravelerRegister")
         if(saved){

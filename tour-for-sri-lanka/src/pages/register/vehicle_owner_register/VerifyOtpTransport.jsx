@@ -144,7 +144,7 @@ export default function VerifyOtpTransport(){
 
                 <button
                     onClick={handleResend}
-                    className="text-[12px] text-[#CCD0CF]/70 hover:text-[#00C896]/80 mt-[15px] underline"
+                    className="text-[12px] text-[#CCD0CF]/70 hover:text-[#00C896]/80 mt-[15px] underline cursor-pointer"
                 >
                     Resend OTP
                 </button>

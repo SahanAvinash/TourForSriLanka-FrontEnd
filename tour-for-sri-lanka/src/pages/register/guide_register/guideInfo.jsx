@@ -1,5 +1,5 @@
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select"
 import { useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -12,13 +12,18 @@ const PROVINCE_OPTIONS = [
     "Western", "Central", "Southern", "Northern", "Eastern",
     "North Western", "North Central", "Uva", "Sabaragamuwa"
 ]
-const DISTRICT_OPTIONS = [
-    "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
-    "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-    "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-    "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-    "Monaragala", "Ratnapura", "Kegalle"
-]
+
+const PROVINCE_DISTRICTS = {
+    "Western": ["Colombo", "Gampaha", "Kalutara"],
+    "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+    "Southern": ["Galle", "Matara", "Hambantota"],
+    "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+    "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
+    "North Western": ["Kurunegala", "Puttalam"],
+    "North Central": ["Anuradhapura", "Polonnaruwa"],
+    "Uva": ["Badulla", "Monaragala"],
+    "Sabaragamuwa": ["Ratnapura", "Kegalle"]
+}
 
 const selectStyles = {
     control: (base) => ({
@@ -75,7 +80,11 @@ export default function GuideInformation() {
     const maritalOptions = MARITAL_OPTIONS.map((m) => ({ label: m, value: m }))
     const nationalityOptions = COUNTRIES.map((c) => ({ label: `${c.flag} ${c.name}`, value: c.name }))
     const provinceOptions = PROVINCE_OPTIONS.map((p) => ({ label: p, value: p }))
-    const districtOptions = DISTRICT_OPTIONS.map((d) => ({ label: d, value: d }))
+
+    const districtOptions = useMemo(() => {
+        if (!province) return []
+        return (PROVINCE_DISTRICTS[province.value] || []).map((d) => ({ label: d, value: d }))
+    }, [province])
 
     useEffect(() => {
         const saved = sessionStorage.getItem("GuideRegister")
@@ -243,7 +252,10 @@ export default function GuideInformation() {
                         <Select
                             options={provinceOptions}
                             value={province}
-                            onChange={setProvince}
+                            onChange={(selected) => {
+                                setProvince(selected)
+                                setDistrict(null)
+                            }}
                             placeholder="Province"
                             menuPosition="fixed"
                             styles={selectStyles}
@@ -265,6 +277,7 @@ export default function GuideInformation() {
                             onChange={setDistrict}
                             placeholder="District"
                             menuPosition="fixed"
+                            isDisabled={!province}
                             styles={selectStyles}
                         />
                     </div>
