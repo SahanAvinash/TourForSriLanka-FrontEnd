@@ -24,13 +24,15 @@ export default function LoginPage(){
         console.log(res)
         toast.success("Login Success")
         const user = res.data.user
+        const token = res.data.token
 
         if(rememberMe){
-            localStorage.setItem("token",res.data.token)
+            localStorage.setItem("token",token)
+            localStorage.setItem("user",JSON.stringify(user))
         }else{
-            sessionStorage.setItem("token", res.data.token)
+            sessionStorage.setItem("token",token)
+            sessionStorage.setItem("user",JSON.stringify(user))
         }
-        localStorage.getItem("token")
         if(user.role == "traveler"){
            navigate("/")
         }

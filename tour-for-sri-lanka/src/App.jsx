@@ -24,11 +24,15 @@ import HotelInformation from './pages/register/hotel_register/hotelInformation';
 import HotelFacilities from './pages/register/hotel_register/hotelFacilities';
 import HotelVerification from './pages/register/hotel_register/hotelVerification';
 import VerifyOtpHotel from './pages/register/hotel_register/verifyOtpHotel';
+import DestinationCategoryPage from "./pages/Destinations/DestinationCategoryPage";
+import DestinationDetailsPage from './pages/Destinations/DestinationDetailsPage';
+import ScrollToTop from './components/ScrollToTop';
 
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop/>
     <Toaster/>
       <Routes path="/*">
         <Route path="/*" element={<HomePage/>}/>
@@ -53,6 +57,8 @@ function App() {
         <Route path="/verify-otp-transport" element={<VerifyOtpTransport/>}/>
         <Route path="/verify-otp-guide" element={<VerifyOtpGuide/>}/>
         <Route path="/verify-otp-hotel" element={<VerifyOtpHotel/>}/>
+        <Route path="/destinations/:category" element={<DestinationCategoryPage />} />
+        <Route path="/destinations/:category/:id" element={<DestinationDetailsPage />} />
       </Routes>
     </BrowserRouter>
   )
