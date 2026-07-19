@@ -53,7 +53,7 @@ const Navbar = () => {
   };
 
   const menuItems = [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/"},
     { name: "Hotels", path: "/hotels" },
     { name: "Transport", path: "/transport" },
     { name: "Tours", path: "/tours" },
@@ -67,6 +67,12 @@ const Navbar = () => {
       return (
         location.pathname === "/" ||
         location.pathname.startsWith("/destinations")
+      )
+    }
+    if(path === "/hotels"){
+      return (
+        location.pathname.startsWith("/hotels") ||
+        location.pathname.startsWith("/hotel/")
       )
     }
     return location.pathname.startsWith(path);

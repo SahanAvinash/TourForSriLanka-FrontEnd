@@ -1,6 +1,9 @@
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const HotelCard = ({ hotel }) => {
+    const navigate = useNavigate()
+
     let imagesArray = []
     try{
         imagesArray = typeof hotel.images === "string"
@@ -42,7 +45,9 @@ const HotelCard = ({ hotel }) => {
                     {hotel.shortDescription}
                 </p>
 
-                <button className="mt-[15px] w-full border border-[#00C896] text-[#00C896] py-[8px] rounded-full text-[13px] hover:bg-[#00C896] hover:text-white transition-all duration-300">
+                <button 
+                    onClick={() => navigate(`/hotel/${hotel._id}`)}
+                    className="mt-[15px] w-full border border-[#00C896] text-[#00C896] py-[8px] rounded-full text-[13px] hover:bg-[#00C896] hover:text-white transition-all duration-300">
                     View Details
                 </button>
             </div>
