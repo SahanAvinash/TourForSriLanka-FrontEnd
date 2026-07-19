@@ -27,6 +27,7 @@ import VerifyOtpHotel from './pages/register/hotel_register/verifyOtpHotel';
 import DestinationCategoryPage from "./pages/Destinations/DestinationCategoryPage";
 import DestinationDetailsPage from './pages/Destinations/DestinationDetailsPage';
 import ScrollToTop from './components/ScrollToTop';
+import HotelPage from './pages/hotels/HotelPage';
 
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
         <Route path="/verify-otp-hotel" element={<VerifyOtpHotel/>}/>
         <Route path="/destinations/:category" element={<DestinationCategoryPage />} />
         <Route path="/destinations/:category/:id" element={<DestinationDetailsPage />} />
+        <Route path="/hotels" element={<HotelPage/>}/>
       </Routes>
     </BrowserRouter>
   )

@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Header from "../src/components/header";
 import Home from "../src/pages/home/home";
-import Hotels from "../src/pages/hotels/hotels";
+import Hotels from "../src/pages/hotels/HotelHeroSection";
 import Transport from "../src/pages/transport/transport";
 import Tours from "../src/pages/tours/tours";
 import Guides from "../src/pages/guides/guides";

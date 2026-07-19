@@ -1,6 +1,7 @@
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaUpload } from "react-icons/fa6";
 import {
     FaCheck, FaWifi, FaParking, FaSwimmer, FaSnowflake, FaSpa,
     FaPaw, FaDumbbell, FaCocktail, FaTv, FaBath, FaTimes,
@@ -28,6 +29,8 @@ export default function HotelFacilities() {
     const [customFacilities, setCustomFacilities] = useState([])
     const [customInput, setCustomInput] = useState("")
 
+    const [photos, setPhotos] = useState([])
+
     const [err, setErr] = useState("")
 
     useEffect(() => {
@@ -37,6 +40,16 @@ export default function HotelFacilities() {
 
             setFacilities(data.facilities || [])
             setCustomFacilities(data.otherFacilities || [])
+
+            if (data.images && data.images.length > 0) {
+                setPhotos(
+                    data.images.map((url) => ({
+                        name: url.split("/").pop(),
+                        url,
+                        uploading: false
+                    }))
+                )
+            }
         }
     }, [])
 
@@ -67,12 +80,68 @@ export default function HotelFacilities() {
         setCustomFacilities((prev) => prev.filter((f) => f !== value))
     }
 
+    const handlePhotoChange = async (e) => {
+        const files = Array.from(e.target.files || [])
+
+        const newFiles = files.filter((file) => {
+            return !photos.some((photo) => photo.name === file.name)
+        })
+        if (newFiles.length !== files.length) {
+            setErr("This photo has already been selected")
+            e.target.value = ""
+            return
+        }
+        if (photos.length + newFiles.length > 5) {
+            setErr("You can upload a maximum of 5 photos")
+            e.target.value = ""
+            return
+        }
+        setErr("")
+        e.target.value = ""
+
+        for (const file of newFiles) {
+            const tempEntry = { name: file.name, url: null, uploading: true }
+            setPhotos((prev) => [...prev, tempEntry])
+
+            try {
+                const uploadFormData = new FormData()
+                uploadFormData.append("photo", file)
+
+                const res = await fetch("http://localhost:3000/api/hotel/upload-photo", {
+                    method: "POST",
+                    body: uploadFormData
+                })
+                const result = await res.json()
+
+                if (!res.ok) {
+                    setErr(result.error || "Photo upload failed")
+                    setPhotos((prev) => prev.filter((p) => p.name !== file.name))
+                    continue
+                }
+                setPhotos((prev) =>
+                    prev.map((p) =>
+                        p.name === file.name ? { ...p, url: result.url, uploading: false } : p
+                    )
+                )
+            } catch (error) {
+                setErr("Photo upload failed, please try again later")
+                setPhotos((prev) => prev.filter((p) => p.name !== file.name))
+            }
+        }
+    }
+
+    const removePhoto = (index) => {
+        setPhotos((prev) => prev.filter((_, i) => i !== index))
+        setErr("")
+    }
+
     const buildFormData = () => {
         const oldData = JSON.parse(sessionStorage.getItem("HotelOwnerRegister")) || {}
         return {
             ...oldData,
             facilities,
             otherFacilities: customFacilities,
+            images: photos.filter(p => p.url).map(p => p.url),
         }
     }
 
@@ -82,6 +151,10 @@ export default function HotelFacilities() {
     }
 
     const handleNext = () => {
+        if (photos.some(p => p.uploading)) {
+            setErr("Please wait, photos are still uploading")
+            return
+        }
         setErr("")
         sessionStorage.setItem("HotelOwnerRegister", JSON.stringify(buildFormData()))
         navigate("/hotelverification")
@@ -194,6 +267,60 @@ export default function HotelFacilities() {
                         {customInput.length}/{CUSTOM_FACILITY_MAX_LENGTH}
                     </span>
                 </div>
+
+                <input
+                    type="file"
+                    id="hotelPhotos"
+                    multiple
+                    accept="image/png,image/jpeg,image/jpg"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                />
+                <label htmlFor="hotelPhotos" className="w-[465px] h-[150px] bg-[#4A5C6A]/50 rounded-[20px] mt-[20px] p-[10px] flex flex-col cursor-pointer">
+                    <span className="text-[12px] font-bold text-[#CCD0CF]">Add Hotel Photos</span>
+                    <span className="text-[12px] text-[#CCD0CF]/80">Upload Your Photos</span>
+                    <div className="w-full h-full p-[10px] flex">
+                        <div className="w-full h-full rounded-[10px] border-2 border-dotted border-[#CCD0CF]/50 p-2">
+                            {photos.length === 0 ? (
+                                <div className="w-full h-full flex flex-col justify-center items-center">
+                                    <FaUpload className="text-[#00C896]/80 text-2xl" />
+                                    <span className="text-[10px] text-[#CCD0CF]/50 text-center">
+                                        Click to Upload <br />
+                                        or Drag and Drop <br />
+                                        JPG or PNG (Max 5MB)
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-5 gap-2 h-full">
+                                    {photos.map((photo, index) => (
+                                        <div key={index} className="relative w-[65px] h-[65px]">
+                                            {photo.uploading ? (
+                                                <div className="w-[65px] h-[65px] rounded-lg bg-[#4A5C6A] flex items-center justify-center text-[8px] text-[#CCD0CF]/80">
+                                                    Uploading...
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={photo.url}
+                                                    alt={`preview-${index}`}
+                                                    className="w-[65px] h-[65px] object-cover rounded-lg"
+                                                />
+                                            )}
+
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    removePhoto(index)
+                                                }}
+                                                className="absolute bottom-[50px] left-[50px] w-[20px] h-[20px] rounded-full bg-[#4A5C6A] hover:bg-[#9E4444] hover:text-[#CCD0CF]/80 text-[#CCD0CF]/50 text-[12px] flex items-center justify-center transition-all duration-300"
+                                            >x</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </label>
 
                 <div className="mt-[20px] w-[465px] flex justify-between">
                     <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95">

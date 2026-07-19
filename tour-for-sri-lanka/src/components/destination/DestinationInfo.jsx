@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
+const hideLocationIds = ["v-1", "v-2", "v-3", "v-4"];
+
 const DestinationInfo = ({ destination }) => {
   return (
     <section className="max-w-7xl mx-auto px-8 py-12">
@@ -9,13 +11,12 @@ const DestinationInfo = ({ destination }) => {
         {destination.name}
       </h1>
 
+      {!hideLocationIds.includes(destination.id) && (
       <div className="flex items-center gap-3 mt-5 text-[#00C896]">
-
         <FaMapMarkerAlt />
-
         <span>{destination.location}</span>
-
       </div>
+      )}
 
       <p className="text-gray-300 leading-8 mt-8">
         {destination.description}

@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import hero from "../../assets/home/hero.jpg";
+import Navbar from "../Navbar";
 
 
 const HeroSection = () => {
   return (
     <section className="">
+      <Navbar />
       <div className="relative w-full h-[720px]  overflow-hidden">
 
         {/* Background Image */}

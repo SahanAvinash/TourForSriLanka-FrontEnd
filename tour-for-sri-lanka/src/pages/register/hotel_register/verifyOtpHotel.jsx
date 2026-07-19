@@ -33,9 +33,6 @@ export default function VerifyOtpHotel() {
         try {
             const formData = new FormData()
 
-            // Everything collected across the Account / Hotel information / Facilities
-            // steps lives in the "HotelOwnerRegister" sessionStorage object, so it's
-            // appended field-by-field the same way the Guide flow does it.
             Object.entries(data).forEach(([key, value]) => {
                 if (value === undefined || value === null) return
                 formData.append(key, typeof value === "object" ? JSON.stringify(value) : value)
