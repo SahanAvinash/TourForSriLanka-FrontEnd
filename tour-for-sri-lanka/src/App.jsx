@@ -29,6 +29,7 @@ import DestinationDetailsPage from './pages/Destinations/DestinationDetailsPage'
 import ScrollToTop from './components/ScrollToTop';
 import HotelPage from './pages/hotels/HotelPage';
 import HotelsDetailsPage from './pages/hotels/HotelDetailsPage';
+import HotelOwnerDashboard from './pages/hotel_owner/HotelOwnerDashboard';
 
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
         <Route path="/destinations/:category/:id" element={<DestinationDetailsPage />} />
         <Route path="/hotels" element={<HotelPage/>}/>
         <Route path="hotel/:id" element={<HotelsDetailsPage/>}/>
+        <Route path="/hotel_owner/dashboard" element={<HotelOwnerDashboard/>}/>
       </Routes>
     </BrowserRouter>
   )

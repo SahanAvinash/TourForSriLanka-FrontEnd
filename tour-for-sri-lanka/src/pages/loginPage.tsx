@@ -14,7 +14,7 @@ export default function LoginPage(){
     function handleOnSubmit(e: React.FormEvent<HTMLFormElement>){
        e.preventDefault()
 
-       axios.post("http://localhost:3000/api/traveler/login",
+       axios.post("http://localhost:3000/api/login",
         {
             email : email,
             password : password,
@@ -25,6 +25,7 @@ export default function LoginPage(){
         toast.success("Login Success")
         const user = res.data.user
         const token = res.data.token
+        const role = res.data.role
 
         if(rememberMe){
             localStorage.setItem("token",token)
@@ -35,6 +36,8 @@ export default function LoginPage(){
         }
         if(user.role == "traveler"){
            navigate("/")
+        }else if(user.role == "hotel_owner"){
+            navigate("/hotel_owner/dashboard")
         }
        }).catch((err)=>{
         console.log(err)

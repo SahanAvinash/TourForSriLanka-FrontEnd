@@ -95,25 +95,16 @@ const HotelHeroSection = ({ onFilterChange }) => {
 
   const districtOptions = DISTRICT_OPTIONS.map((d) => ({ label: d, value: d }));
 
-  useEffect(() => {
-    if (onFilterChange) {
+  const handleSearch = () => {
+    if(onFilterChange) {
       onFilterChange({
         destination: destination?.value || "",
         checkIn,
         checkOut,
-        guests,
-      });
+        guests
+      })
     }
-  }, [destination, checkIn, checkOut, guests, onFilterChange]);
-
-  const handleSearch = () => {
-    console.log({
-      destination: destination?.value || "",
-      checkIn,
-      checkOut,
-      guests,
-    });
-  };
+  }
 
   return (
     <section className="pt-28 pb-24 bg-[#11212D]">

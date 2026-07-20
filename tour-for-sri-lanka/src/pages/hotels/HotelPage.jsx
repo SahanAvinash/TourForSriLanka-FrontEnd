@@ -1,14 +1,13 @@
 import HotelHeroSection from "./HotelHeroSection";
 import HotelList from "./HotelList";
+import { useState } from "react";
 
 const HotelPage = () =>{
-    const handleFileChange = (filters) => {
-        console.log(filters)
-    }
+    const [filters, setFilters] = useState(null)
     return (
         <>
-            <HotelHeroSection onFilterChange={handleFileChange}/>
-            <HotelList/>
+            <HotelHeroSection onFilterChange={setFilters}/>
+            <HotelList filters={filters}/>
         </>
     )
 }

@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react";
 import HotelCard from "./HotelCard";
 
-const HotelList = () => {
+const HotelList = ({filters}) => {
     const [hotels, setHotels] = useState([])
     const [loading, setLoading] = useState(true)
 
+    const isSearching = filters && (filters.destination || filters.guests)
+
     useEffect(() => {
-        fetch("http://localhost:3000/api/hotel/")
+        setLoading(true)
+
+        let url = "http://localhost:3000/api/hotel/"
+        if(isSearching){
+            const params = new URLSearchParams()
+            if(filters.destination) params.append("district",filters.destination)
+            if(filters.guests) params.append("guests", filters.guests)
+            url = `http://localhost:3000/api/hotel/search?${params.toString()}`
+        }
+        console.log("FETCH URL:", url)
+        fetch(url)
             .then((res) => res.json())
             .then((data) => {
                 setHotels(data)
@@ -16,7 +28,7 @@ const HotelList = () => {
                 console.log(error)
                 setLoading(false)
             })
-    }, [])
+    }, [filters])
 
     return (
         <section className="px-8 pb-16 bg-[#11212D]">
@@ -28,11 +40,14 @@ const HotelList = () => {
 
                     <div>
                         <h2 className="text-3xl font-bold text-white">
-                            Popular Hotels
+                            {isSearching ? "Search Result" : "Popular Hotels"}
                         </h2>
 
                         <p className="text-gray-400 mt-2">
-                            Explore the best hotels in Sri Lanka
+                            {isSearching
+                                ? "Hotels matching your search"
+                                : "Explore the best hotels in Sri Lanka"
+                            }
                         </p>
                     </div>
 
@@ -49,7 +64,9 @@ const HotelList = () => {
                     {loading ? (
                         <p className="text-gray-400 col-span-full text-center">Loading hotels...</p>
                     ) : hotels.length === 0 ? (
-                        <p className="text-gray-400 col-span-full text-center">No hotels found</p>
+                        <p className="text-gray-400 col-span-full text-center">
+                            {isSearching ? "No hotels match your search" : "No hotels found"}
+                        </p>
                     ) : (
                         hotels.map((hotel) => (
                             <HotelCard
