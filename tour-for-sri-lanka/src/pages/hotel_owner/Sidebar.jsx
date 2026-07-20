@@ -18,9 +18,14 @@ export default function Sidebar() {
 
   const menu = [
     {
-      name: "Dashboard",
+      name: "Overview",
       icon: <FaHome />,
-      id: "dashboard",
+      id: "overview",
+    },
+    {
+      name: "Room Management",
+      icon: <FaBed />,
+      id: "rooms",
     },
     {
       name: "Profile",
@@ -31,11 +36,6 @@ export default function Sidebar() {
       name: "Hotel Information",
       icon: <FaHotel />,
       id: "hotel-information",
-    },
-    {
-      name: "Room Management",
-      icon: <FaBed />,
-      id: "rooms",
     },
     {
       name: "Reviews",

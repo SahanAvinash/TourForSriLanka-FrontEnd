@@ -7,20 +7,32 @@ export default function TopBar(){
     useEffect(() => {
         const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
         if(storedUser){
-            setUser(JSON.parse(storedUser));
+            const parsedUser = JSON.parse(storedUser)
+
+            if(typeof parsedUser.images === "string"){
+                try{
+                    parsedUser.images = JSON.parse(parsedUser.images)
+                }catch(e){
+                    parsedUser.images = []
+                }
+            }
+            console.log("stored user : ",storedUser)
+            console.log("parsed images: ",parsedUser.images)
+            setUser(parsedUser)
         }
     }, []);
 
     return(
         <div className="w-full h-[80px] bg-[#253745] flex items-center justify-end px-8">
             <div className="flex items-center gap-3">
-                <span className="text-[#CCD0CF] font-semibold">{user?.name}</span>
-                {user?.image ?.[0] ? (
+                <span className="text-[#CCD0CF] font-bold">Hotel Owner<br/> {user?.firstName}</span>
+                {user?.images ?.[0] ? (
                     <img 
                         src={user.images[0]} 
                         alt="profile" 
-                        className="w-10 h-10 rounded-full object-cover border-2 border-[#00C896]"
+                        className="w-10 h-10 rounded-full object-cover"
                     />
+
                 ) : (
                     <FaUserCircle className="w-10 h-10 text-[#00C896]" />
                 )}
