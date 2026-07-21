@@ -2,6 +2,7 @@ import Overview from "./overview";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import RoomManagement from "./RoomManagement";
+import Bookings from "./Bookings";
 
 export default function HotelOwnerDashboard(){
     return(
@@ -12,6 +13,7 @@ export default function HotelOwnerDashboard(){
                 <main className="flex-1 px-8 py-8">
                     <Overview/>
                     <RoomManagement/>
+                    <Bookings/>
                 </main>
             </div>
         </div>

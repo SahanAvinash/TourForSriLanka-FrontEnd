@@ -69,7 +69,8 @@ export default function Sidebar() {
         });
       },
       {
-        threshold: 0.35,
+        rootMargin: "-40% 0px -55% 0px",
+        threshold: 0,
       }
     );
 
