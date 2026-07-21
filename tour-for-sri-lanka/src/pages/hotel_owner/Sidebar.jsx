@@ -8,13 +8,16 @@ import {
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { SiBookingdotcom } from "react-icons/si";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/logo.png"
 
 export default function Sidebar() {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const navigate = useNavigate();
 
   const menu = [
     {
@@ -28,9 +31,9 @@ export default function Sidebar() {
       id: "rooms",
     },
     {
-      name: "Profile",
-      icon: <FaUser />,
-      id: "profile",
+      name: "Bookings",
+      icon: <SiBookingdotcom />,
+      id: "bookings",
     },
     {
       name: "Hotel Information",
@@ -82,8 +85,14 @@ export default function Sidebar() {
     });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
-    <aside className="w-64 bg-[#253745] min-h-screen sticky top-0 flex flex-col">
+    <aside className="w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col owerflow-y-auto">
       {/* Logo */}
       <div className="py-8 flex justify-center">
         <img src={logo} alt="logo" className="w-36" />
@@ -103,7 +112,6 @@ export default function Sidebar() {
             }`}
           >
             {item.icon}
-
             <span>{item.name}</span>
           </button>
         ))}
@@ -111,7 +119,10 @@ export default function Sidebar() {
 
       {/* Logout */}
       <div className="p-5 border-t border-[#4A5C6A]">
-        <button className="flex items-center gap-3 text-red-400 hover:text-red-300">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 text-red-400 hover:text-red-300"
+        >
           <FaSignOutAlt />
           Logout
         </button>

@@ -50,6 +50,7 @@ export default function HotelDetailsPage(){
   const [reviewRating, setReviewRating] = useState(5)
   const [reviewComment, setReviewComment] = useState("")
   const [submittingReview, setSubmittingReview] = useState(false)
+  const todayISO = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
     async function loadHotel(){
@@ -113,19 +114,31 @@ export default function HotelDetailsPage(){
     }
     setBooking(true)
     try{
-      const token = localStorage.getItem("token")
-      const res = await fetch(`${API_BASE}/booking`, {
+      const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user")
+      const traveler = storedUser ? JSON.parse(storedUser) : null
+
+      if(!traveler){
+        toast.error("Please login to book a room")
+        setBooking(false)
+        return
+      }
+
+      const nights = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24))
+      const totalPrice = nights * selectedRoom.pricePerNight
+
+      const res = await fetch(`${API_BASE}/booking/create`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           hotelId: id,
           roomId: selectedRoom._id,
-          checkIn,
-          checkOut,
-          guests
+          travelerId: traveler._id,
+          checkInDate: checkIn,
+          checkOutDate: checkOut,
+          numberOfGuests: guests,
+          totalPrice
         })
       })
       if(!res.ok) throw new Error("failed")
@@ -139,7 +152,7 @@ export default function HotelDetailsPage(){
     }finally{
       setBooking(false)
     }
-  }
+}
 
   async function submitReview(){
     if(!reviewComment.trim()){
@@ -413,12 +426,21 @@ export default function HotelDetailsPage(){
             <div className="mt-[18px] space-y-[12px]">
               <div>
                 <label className="text-gray-400 text-[12px]">Check-in</label>
-                <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
+                <input type="date" value={checkIn} min={todayISO}
+                    onChange={(e) => {
+                        const newCheckIn = e.target.value
+                        setCheckIn(newCheckIn)
+                        if(checkOut && checkOut <= newCheckIn){
+                            setCheckOut("")
+                        }
+                    }}
                   className="w-full bg-[#1a2530] text-white text-[13px] rounded-[10px] p-[10px] mt-[4px] outline-none" />
               </div>
               <div>
                 <label className="text-gray-400 text-[12px]">Check-out</label>
-                <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
+                <input type="date" value={checkOut} min={checkIn || todayISO} 
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    disabled={!checkIn}
                   className="w-full bg-[#1a2530] text-white text-[13px] rounded-[10px] p-[10px] mt-[4px] outline-none" />
               </div>
               <div>
@@ -431,7 +453,7 @@ export default function HotelDetailsPage(){
 
             <button onClick={submitBooking} disabled={booking}
               className="w-full mt-[20px] bg-[#00C896] text-white py-[10px] rounded-full text-[14px] disabled:opacity-50">
-              {booking ? "Booking..." : "Confirm Booking"}
+              {booking ? "Booking..." : "Request Booking"}
             </button>
           </div>
         </div>

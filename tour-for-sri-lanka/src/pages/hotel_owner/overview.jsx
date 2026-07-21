@@ -11,6 +11,11 @@ export default function Overview(){
     const [loadingStats, setLoadingStats] = useState(true)
     const [hotelName, setHotelName] = useState("")
     const [isApproved, setIsApproved] = useState(false)
+    const [availableRooms, setAvailableRooms] = useState(0)
+    const [maintenanceRooms, setMaintenanceRooms] = useState(0)
+
+    const [todayBookings, setTodayBookings] = useState(0)
+    const [pendingBookings, setPendingBookings] = useState(0)
 
     const today = new Date().toLocaleDateString("en-US",{
         weekday: "long",
@@ -32,11 +37,25 @@ export default function Overview(){
 
         axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
-                setRoomCount(res.data.length)
+                const rooms = res.data
+                setRoomCount(rooms.length)
+                setAvailableRooms(rooms.filter(r => r.status === "available").length)
+                setMaintenanceRooms(rooms.filter(r => r.status === "maintenance").length)
             }).catch((error) => {
                 console.log(error)
             }).finally(() => {
                 setLoadingStats(false)
+            })
+
+        axios.get(`http://localhost:3000/api/booking/hotel/${hotelId}`)
+            .then((res) => {
+                const bookings = res.data
+                const todayStr = new Date().toDateString()
+
+                setPendingBookings(bookings.filter(b => b.status === "pending").length)
+                setTodayBookings(bookings.filter(b => new Date(b.checkInDate).toDateString() === todayStr).length)
+            }).catch((error) => {
+                console.log(error)
             })
     },[])
     return(
@@ -80,7 +99,9 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Available Rooms</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
+                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                            {loadingStats? "..." : availableRooms}
+                        </p>
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
@@ -89,7 +110,9 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Today Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
+                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                            {loadingStats? "..." : todayBookings}
+                        </p>
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
@@ -98,7 +121,9 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Pending Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
+                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                            {loadingStats? "..." : pendingBookings}
+                        </p>
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
@@ -107,7 +132,9 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Maintance Rooms</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
+                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                            {loadingStats? "..." : maintenanceRooms}
+                        </p>
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
