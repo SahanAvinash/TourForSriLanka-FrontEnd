@@ -4,10 +4,12 @@ import {
   FaMapMarkerAlt, FaWifi, FaSwimmingPool, FaParking, FaSnowflake,
   FaSpa, FaDog, FaDumbbell, FaGlassMartiniAlt, FaTv, FaBath,
   FaStar, FaUserFriends, FaBed, FaTimes, FaCheckCircle,
-  FaChevronLeft, FaChevronRight
+  FaChevronLeft, FaChevronRight, FaPhone
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
+import HotelReviews from "./HotelReviews";
+import Footer from "../../components/Footer";
 
 const facilityMeta = {
   wifi: { icon: <FaWifi />, label: "Free WiFi" },
@@ -30,6 +32,86 @@ const roomFacilityLabels = {
 
 const API_BASE = "http://localhost:3000/api"
 
+function RoomImageCarousel ({images, isHovered}){
+    const [activeIndex, setActiveIndex] = useState(0)
+
+    useEffect(() => {
+        if(!isHovered || images.length <= 1){
+            setActiveIndex(0)
+            return
+        }
+        const interval = setInterval(() => {
+            setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+        },4000)
+        return () => clearInterval(interval)
+    }, [isHovered, images.length])
+    return(
+        <div className="w-full h-[160px] relative overflow-hidden">
+            {images.map((img, i) => (
+                <img
+                    key={i}
+                    src={img}
+                    alt=""
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                        i === activeIndex ? "opacity-100" : "opacity-0"
+                    }`}
+                />
+            ))}
+        </div>
+    )
+}
+
+function RoomCard({ room, onBook }) {
+    const [isHovered, setIsHovered] = useState(false)
+    const images = room.images && room.images.length > 0 ? room.images : ["/room_placeholder.jpg"]
+
+    return (
+        <div
+            className="bg-[#253745] rounded-[18px] overflow-hidden"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <RoomImageCarousel images={images} isHovered={isHovered} />
+            <div className="p-[16px]">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-white font-semibold text-[15px]">{room.roomType}</h3>
+                    <span className="text-gray-400 text-[12px]">#{room.roomNumber}</span>
+                </div>
+
+                <div className="flex items-center gap-[14px] mt-[8px] text-gray-400 text-[12px]">
+                    <span className="flex items-center gap-1"><FaUserFriends /> {room.capacity}</span>
+                    <span className="flex items-center gap-1"><FaBed /> {room.roomType}</span>
+                </div>
+
+                <p className="text-gray-400 text-[12px] mt-[8px] line-clamp-2">{room.shortDescription}</p>
+
+                <div className="flex flex-wrap gap-[6px] mt-[10px]">
+                    {Object.entries(roomFacilityLabels)
+                        .filter(([key]) => room.roomFacility?.[key])
+                        .map(([key, label]) => (
+                            <span key={key} className="text-[10px] text-gray-300 bg-[#1a2530] px-[8px] py-[3px] rounded-full">
+                                {label}
+                            </span>
+                        ))}
+                </div>
+
+                <div className="flex items-center justify-between mt-[14px]">
+                    <div>
+                        <p className="text-[#00C896] font-bold text-[16px]">Rs. {room.pricePerNight}</p>
+                        <p className="text-gray-500 text-[11px]">per night</p>
+                    </div>
+                    <button
+                        onClick={() => onBook(room)}
+                        className="border border-[#00C896] text-[#00C896] px-[16px] py-[8px] rounded-full text-[13px] hover:bg-[#00C896] hover:text-white transition-all duration-300"
+                    >
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export default function HotelDetailsPage(){
   const { id } = useParams()
 
@@ -38,8 +120,6 @@ export default function HotelDetailsPage(){
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeImage, setActiveImage] = useState(0)
-  const[prevImage, setPrevImage] = useState(0)
-  const [fade, setFade] = useState(false)
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [checkIn, setCheckIn] = useState("")
@@ -47,9 +127,6 @@ export default function HotelDetailsPage(){
   const [guests, setGuests] = useState(1)
   const [booking, setBooking] = useState(false)
 
-  const [reviewRating, setReviewRating] = useState(5)
-  const [reviewComment, setReviewComment] = useState("")
-  const [submittingReview, setSubmittingReview] = useState(false)
   const todayISO = new Date().toISOString().split("T")[0]
 
   useEffect(() => {
@@ -152,39 +229,6 @@ export default function HotelDetailsPage(){
     }finally{
       setBooking(false)
     }
-}
-
-  async function submitReview(){
-    if(!reviewComment.trim()){
-      toast.error("Failed to submit a review")
-      return
-    }
-    setSubmittingReview(true)
-    try{
-      const token = localStorage.getItem("token")
-      const res = await fetch(`${API_BASE}/review`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          hotelId: id,
-          rating: reviewRating,
-          comment: reviewComment
-        })
-      })
-      if(!res.ok) throw new Error("failed")
-      const newReview = await res.json()
-      setReviews([newReview, ...reviews])
-      setReviewComment("")
-      setReviewRating(5)
-      toast.success("Review added successfully")
-    }catch(err){
-      toast.error("Review submited failed")
-    }finally{
-      setSubmittingReview(false)
-    }
   }
 
   if(loading){
@@ -204,14 +248,14 @@ export default function HotelDetailsPage(){
   }
 
   return (
-    <div className="min-h-screen bg-[#1a2530] pt-28 pb-[60px]">
+    <div className="min-h-screen bg-[#1a2530] pt-28">
         <Navbar/>
         {/* Hero image gallery */}
         <div className="relative h-[420px] px-4">
             <div className="relative h-full rounded-[30px] overflow-hidden group">
                 {imagesArray.map((img, i) => (
                     <img
-                        key={1}
+                        key={i}
                         src={img}
                         alt={hotel.hotelName}
                         className={`absolute inset-0 w-full h-full object-cover object-[center_70%] transition-opacity duration-1000 ease-in-out ${
@@ -219,7 +263,7 @@ export default function HotelDetailsPage(){
                         }`}
                     />
                 ))}
-                
+
         {imagesArray.length > 1 && (
             <>
                 <button
@@ -232,7 +276,7 @@ export default function HotelDetailsPage(){
                 </button>
 
                 <button
-                    onClick={() => 
+                    onClick={() =>
                         setActiveImage((prev) => (prev === imagesArray.length - 1 ? 0 : prev + 1))
                     }
                     className="absolute right-[16px] top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60  hover:text-[#00C896]/80 text-white w-[40px] h-[40px] rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
@@ -240,7 +284,7 @@ export default function HotelDetailsPage(){
                     <FaChevronRight/>
                 </button>
             </>
-                
+
         )}
         </div>
     </div>
@@ -261,6 +305,12 @@ export default function HotelDetailsPage(){
                 <FaMapMarkerAlt className="text-[#00C896]" />
                 <span>{hotel.location}, {hotel.district}, {hotel.province}</span>
               </div>
+              {hotel.phone1 && (
+                <div className="flex items-center gap-1 mt-[6px] text-gray-400 text-[14px]">
+                    <FaPhone className="text-[#00C896]"/>
+                    <span>{hotel.phone1}{hotel.phone2 ? `/ ${hotel.phone2}` : ""}</span>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col items-end gap-[6px]">
@@ -311,105 +361,28 @@ export default function HotelDetailsPage(){
             <p className="text-gray-400 text-[14px]">No rooms have been added for this hotel yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-              {rooms.map((room) => (
-                <div key={room._id} className="bg-[#253745] rounded-[18px] overflow-hidden">
-                  <div className="w-full h-[160px]">
-                    <img src={room.image || "/room_placeholder.jpg"} alt={room.roomType} className="w-full h-full object-cover" />
-                  </div>
-
-                  <div className="p-[16px]">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-white font-semibold text-[15px]">{room.roomType}</h3>
-                      <span className="text-gray-400 text-[12px]">#{room.roomNumber}</span>
-                    </div>
-
-                    <div className="flex items-center gap-[14px] mt-[8px] text-gray-400 text-[12px]">
-                      <span className="flex items-center gap-1"><FaUserFriends /> {room.capacity}</span>
-                      <span className="flex items-center gap-1"><FaBed /> {room.roomType}</span>
-                    </div>
-
-                    <p className="text-gray-400 text-[12px] mt-[8px] line-clamp-2">{room.shortDescription}</p>
-
-                    <div className="flex flex-wrap gap-[6px] mt-[10px]">
-                      {Object.entries(roomFacilityLabels)
-                        .filter(([key]) => room.roomFacility?.[key])
-                        .map(([key, label]) => (
-                          <span key={key} className="text-[10px] text-gray-300 bg-[#1a2530] px-[8px] py-[3px] rounded-full">
-                            {label}
-                          </span>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center justify-between mt-[14px]">
-                      <div>
-                        <p className="text-[#00C896] font-bold text-[16px]">Rs. {room.pricePerNight}</p>
-                        <p className="text-gray-500 text-[11px]">per night</p>
-                      </div>
-                      <button
-                        onClick={() => setSelectedRoom(room)}
-                        className="border border-[#00C896] text-[#00C896] px-[16px] py-[8px] rounded-full text-[13px] hover:bg-[#00C896] hover:text-white transition-all duration-300"
-                      >
-                        Book Now
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                {rooms.map((room) => (
+                    <RoomCard key={room._id} room={room} onBook={setSelectedRoom} />
+                ))}
             </div>
           )}
         </div>
 
         {/* Reviews */}
-        <div className="mt-[40px]">
-          <h2 className="text-white font-bold text-[20px] mb-[16px]">Reviews</h2>
-
-          <div className="bg-[#253745] rounded-[18px] p-[20px] mb-[20px]">
-            <p className="text-gray-300 text-[13px] mb-[10px]">Write a review</p>
-            <div className="flex gap-[6px] mb-[10px]">
-              {[1,2,3,4,5].map((n) => (
-                <FaStar
-                  key={n}
-                  onClick={() => setReviewRating(n)}
-                  className={`cursor-pointer text-[18px] ${n <= reviewRating ? "text-yellow-400" : "text-gray-600"}`}
-                />
-              ))}
-            </div>
-            <textarea
-              value={reviewComment}
-              onChange={(e) => setReviewComment(e.target.value)}
-              placeholder="Share Your Experience"
-              className="w-full bg-[#1a2530] text-white text-[13px] rounded-[10px] p-[12px] outline-none resize-none"
-              rows={3}
-            />
-            <button
-              onClick={submitReview}
-              disabled={submittingReview}
-              className="mt-[10px] bg-[#00C896] text-white px-[18px] py-[8px] rounded-full text-[13px] disabled:opacity-50"
-            >
-              {submittingReview ? "Submitting..." : "Submit Review"}
-            </button>
-          </div>
-
-          {reviews.length === 0 ? (
-            <p className="text-gray-400 text-[14px]">No any reviews</p>
-          ) : (
-            <div className="space-y-[12px]">
-              {reviews.map((r, i) => (
-                <div key={r._id || i} className="bg-[#253745] rounded-[14px] p-[16px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white text-[14px] font-medium">{r.userName || "Traveler"}</span>
-                    <div className="flex gap-[2px]">
-                      {[1,2,3,4,5].map((n) => (
-                        <FaStar key={n} className={`text-[12px] ${n <= r.rating ? "text-yellow-400" : "text-gray-600"}`} />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-gray-400 text-[13px] mt-[8px]">{r.comment}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <HotelReviews
+          hotelId={id}
+          reviews={reviews}
+          onReviewAdded={(review, isUpdate) => {
+            setReviews((prev) => 
+                isUpdate
+                    ? prev.map((r) => (r._id === review._id ? review : r))
+                    : [review, ...prev]
+            )
+          }}
+          onReviewDeleted={(reviewId) => {
+            setReviews((prev) => prev.filter((r) => r._id !== reviewId))
+          }}
+        />
       </div>
 
       {/* Booking modal */}
@@ -438,7 +411,7 @@ export default function HotelDetailsPage(){
               </div>
               <div>
                 <label className="text-gray-400 text-[12px]">Check-out</label>
-                <input type="date" value={checkOut} min={checkIn || todayISO} 
+                <input type="date" value={checkOut} min={checkIn || todayISO}
                     onChange={(e) => setCheckOut(e.target.value)}
                     disabled={!checkIn}
                   className="w-full bg-[#1a2530] text-white text-[13px] rounded-[10px] p-[10px] mt-[4px] outline-none" />
@@ -458,6 +431,9 @@ export default function HotelDetailsPage(){
           </div>
         </div>
       )}
+      <div className="mt-[60px]">
+        <Footer/>
+      </div>
     </div>
   )
 }

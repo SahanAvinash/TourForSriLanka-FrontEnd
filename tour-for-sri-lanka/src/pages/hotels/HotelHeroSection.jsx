@@ -258,7 +258,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
           </div>
         </div>
       </div>
-    </section>
+    </section>       
   );
 };
 

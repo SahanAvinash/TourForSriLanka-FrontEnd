@@ -32,7 +32,14 @@ export default function Overview(){
         const hotelId = user._id
 
         setHotelName(user.hotelName || "")
-        setIsApproved(user.isApproved || false)
+        
+        axios.get(`http://localhost:3000/api/hotel/${hotelId}`)
+            .then((res) => {
+                setIsApproved(res.data.isApproved || false)
+            }).catch((error) => {
+                console.log(Error)
+            })
+        axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)
         console.log("isApproved value:", user.isApproved)
 
         axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)

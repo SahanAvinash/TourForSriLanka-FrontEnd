@@ -34,7 +34,7 @@ export default function LoginPage(){
             sessionStorage.setItem("token",token)
             sessionStorage.setItem("user",JSON.stringify(user))
         }
-        if(user.role == "traveler"){
+        if(role == "traveler"){
            navigate("/")
         }else if(user.role == "hotel_owner"){
             navigate("/hotel_owner/dashboard")

@@ -60,7 +60,8 @@ const selectStyles = {
         ...base,
         backgroundColor: "#4A5C6A",
         borderRadius: "20px",
-        overflow: "hidden"
+        overflow: "hidden",
+        zIndex: 9999
     }),
     option: (base, state) => ({
         ...base,
@@ -372,12 +373,12 @@ export default function RoomManagement() {
                             onChange={(e) => setShortDescription(e.target.value)}
                             placeholder="Short Description"
                             rows={3}
-                            className="w-full bg-[#4A5C6A80] rounded-[12px] px-4 py-3 text-[#CCD0CF] text-[12px] outline-none focus:ring-2 focus:ring-[#00C896]"
+                            className="w-full bg-[#4A5C6A80] rounded-[12px] px-4 py-3 text-[#CCD0CF] text-[12px] outline-none"
                         />
                     </div>
 
                     <div className="mt-4">
-                        <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">Room Images (max 5)</label>
+                        <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">Room Images</label>
                         <div className="flex flex-wrap gap-3">
                             {images.map((url, index) => (
                                 <div key={index} className="relative w-[80px] h-[80px]">
@@ -503,7 +504,8 @@ export default function RoomManagement() {
                 ) : filteredRooms.length === 0 ? (
                     <p className="text-[#CCD0CF]/60 text-[14px]">No rooms found.</p>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto overflow-y-visible">
+                        <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                             <thead>
                                 <tr className="text-left text-[#CCD0CF] text-[13px] font-bold">
@@ -584,6 +586,7 @@ export default function RoomManagement() {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 )}
             </div>
