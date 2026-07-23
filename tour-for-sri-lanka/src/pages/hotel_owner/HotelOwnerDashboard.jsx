@@ -3,6 +3,8 @@ import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import RoomManagement from "./RoomManagement";
 import Bookings from "./Bookings";
+import Reviews from "./Reviews";
+import Profile from "./Profile";
 
 export default function HotelOwnerDashboard(){
     return(
@@ -14,6 +16,8 @@ export default function HotelOwnerDashboard(){
                     <Overview/>
                     <RoomManagement/>
                     <Bookings/>
+                    <Reviews/>
+                    <Profile/>
                 </main>
             </div>
         </div>

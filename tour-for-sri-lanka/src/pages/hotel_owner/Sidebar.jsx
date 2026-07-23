@@ -36,24 +36,14 @@ export default function Sidebar() {
       id: "bookings",
     },
     {
-      name: "Hotel Information",
-      icon: <FaHotel />,
-      id: "hotel-information",
-    },
-    {
       name: "Reviews",
       icon: <FaStar />,
       id: "reviews",
     },
     {
-      name: "Messages",
-      icon: <FaEnvelope />,
-      id: "messages",
-    },
-    {
-      name: "Settings",
+      name: "Profile",
       icon: <FaCog />,
-      id: "settings",
+      id: "profile",
     },
   ];
 
