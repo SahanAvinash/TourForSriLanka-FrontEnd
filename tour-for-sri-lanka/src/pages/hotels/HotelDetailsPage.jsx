@@ -218,14 +218,18 @@ export default function HotelDetailsPage(){
           totalPrice
         })
       })
-      if(!res.ok) throw new Error("failed")
+      const data = await res.json().catch(() => ({}))
+
+      if(!res.ok){
+        throw new Error(data.message || "Booking submit failed")
+      }
       toast.success("Booking request sent")
       setSelectedRoom(null)
       setCheckIn("")
       setCheckOut("")
       setGuests(1)
     }catch(err){
-      toast.error("Booking submit failed")
+      toast.error("This room is already booked for the selected dates. Please choose different dates or another room.")
     }finally{
       setBooking(false)
     }
@@ -357,11 +361,11 @@ export default function HotelDetailsPage(){
         <div className="mt-[40px]">
           <h2 className="text-white font-bold text-[20px] mb-[16px]">Available Rooms</h2>
 
-          {rooms.length === 0 ? (
+          {rooms.filter((room) => room.status !== "maintenance").length === 0 ? (
             <p className="text-gray-400 text-[14px]">No rooms have been added for this hotel yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-                {rooms.map((room) => (
+                {rooms.filter((room) => room.status !== "maintenance").map((room) => (
                     <RoomCard key={room._id} room={room} onBook={setSelectedRoom} />
                 ))}
             </div>
