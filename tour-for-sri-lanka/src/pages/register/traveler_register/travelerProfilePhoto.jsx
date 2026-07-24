@@ -193,12 +193,12 @@ export default function TravelerProfilePhoto(){
                         onChange={handlePhotoChange}
                     />
                     <div className="flex flex-col">
-                        <button onClick={() => fileInputRef.current.click()} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] border border-[#4A5C6A]/50 hover:border-[#00C896]/80 transition-all duration-300">Change Photo</button>
-                        <button onClick={handleRemovePhoto} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] mt-[10px] border border-[#4A5C6A]/50 hover:border-[#9E4444]/80 transition-all duration-300">Remove Photo</button>
+                        <button onClick={() => fileInputRef.current.click()} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] border border-[#4A5C6A]/50 hover:border-[#00C896]/80 transition-all duration-300 cursor-pointer">Change Photo</button>
+                        <button onClick={handleRemovePhoto} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] mt-[10px] border border-[#4A5C6A]/50 hover:border-[#9E4444]/80 transition-all duration-300 cursor-pointer">Remove Photo</button>
                     </div>
                 </div>
-                        <button onClick={handleSignUp} className="text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Sign Up</button>
-                        <button onClick={handlePrevious} className="w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[10px] hover:scale-95 text-[20px] font-bold"><GrFormPreviousLink/>Previous</button>
+                        <button onClick={handleSignUp} className="text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">Sign Up</button>
+                        <button onClick={handlePrevious} className="w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[10px] hover:scale-95 text-[20px] font-bold cursor-pointer"><GrFormPreviousLink/>Previous</button>
             </div>
 
          </div>

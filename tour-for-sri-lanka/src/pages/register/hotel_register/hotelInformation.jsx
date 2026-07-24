@@ -9,8 +9,10 @@ import "leaflet/dist/leaflet.css"
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
+import COUNTRIES from "../../../data/countryCode";
+import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js";
 
-// Leaflet's default marker icon paths break under most bundlers unless reset like this.
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
@@ -18,7 +20,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 })
 
-const DEFAULT_MAP_CENTER = { lat: 6.9271, lng: 79.8612 } // Colombo, Sri Lanka
+const DEFAULT_MAP_CENTER = { lat: 6.9271, lng: 79.8612 }
 
 function LocationClickHandler({ onPick }) {
     useMapEvents({
@@ -49,7 +51,6 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
 
     useEffect(() => {
         reverseGeocode(position.lat, position.lng)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handlePick = (latlng) => {
@@ -190,6 +191,9 @@ export default function HotelInformation() {
     const [location, setLocation] = useState("")
     const [coordinates, setCoordinates] = useState(null)
     const [showMapPicker, setShowMapPicker] = useState(false)
+    const [dialCode, setDialCode] = useState("")
+    const [countryCode, setCountryCode] = useState("")
+    const [existingMobile, setExistingMobile] = useState("")
 
     const [err, setErr] = useState("")
 
@@ -211,11 +215,24 @@ export default function HotelInformation() {
             setShortDescription(data.shortDescription || "")
             setPhone1(data.phone1 || "")
             setPhone2(data.phone2 || "")
-            setLocation(data.location || "")
+            setLocation(data.location || "") 
             if (data.latitude && data.longitude) {
                 setCoordinates({ lat: data.latitude, lng: data.longitude })
             }
-
+            let matchedCountry = null
+            if(data.country){
+                matchedCountry = COUNTRIES.find(c => `${c.flag} ${c.name}` === data.country)
+                if(matchedCountry) {
+                    setDialCode(matchedCountry.dial)
+                    setCountryCode(matchedCountry.code)
+                }
+            }
+            if(data.mobile){
+                const cleanMobile = matchedCountry && data.mobile.startsWith(matchedCountry.dial)
+                    ? data.mobile.slice(matchedCountry.dial.length)
+                    : data.mobile
+                setExistingMobile(cleanMobile)
+            }
             if (data.hotelType) {
                 setHotelType({ label: data.hotelType, value: data.hotelType })
             }
@@ -255,7 +272,22 @@ export default function HotelInformation() {
             setErr("Please fill all required fields")
             return;
         }
-
+        if(countryCode && !isValidPhoneNumber(phone1, countryCode)){
+            setErr("Please enter a valid phone1 number")
+            return
+        }
+        if(phone2 && countryCode && !isValidPhoneNumber(phone2, countryCode)){
+            setErr("Please enter a valid phone2 number")
+            return
+        }
+        if(existingMobile && (phone1 === existingMobile || phone2 === existingMobile)){
+            setErr("Phone1 or Phone2 cannot be the same as your mobile number")
+            return
+        }
+        if(phone1 && phone2 && phone1 === phone2){
+            setErr("Phone 1 and Phone 2 cannote be the same")
+            return
+        }
         setErr("")
         sessionStorage.setItem("HotelOwnerRegister", JSON.stringify(buildFormData()))
         navigate("/hotelfacilities")
@@ -338,28 +370,50 @@ export default function HotelInformation() {
                     <textarea
                         placeholder="Short Description"
                         value={shortDescription}
-                        maxLength={100}
+                        maxLength={1000}
                         onChange={(e) => setShortDescription(e.target.value)}
                         className="w-full h-[70px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none"
                     />
                     <span className="absolute right-[20px] bottom-[10px] text-[10px] text-[#CCD0CF]/50">
-                        {shortDescription.length}/100
+                        {shortDescription.length}/1000
                     </span>
                 </div>
 
                 <div className="w-[465px] mt-[15px] flex justify-between">
-                    <input
-                        placeholder="Phone 1"
-                        value={phone1}
-                        onChange={(e) => setPhone1(e.target.value.replace(/\D/g, ""))}
-                        className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
-                    />
-                    <input
-                        placeholder="Phone 2"
-                        value={phone2}
-                        onChange={(e) => setPhone2(e.target.value.replace(/\D/g, ""))}
-                        className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
-                    />
+                    <div className="w-[220px] h-[50px] bg-[#4A5C6A]/50 rounded-[20px] flex items-center relative">
+                        <div className="absolute pl-[20px] text-[12px] text-[#CCD0CF]">
+                            {dialCode || "+"}
+                        </div>
+                        <input
+                            placeholder="Phone 1"
+                            value={phone1}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "")
+                                if(countryCode && validatePhoneNumberLength(value, countryCode) === "TOO_LONG"){
+                                    return
+                                }
+                                setPhone1(value)
+                            }}
+                            className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[60px]"
+                        />
+                    </div>
+                    <div className="w-[220px] h-[50px] bg-[#4A5C6A]/50 rounded-[20px] flex items-center relative">
+                        <div className="absolute pl-[20px] text-[12px] text-[#CCD0CF]">
+                            {dialCode || "+"}
+                        </div>
+                        <input
+                            placeholder="Phone 2"
+                            value={phone2}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "")
+                                if(countryCode && validatePhoneNumberLength(value, countryCode) === "TOO_LONG"){
+                                    return
+                                }
+                                setPhone2(value)
+                            }}
+                            className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[60px]"
+                        />
+                    </div>
                 </div>
 
                 <div className="w-[465px] mt-[15px] flex justify-between">
@@ -404,10 +458,10 @@ export default function HotelInformation() {
                 </div>
 
                 <div className="mt-[20px] w-[465px] flex justify-between">
-                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95">
+                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer">
                         <GrFormPreviousLink className="font-bold text-[20px]" />Previous
                     </button>
-                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
                         Next <GrFormNextLink className="font-bold text-[20px]" />
                     </button>
                 </div>

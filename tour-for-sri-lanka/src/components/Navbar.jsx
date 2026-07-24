@@ -6,6 +6,7 @@ import logo from "../assets/logo.png";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isProfileActive = location.pathname.startsWith("/profile")
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -118,7 +119,19 @@ const Navbar = () => {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center gap-2 text-white hover:text-[#00C896] transition duration-300"
                 >
-                  <HiUserCircle className="text-3xl" />
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt="profile"
+                      className={`w-9 h-9 rounded-full object-cover border-2 transition duration-300 ${
+                          isProfileActive
+                            ? "border-[#00C896]"
+                            : "border-transparent hover:border-[#00C896]"
+                      }`}
+                    />
+                  ) : (
+                    <HiUserCircle className="text-3xl" />
+                  )}
                 </button>
 
                 {isProfileOpen && (
@@ -192,7 +205,15 @@ const Navbar = () => {
             {user ? (
               <div className="flex flex-col gap-3 mt-5 border-t border-white/10 pt-4">
                 <div className="flex items-center gap-2 text-white">
-                  <HiUserCircle className="text-3xl" />
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt="profile"
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <HiUserCircle className="text-3xl" />
+                  )}
                 </div>
                 <Link
                   to="/profile"

@@ -120,21 +120,21 @@ export default function VerifyOtpHotel() {
                 <button
                     onClick={handleVerify}
                     disabled={loading}
-                    className="text-[18px] font-bold w-full h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 mt-[20px] disabled:opacity-50"
+                    className="text-[18px] font-bold w-full h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 mt-[20px] disabled:opacity-50 cursor-pointer"
                 >
                     {loading ? "Verifying..." : "Verify"}
                 </button>
 
                 <button
                     onClick={handleResend}
-                    className="text-[12px] text-[#CCD0CF]/70 hover:text-[#00C896]/80 mt-[15px] underline"
+                    className="text-[12px] text-[#CCD0CF]/70 hover:text-[#00C896]/80 mt-[15px] underline cursor-pointer"
                 >
                     Resend OTP
                 </button>
 
                 <button
                     onClick={handlePrevious}
-                    className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold"
+                    className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer"
                 >
                     <GrFormPreviousLink />Previous
                 </button>

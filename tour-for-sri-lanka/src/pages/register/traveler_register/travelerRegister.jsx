@@ -5,6 +5,7 @@ import COUNTRIES from "../../../data/countryCode";
 import { useNavigate } from "react-router-dom";
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
+import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js";
 
 export default function TravelerRegister(){
     const navigate = useNavigate()
@@ -28,6 +29,9 @@ export default function TravelerRegister(){
     const [showConfirmPassword,setShowConfirmPassword] = useState(false)
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12}$)/
+    const passportRegex = /^[A-Za-z0-9]{6,9}$/
 
     const options = COUNTRIES.map((c) => ({
         label: `${c.flag} ${c.name}`,
@@ -62,6 +66,14 @@ export default function TravelerRegister(){
             setErr("Password must be a least 8 characters")
             return
         }
+        if(!nicRegex.test(NIC) && !passportRegex.test(NIC)){
+            setErr("Please enter a valid NIC or Passport number")
+            return
+        }
+        if(!isValidPhoneNumber(mobile, country.value)){
+            setErr("Please enter a valid mobile number for the selected country")
+            return
+        }
         const formData = {
             role,
             firstName,
@@ -71,7 +83,8 @@ export default function TravelerRegister(){
             confirmPassword,
             NIC,
             country: country?.label,
-            mobile: dialCode ? `${dialCode}${mobile}` : mobile
+            dialCode,
+            mobile
         }
         sessionStorage.setItem("TravelerRegister",JSON.stringify(formData))
         navigate("/travelerprofilephoto")
@@ -88,6 +101,7 @@ export default function TravelerRegister(){
             setConfirmPassword(data.confirmPassword || "");
             setNIC(data.NIC || "");
             setMobile(data.mobile || "");
+            setDialCode(data.dialCode || "");
             
             if(data.country){
                 const match = options.find(o => o.label === data.country)
@@ -104,7 +118,8 @@ export default function TravelerRegister(){
             password,
             confirmPassword,
             NIC,
-            country,
+            country: country?.label,
+            dialCode,
             mobile
         }
         sessionStorage.setItem("TravelerRegister",JSON.stringify(formData))
@@ -129,7 +144,7 @@ export default function TravelerRegister(){
                 <div className="w-[500px] h-full mt-[10px] flex flex-col items-center">
                     <input type="email" value={email} placeholder="E-Mail" onChange={(e)=> setEmail(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
                     <div className="flex flex-col relative w-[465px]">
-                        <input type={showPassword? "text" : "password"} placeholder="Password" onChange={(e)=> setPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                        <input type={showPassword? "text" : "password"} value={password} placeholder="Password" onChange={(e)=> setPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
                         {showPassword ? (
                             <IoEye className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowPassword(false)}/>
                         ) : (
@@ -137,14 +152,14 @@ export default function TravelerRegister(){
                         )}
                     </div>
                     <div className="flex flex-col relative w-[465px]">
-                        <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" onChange={(e)=> setConfirmPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                        <input type={showConfirmPassword ? "text" : "password"} value={confirmPassword} placeholder="Confirm Password" onChange={(e)=> setConfirmPassword(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
                         {showConfirmPassword ? (
                             <IoEye className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowConfirmPassword(false)}/>
                         ) : (
                             <FaEyeSlash className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowConfirmPassword(true)}/>
                         )}
                     </div>
-                    <input  placeholder="Passport Number/NIC" value={NIC} onChange={(e)=> setNIC(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                    <input  placeholder="Passport Number/NIC" value={NIC} onChange={(e)=> setNIC(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 12).toUpperCase())} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
 
                     <div className="mt-[10px] w-full flex justify-evenly">
                         <div className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px]">
@@ -161,6 +176,14 @@ export default function TravelerRegister(){
                                         backgroundColor: "#4A5C6A80",
                                         border: "none",
                                         boxShadow: "none",
+                                    }),
+                                     option: (base,state) =>({
+                                        ...base,
+                                        backgroundColor:state.isFocused
+                                            ? "#00C896"
+                                            : "#4A5C6A",
+                                        color : "#CCD0CF",
+                                        cursor : "pointer",
                                     }),
                                     menu: (base) => ({
                                         ...base,
@@ -194,15 +217,18 @@ export default function TravelerRegister(){
                                 value={mobile}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "")
-                                    setMobile(value)}
-                                }
+                                    if(country && validatePhoneNumberLength(value, country.value) === "TOO_LONG"){
+                                        return
+                                    }
+                                    setMobile(value)
+                                }}
                                 className="w-[225px] h-[50px] bg-[#4A5C6A80] rounded-[20px] text-[12px] pl-[70px] text-[#CCD0CF]"
                             />
                         </div>
                     </div>
                     <div className="mt-[20px] w-full flex justify-evenly">
-                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
+                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                        <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
                     </div>
                 </div>
             </div>

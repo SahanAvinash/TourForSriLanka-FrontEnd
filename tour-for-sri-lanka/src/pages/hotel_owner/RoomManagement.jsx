@@ -90,12 +90,15 @@ const selectStyles = {
 };
 
 function getAuthHeader() {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const localToken = localStorage.getItem("token")
+    const sessionToken = sessionStorage.getItem("token")
+    const token = (localToken && localToken !== "undefined") ? localToken : sessionToken
     return { Authorization: `Bearer ${token}` };
 }
 
 export default function RoomManagement() {
     const [hotelId, setHotelId] = useState(null);
+    const [isApproved, setIsApproved] = useState(false);
     const [rooms, setRooms] = useState([]);
     const [loadingRooms, setLoadingRooms] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -124,6 +127,16 @@ export default function RoomManagement() {
 
     useEffect(() => {
         if (hotelId) fetchRooms();
+    }, [hotelId]);
+
+    useEffect(() => {
+        if (!hotelId) return;
+        axios.get(`http://localhost:3000/api/hotel/${hotelId}`)
+            .then((res) => {
+                setIsApproved(res.data.isApproved === true);
+            }).catch((error) => {
+                console.log(error);
+            });
     }, [hotelId]);
 
     function fetchRooms() {
@@ -297,10 +310,14 @@ export default function RoomManagement() {
                     onClick={() => {
                         if (showAddForm) {
                             resetForm();
-                        } else {
-                            setEditingOriginalRoomNumber(null);
-                            setShowAddForm(true);
+                            return;
                         }
+                        if (!isApproved) {
+                            toast.error("Your hotel is not verified yet. You cannot add rooms until an admin approves your hotel.");
+                            return;
+                        }
+                        setEditingOriginalRoomNumber(null);
+                        setShowAddForm(true);
                     }}
                     className="flex items-center gap-2 bg-[#00C896]/80 hover:bg-[#00C896] transition-all duration-300 text-white px-5 py-2 rounded-[15px] text-[14px] font-semibold cursor-pointer"
                 >

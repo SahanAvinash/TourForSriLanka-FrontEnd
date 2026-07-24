@@ -14,9 +14,11 @@ function DetailRow({ label, value }) {
 
 function getStoredUser() {
   const raw = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    const user = JSON.parse(raw);
+    return { ...user, token };
   } catch (err) {
     return null;
   }
@@ -26,6 +28,10 @@ export default function Profile() {
   const storedUser = getStoredUser();
   const token = storedUser?.token;
   const hotelId = storedUser?._id;
+
+  console.log("DEBUG storedUser:", storedUser);
+  console.log("DEBUG token:", token);
+  console.log("DEBUG hotelId:", hotelId);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,7 +86,7 @@ export default function Profile() {
     setError("");
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("photo", file);
 
     try {
       const res = await fetch(`${API_BASE}/api/hotel/upload-photo`, {

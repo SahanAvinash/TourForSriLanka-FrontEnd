@@ -11,6 +11,8 @@ const DOCUMENT_FIELDS = [
 ]
 
 const ALLOWED_TYPES = ["application/pdf"]
+const brNumberRegex = /^[A-Za-z]{1,4}[\/\s-]?\d{3,10}$/
+const licenseNumberRegex = /^(?=.*\d)[A-Za-z0-9][A-Za-z0-9\/\s-]{2,14}$/
 
 export default function HotelVerification() {
     const navigate = useNavigate()
@@ -59,6 +61,14 @@ export default function HotelVerification() {
     const handleSaveAndContinue = async () => {
         if (!brNumber || !licenseNumber || !files.brCertificate || !files.hotelLicenseFile || !files.ownerIdFile || !files.addressProofFile) {
             setErr("Please fill all required fields")
+            return
+        }
+        if(!brNumberRegex.test(brNumber)){
+            setErr("Please enter a valid BR Number (eg : PV12345)")
+            return
+        }
+        if(!licenseNumberRegex.test(licenseNumber)){
+            setErr("Please enter a valid License Number (eg : HTL1234)")
             return
         }
 
@@ -151,13 +161,13 @@ export default function HotelVerification() {
                     <input
                         placeholder="Enter BR Number"
                         value={brNumber}
-                        onChange={(e) => setBrNumber(e.target.value)}
+                        onChange={(e) => setBrNumber(e.target.value.replace(/[^a-zA-Z0-9\/\s-]/g, "").toUpperCase())}
                         className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
                     />
                     <input
                         placeholder="Enter License Number"
                         value={licenseNumber}
-                        onChange={(e) => setLicenseNumber(e.target.value)}
+                        onChange={(e) => setLicenseNumber(e.target.value.replace(/[^a-zA-Z0-9\/\s-]/g, "").toUpperCase())}
                         className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
                     />
                 </div>

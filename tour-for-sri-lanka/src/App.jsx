@@ -1,7 +1,6 @@
 import './App.css'
 import AdminPage from './pages/admin/AdminPage';
 import {BrowserRouter, Route ,Routes} from "react-router-dom"
-import HomePage from '../routes/AppRoutes';
 import LoginPage from './pages/loginPage';
 import {Toaster} from "react-hot-toast"
 import RegisterRole from './pages/register/registerRole';
@@ -30,6 +29,12 @@ import ScrollToTop from './components/ScrollToTop';
 import HotelPage from './pages/hotels/HotelPage';
 import HotelsDetailsPage from './pages/hotels/HotelDetailsPage';
 import HotelOwnerDashboard from './pages/hotel_owner/HotelOwnerDashboard';
+import TravelerProfile from './pages/traveler/TravelerProfile';
+import AboutUsPage from './pages/aboutus/AboutUsPage';
+import ContactUsPage from './pages/contactus/ContactUsPage';
+import HomePage from './pages/home/home';
+import Home from './pages/home/home'
+import TransportPage from './pages/transport/transportPage';
 
 
 function App() {
@@ -38,11 +43,12 @@ function App() {
     <ScrollToTop/>
     <Toaster/>
       <Routes path="/*">
-        <Route path="/*" element={<HomePage/>}/>
+        <Route path="/" element={<HomePage/>}/>
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/register-role" element={<RegisterRole/>}/>
         <Route path="/traveler-register" element={<TravelerRegister/>}/>
         <Route path="/travelerprofilephoto" element={<TravelerProfilePhoto/>}/>
+        <Route path="/profile" element={<TravelerProfile/>}/>
         <Route path="/vehicle-register" element={<VehicleOwnerRegister/>}/>
         <Route path="/vehicleownerinformation" element={<VehicleOwnerInformation/>}/>
         <Route path="/vehiclefacilities" element={<VehicleFacilities/>}/>
@@ -65,6 +71,12 @@ function App() {
         <Route path="/hotels" element={<HotelPage/>}/>
         <Route path="hotel/:id" element={<HotelsDetailsPage/>}/>
         <Route path="/hotel_owner/dashboard" element={<HotelOwnerDashboard/>}/>
+
+        <Route path="/about-us" element={<AboutUsPage/>}/>
+
+        <Route path="/contact-us" element={<ContactUsPage/>}/>
+
+        <Route path="/transport" element={<TransportPage/>}/>
       </Routes>
     </BrowserRouter>
   )
