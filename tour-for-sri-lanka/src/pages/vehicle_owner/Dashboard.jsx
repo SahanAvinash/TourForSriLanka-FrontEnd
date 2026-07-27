@@ -1,10 +1,10 @@
 import Overview from "./Overview";
 import Sidebar from "./SlideBar";
 import TopBar from "../hotel_owner/TopBar";
-import VehicleManagement from "./VehicleManagement";
 import Bookings from "./Bookings";
 import Reviews from "./Reviews";
 import Profile from "./Profile";
+import MyVehicle from "./MyVehicle";
 
 export default function TransportOwnerDashboard(){
     return(
@@ -14,7 +14,7 @@ export default function TransportOwnerDashboard(){
                 <TopBar/>
                 <main className="flex-1 px-8 py-8">
                     <Overview/>
-                    <VehicleManagement/>
+                    <MyVehicle/>
                     <Bookings/>
                     <Reviews/>
                     <Profile/>

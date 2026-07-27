@@ -5,6 +5,7 @@ import Select from "react-select";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
+import TransportReviews from "./TransportReviews";
 
 const districts = [
     "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
@@ -102,6 +103,9 @@ export default function BookingPage() {
   const [estimating, setEstimating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
   const updateForm = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -152,6 +156,22 @@ export default function BookingPage() {
         vehicleId
     ]);
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+        setLoadingReviews(true)
+        try {
+            const res = await fetch(`http://localhost:3000/api/transport-review/vehicle/${vehicleId}`)
+            const data = await res.json()
+            setReviews(data)
+        } catch (err) {
+            console.log(err)
+        } finally {
+            setLoadingReviews(false)
+        }
+    }
+    if (vehicleId) fetchReviews()
+  }, [vehicleId]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -178,7 +198,6 @@ export default function BookingPage() {
       if (!res.ok) throw new Error(data.message || "Booking failed");
 
       toast.success("Booking request sent to the vehicle owner!");
-      navigate("/");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -393,6 +412,24 @@ export default function BookingPage() {
             </button>
           </form>
         </div>
+
+        {/* Reviews Section */}
+        <section className="mt-10">
+          {loadingReviews ? (
+            <p className="text-sm text-[#d5dde2]">Loading reviews...</p>
+          ) : (
+            <TransportReviews
+              vehicleId={vehicleId}
+              reviews={reviews}
+              onReviewAdded={(review, isUpdate) => {
+                setReviews((prev) =>
+                  isUpdate ? prev.map((r) => (r._id === review._id ? review : r)) : [review, ...prev]
+                );
+              }}
+              onReviewDeleted={(id) => setReviews((prev) => prev.filter((r) => r._id !== id))}
+            />
+          )}
+        </section>
       </section>
 
       <Footer />

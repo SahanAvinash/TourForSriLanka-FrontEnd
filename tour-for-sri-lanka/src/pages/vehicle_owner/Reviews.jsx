@@ -25,7 +25,7 @@ export default function Reviews() {
 
     function fetchReviews() {
         setLoadingReviews(true);
-        axios.get(`http://localhost:3000/api/reviews/transport/${transportId}`)
+        axios.get(`http://localhost:3000/api/transport-review/vehicle/${transportId}`)
             .then((res) => {
                 setReviews(res.data);
             }).catch((error) => {

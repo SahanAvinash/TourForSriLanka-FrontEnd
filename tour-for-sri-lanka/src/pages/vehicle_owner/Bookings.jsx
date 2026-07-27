@@ -51,7 +51,7 @@ export default function Bookings() {
     }
 
     function handleStatusChange(bookingId, newStatus) {
-        axios.patch(`http://localhost:3000/api/booking/${bookingId}/status`, { status: newStatus }, {
+        axios.patch(`http://localhost:3000/api/booking/transport/${bookingId}/status`, { status: newStatus }, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success(`Booking marked as ${newStatus}`);
@@ -136,14 +136,15 @@ export default function Bookings() {
                                                 </div>
                                             </td>
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[14px]">
-                                                <p className="font-bold">{booking.vehicleId?.vehicleNumber || "-"}</p>
-                                                <p className="text-[#CCD0CF]/60 text-[12px]">{booking.vehicleId?.vehicleType || ""}</p>
+                                                <p className="font-bold">{booking.vehicleId?.registrationNo || "-"}</p>
                                             </td>
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[14px]">
-                                                {formatDate(booking.startDate)}
+                                                {formatDate(booking.pickupDate)}
                                             </td>
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[14px]">
-                                                {formatDate(booking.endDate)}
+                                                {new Date(booking.pickupDate).toDateString() === new Date(booking.returnDate).toDateString()
+                                                    ?<span className="text-[#CCD0CF]/60">One Way</span>
+                                                    : formatDate(booking.returnDate)}
                                             </td>
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[14px]">
                                                 LKR {Number(booking.totalPrice).toLocaleString()}

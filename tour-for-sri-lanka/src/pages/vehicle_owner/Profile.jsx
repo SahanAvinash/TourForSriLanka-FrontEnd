@@ -38,6 +38,8 @@ export default function Profile() {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [availableAreas, setAvailableAreas] = useState("")
+  const [ratePerKm, setRatePerKm] = useState("")
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -61,6 +63,8 @@ export default function Profile() {
         setDescription(data.shortDescription || "");
         setImages(data.images || []);
         setStatus(data.status || "active");
+        setAvailableAreas((data.availableArea || []).join(", "))
+        setRatePerKm(data.ratePerKm || "")
         setLoading(false);
       })
       .catch(() => {
@@ -125,6 +129,8 @@ export default function Profile() {
       shortDescription: description,
       images: JSON.stringify(images),
       status,
+      availableAreas: availableAreas.split(",").map((a) => a.trim()).filter(Boolean),
+      ratePerKm: Number(ratePerKm)
     };
 
     if (newPassword) {
@@ -168,28 +174,51 @@ export default function Profile() {
   }
 
   return (
-    <section id="profile" className="pb-16">
+    <section id="profile" className="pb-16 pt-10">
       <h2 className="text-2xl font-semibold text-white mb-6">Transport Owner Profile</h2>
 
       <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-4">Owner Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <DetailRow label="Owner Name" value={`${transport?.firstName || ""} ${transport?.lastName || ""}`} />
-          <DetailRow label="Email" value={transport?.email} />
-          <DetailRow label="NIC" value={transport?.NIC} />
-          <DetailRow label="Mobile" value={transport?.mobile} />
-          <DetailRow label="Country" value={transport?.country} />
-          <DetailRow label="Phone 1" value={transport?.phone1} />
-          <DetailRow label="Phone 2" value={transport?.phone2} />
-          <DetailRow label="Province" value={transport?.province} />
-          <DetailRow label="District" value={transport?.district} />
-          <DetailRow label="Location" value={transport?.location} />
-          <DetailRow label="BR Number" value={transport?.BRnumber} />
-          <DetailRow label="License Number" value={transport?.licenseNumber} />
-          <DetailRow
-            label="Approval Status"
-            value={transport?.isApproved ? "Approved" : "Pending Approval"}
-          />
+            <DetailRow label="Owner Name" value={`${transport?.firstName || ""} ${transport?.lastName || ""}`} />
+            <DetailRow label="Email" value={transport?.email} />
+            <DetailRow label="NIC" value={transport?.NIC} />
+            <DetailRow label="Mobile" value={transport?.mobile} />
+            <DetailRow label="Country" value={transport?.country} />
+            <div>
+                <label className="text-gray-400 text-xs mb-1 block">Available Areas (comma seperated)</label>
+                <input 
+                    type="text"
+                    value={availableAreas}
+                    onChange={(e) => setAvailableAreas(e.target.value)}
+                    placeholder="e.g. Colombo, Kandy, Galle"
+                    className="w-full bg-[#1B2B34] text-gray-200 rounded-xl px-4 py-3 outline-none"
+                />
+            </div>
+            <DetailRow label="Vehicle Type" value={transport?.vehicleType}/>
+            <DetailRow label="Brand" value={transport?.vehicleBrand}/>
+            <DetailRow label="Model" value={transport?.vehicleModel} />
+            <DetailRow label="Registration No" value={transport?.registrationNo} />
+            <DetailRow label="Manufacture Year" value={transport?.manufactureYear} />
+            <DetailRow label="Chassis Number" value={transport?.chassisNumber} />
+            <DetailRow label="Vehicle Color" value={transport?.vehicleColor} />
+            <DetailRow label="Fuel Type" value={transport?.fuelType} />
+            <DetailRow label="Passenger Capacity" value={transport?.passengerCapacity} />
+            <DetailRow label="Luggage Capacity" value={transport?.luggageCapacity} />
+            <div>
+                <label className="text-gray-400 text-xs mb-1 block">Rate Per Km (Rs.)</label>
+                <input
+                    type="number"
+                    min="1"
+                    value={ratePerKm}
+                    onChange={(e) => setRatePerKm(e.target.value)}
+                    className="w-full bg-[#1B2B34] text-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00C896]"
+                />
+            </div>
+            <DetailRow
+                label="Approval Status"
+                value={transport?.isApproved ? "Approved" : "Pending Approval"}
+            />
         </div>
 
         {transport?.facilities && (
@@ -266,45 +295,6 @@ export default function Profile() {
           className="w-full bg-[#1B2B34] text-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00C896] resize-none"
           placeholder="Tell travelers about your transport service..."
         />
-      </div>
-
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
-        <h3 className="text-lg font-medium text-white mb-3">
-          Images ({images.length}/5)
-        </h3>
-        <div className="flex flex-wrap gap-4">
-          {images.map((img, index) => (
-            <div key={index} className="relative w-28 h-28">
-              <img
-                src={img}
-                alt={`transport-${index}`}
-                className="w-full h-full object-cover rounded-xl"
-              />
-              <button
-                onClick={() => removeImage(index)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-              >
-                <FaTimes />
-              </button>
-            </div>
-          ))}
-
-          {images.length < 5 && (
-            <label className="w-28 h-28 rounded-xl border-2 border-dashed border-[#4A5C6A] flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#00C896] hover:text-[#00C896] transition-all">
-              <FaCamera className="mb-1" />
-              <span className="text-xs">
-                {uploading ? "Uploading..." : "Add"}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploading}
-                className="hidden"
-              />
-            </label>
-          )}
-        </div>
       </div>
 
       <div className="bg-[#11212D] rounded-2xl p-6 mb-6">

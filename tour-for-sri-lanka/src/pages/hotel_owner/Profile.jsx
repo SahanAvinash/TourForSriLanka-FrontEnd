@@ -29,10 +29,6 @@ export default function Profile() {
   const token = storedUser?.token;
   const hotelId = storedUser?._id;
 
-  console.log("DEBUG storedUser:", storedUser);
-  console.log("DEBUG token:", token);
-  console.log("DEBUG hotelId:", hotelId);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");

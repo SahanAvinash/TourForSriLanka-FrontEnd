@@ -23,9 +23,9 @@ export default function Sidebar() {
       id: "overview",
     },
     {
-      name: "Vehicle Management",
+      name: "My vehicle",
       icon: <FaCar />,
-      id: "vehicles",
+      id: "my-vehicle",
     },
     {
       name: "Bookings",
