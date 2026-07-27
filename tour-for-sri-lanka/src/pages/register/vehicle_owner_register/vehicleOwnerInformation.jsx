@@ -22,6 +22,11 @@ export default function VehicleOwnerInformation(){
     const [chassisNumber,setChassisNumber] = useState("")
     const [vehicleColor, setVehicleColor] = useState(null)
 
+    const [ratePerKm, setRatePerKm] = useState("")
+
+    const registrationNoRegex = /^([A-Za-z]{1,3}[\s-]?\d{1,4}|\d{1,3}[\s-]\d{4})$/
+    const chassisNumberRegex = /^[A-Za-z0-9-]{5,17}$/
+
     const years = Array.from({length : 50}, (_,i) =>{
         const year = new Date().getFullYear() - i
         return {value: year, label : year.toString()}
@@ -133,6 +138,12 @@ export default function VehicleOwnerInformation(){
             ashok_leyland: ["Falcon"]
         }  
     }
+    const suggestedRates = {
+        car : { min: 80, max: 200 },
+        van : { min: 150, max: 350 },
+        jeep : { min: 150, max: 350 },
+        bus : { min: 300, max: 700 }
+    }
      const brandOption = useMemo(() => {
         return vehicleType ? vehicleBrands[vehicleType.value] : []
      },[vehicleType])
@@ -156,6 +167,7 @@ export default function VehicleOwnerInformation(){
             setManufactureYear(data.manufactureYear || null)
             setChassisNumber(data.chassisNumber || "")
             setVehicleColor(data.vehicleColor || null)
+            setRatePerKm(data.ratePerKm || "")
         }
     },[])
 
@@ -172,15 +184,28 @@ export default function VehicleOwnerInformation(){
             registrationNo,
             manufactureYear,
             chassisNumber,
-            vehicleColor
+            vehicleColor,
+            ratePerKm
         }
         sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
         navigate(-1)
     }
     const handleNext = () => {
-        if(!vehicleType || !vehicleBrand || !vehicleModel || !shortDescription || !registrationNo || !manufactureYear || !chassisNumber || !vehicleColor){
+        if(!vehicleType || !vehicleBrand || !vehicleModel || !shortDescription || !registrationNo || !manufactureYear || !chassisNumber || !vehicleColor || !ratePerKm){
             setErr("Please fill all required fields")
             return;
+        }
+        if(!registrationNoRegex.test(registrationNo)){
+            setErr("Please enter a valid vehicle registration number")
+            return
+        }
+        if(!chassisNumberRegex.test(chassisNumber)){
+            setErr("Please enter a valid chassis number")
+            return
+        }
+        if(Number(ratePerKm) < 1){
+            setErr("Please enter a valid rate per km")
+            return
         }
         const oldData = JSON.parse(sessionStorage.getItem("VehicleOwnerRegister")) || {}
         const formData = {
@@ -193,7 +218,8 @@ export default function VehicleOwnerInformation(){
             registrationNo,
             manufactureYear,
             chassisNumber,
-            vehicleColor
+            vehicleColor,
+            ratePerKm
         }
         sessionStorage.setItem("VehicleOwnerRegister",JSON.stringify(formData))
         navigate("/vehiclefacilities")
@@ -237,7 +263,7 @@ export default function VehicleOwnerInformation(){
 
                         </div>
                     </div>
-                    <div className="w-[500px] h-[560px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
+                    <div className="w-[500px] h-[650px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
                         <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Vehicle Owner</h1>
                         {err && (
                             <div className="text-[#9E4444] text-[12px]">
@@ -401,7 +427,7 @@ export default function VehicleOwnerInformation(){
                             </div>
                         </div>
                         <div className="mt-[20px] gap-[10px] text-[12px] flex justify-between items-center">
-                            <input placeholder="Registration No" value={registrationNo} onChange={(e)=> setRegistrationNo(e.target.value)} className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
+                            <input placeholder="Registration No" value={registrationNo} onChange={(e)=> setRegistrationNo(e.target.value.replace(/[^a-zA-Z0-9\s-]/g, "").toUpperCase())} className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
                             <Select 
                                 options={years}
                                 value={manufactureYear}
@@ -449,7 +475,7 @@ export default function VehicleOwnerInformation(){
                             
                         </div>
                         <div className="mt-[20px] gap-[10px] text-[12px] flex justify-between items-center">
-                            <input placeholder="Chassis Number" value={chassisNumber} onChange={(e)=> setChassisNumber(e.target.value)} className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
+                            <input placeholder="Chassis Number" value={chassisNumber} onChange={(e)=> setChassisNumber(e.target.value.replace(/[^a-zA-Z0-9-]/g, "").toUpperCase())} className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
                             <Select 
                                 options={vehicleColors}
                                 value={vehicleColor}
@@ -494,10 +520,25 @@ export default function VehicleOwnerInformation(){
                                     })
                                 }}
                             />
-                        </div>
+                            </div>
+                            <div className="mt-[20px] w-[465px]">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="Rate per KM (Rs.)"
+                                    value={ratePerKm}
+                                    onChange={(e) => setRatePerKm(e.target.value)}
+                                    className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+                                    {vehicleType && suggestedRates[vehicleType.value] && (
+                                        <p className="text-[10px] text-[#CCD0CF]/60 mt-1 pl-[10px]">
+                                            Suggested range for {vehicleType.label}: Rs. {suggestedRates[vehicleType.value].min} - {suggestedRates[vehicleType.value].max} per km
+                                        </p>
+                                    )}
+                            </div>
                         <div className="mt-[20px] w-full flex justify-evenly">
-                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
+                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                        <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
                     </div>
                     </div>
         </div>

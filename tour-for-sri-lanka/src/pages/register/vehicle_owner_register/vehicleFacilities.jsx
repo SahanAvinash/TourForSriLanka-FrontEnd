@@ -38,7 +38,8 @@ export default function VehicleFacilities(){
     const fuelTypes = [
         {value: "petrole", label: "Petrole"},
         {value: "diesel", label: "Diesel"},
-        {value: "electric", label: "Electric"}
+        {value: "electric", label: "Electric"},
+        {value: "hybrid", label: "Hybrid"}
     ]    
     const districts = [
         { value: "ampara", label: "Ampara" },
@@ -549,8 +550,8 @@ export default function VehicleFacilities(){
                     </div>
                 </label>
                 <div className="mt-[20px] w-full flex justify-evenly">
-                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
+                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">Next <GrFormNextLink className="font-bold text-[20px]"/></button>
                 </div>
             </div>
         </div>

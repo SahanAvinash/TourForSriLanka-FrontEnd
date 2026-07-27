@@ -36,8 +36,10 @@ export default function LoginPage(){
         }
         if(role == "traveler"){
            navigate("/")
-        }else if(user.role == "hotel_owner"){
+        }else if(role == "hotel_owner"){
             navigate("/hotel_owner/dashboard")
+        }else if(role === "vehicle_owner"){
+            navigate("/vehicle_owner/dashboard")
         }
        }).catch((err)=>{
         console.log(err)

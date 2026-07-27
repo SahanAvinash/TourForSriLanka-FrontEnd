@@ -34,7 +34,10 @@ import AboutUsPage from './pages/aboutus/AboutUsPage';
 import ContactUsPage from './pages/contactus/ContactUsPage';
 import HomePage from './pages/home/home';
 import Home from './pages/home/home'
-import TransportPage from './pages/transport/transportPage';
+import TransportPage from './pages/transport/TransportPage';
+import VehicleList from './pages/transport/VehicleList';
+import BookingPage from './pages/transport/BookingPage';
+import TransportOwnerDashboard from './pages/vehicle_owner/Dashboard';
 
 
 function App() {
@@ -70,6 +73,7 @@ function App() {
         <Route path="/destinations/:category/:id" element={<DestinationDetailsPage />} />
         <Route path="/hotels" element={<HotelPage/>}/>
         <Route path="hotel/:id" element={<HotelsDetailsPage/>}/>
+
         <Route path="/hotel_owner/dashboard" element={<HotelOwnerDashboard/>}/>
 
         <Route path="/about-us" element={<AboutUsPage/>}/>
@@ -77,6 +81,9 @@ function App() {
         <Route path="/contact-us" element={<ContactUsPage/>}/>
 
         <Route path="/transport" element={<TransportPage/>}/>
+        <Route path="/transport/vehicles/:type" element={<VehicleList/>}/>
+        <Route path="/transport/book/:vehicleId" element={<BookingPage/>}/>
+        <Route path="/vehicle_owner/dashboard" element={<TransportOwnerDashboard/>}/>
       </Routes>
     </BrowserRouter>
   )

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function VehicleVerification(){
 const [err,setErr] = useState(null)
+const [loading, setLoading] = useState(false)
 
 const [drivingLicense,setDrivingLicense] = useState(null)
 const [vehicleRegistrationCertificate,setVehicleRegistrationCertificate] = useState(null)
@@ -30,6 +31,8 @@ const handleSignUp = async () => {
             setErr("Email not found. Please fill account details again")
             return
         }
+        setErr(null)
+        setLoading(true)
 
         const res = await fetch("http://localhost:3000/api/transport/send-otp", {
             method: "POST",
@@ -56,6 +59,7 @@ const handleSignUp = async () => {
 
     }catch (err) {
         setErr(err.message);
+        setLoading(false)
     }
 }
 
@@ -356,8 +360,10 @@ console.log(sessionStorage.getItem("VehicleOwnerRegister"))
                 </div>
                 <div>
                     <div className="mb-[20px] w-full flex justify-evenly">
-                        <button onClick={handlePrevious} className="mr-[10px] w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleSignUp} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">Sign up</button>
+                        <button onClick={handlePrevious} className="mr-[10px] w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                        <button onClick={handleSignUp} disabled={loading} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
+                            {loading ? "Sending OTP..." : "Sign up"}
+                        </button>
                     </div>
                 </div>
             </div>

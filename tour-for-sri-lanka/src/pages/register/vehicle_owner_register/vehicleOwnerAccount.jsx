@@ -6,12 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
+import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js";
 
 export default function VehicleOwnerRegister(){
     const navigate = useNavigate()
 
     const role = sessionStorage.getItem("role")
     const [checkingEmail,setCheckingEmail] = useState(false)
+    const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12}$)/
+    const passportRegex = /^[A-Za-z0-9]{6,9}$/
 
     const [country, setCountry] = useState(null)
     const [mobile,setMobile] = useState("")
@@ -62,6 +65,14 @@ export default function VehicleOwnerRegister(){
         }
         if(password.length<8){
             setErr("Password must be a least 8 characters")
+            return
+        }
+        if(!nicRegex.test(NIC) && !passportRegex.test(NIC)){
+            setErr("Please enter a valid NIC or Passport number")
+            return
+        }
+        if(!isValidPhoneNumber(mobile, country.value)){
+            setErr("Please enter a valid mobile number for the selected country")
             return
         }
 
@@ -214,7 +225,7 @@ export default function VehicleOwnerRegister(){
                             <FaEyeSlash className="absolute right-[30px] top-1/2 cursor-pointer" onClick={()=>setShowConfirmPassword(true)}/>
                         )}
                     </div>
-                    <input  placeholder="Passport Number/NIC" value={NIC} onChange={(e)=> setNIC(e.target.value)} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
+                    <input  placeholder="Passport Number/NIC" value={NIC} onChange={(e)=> setNIC(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 12).toUpperCase())} className="w-[465px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] mt-[10px]"/>
 
                     <div className="mt-[10px] w-full flex justify-evenly">
                         <div className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px]">
@@ -273,6 +284,9 @@ export default function VehicleOwnerRegister(){
                                 value={mobile}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "")
+                                    if(country && validatePhoneNumberLength(value, country.value) === "TOO_LONG"){
+                                        return
+                                    }
                                     setMobile(value)}
                                 }
                                 className="w-[225px] h-[50px] bg-[#4A5C6A80] rounded-[20px] text-[12px] pl-[70px] text-[#CCD0CF]"
@@ -280,8 +294,8 @@ export default function VehicleOwnerRegister(){
                         </div>
                     </div>
                     <div className="mt-[20px] w-full flex justify-evenly">
-                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleNext} disabled={checkingEmail} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                        <button onClick={handleNext} disabled={checkingEmail} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
     {checkingEmail ? "Checking..." : (<>Next <GrFormNextLink className="font-bold text-[20px]"/></>)}
 </button>
                     </div>

@@ -1,10 +1,11 @@
 import { Bus } from "lucide-react";
 
+
 export default function VehicleTypeCard({ item, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="relative overflow-hidden rounded-xl bg-[#243b4a] text-left text-white transition hover:-translate-y-1"
+      className="relative overflow-hidden rounded-xl bg-[#243b4a] text-left text-white transition hover:-translate-y-1 transition-all duration-300"
     >
       <Bus className="absolute left-3 top-3 text-[#00d1a3]" size={16} />
 
@@ -12,6 +13,7 @@ export default function VehicleTypeCard({ item, onClick }) {
         src={item.image}
         alt={item.title}
         className="h-[120px] w-full bg-white object-contain"
+        onError={(e) => console.log('Image failed:', item.image)}
       />
 
       <div className="px-3 py-2.5">

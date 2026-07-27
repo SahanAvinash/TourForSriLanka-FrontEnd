@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import TransportHeroSection from "./TransportHeroSection";
 import VehicleTypeCard from "./VehicleTypeCard";
 import { vehicleTypes } from "../../data/vehicles";
+import Navbar from "../../components/Navbar";
 
 export default function TransportPage() {
   const navigate = useNavigate();
+  const vehicleTypeSectionRef = useRef(null);
 
   const [service, setService] = useState("airport-pickup");
   const [form, setForm] = useState({
-    pickupLocation: "Colombo, Sri Lanka",
+    pickupLocation: "",
     pickupDate: "",
-    passengers: "2",
-    bags: "1 to 2 bags",
+    passengers: "",
+    bags: "",
   });
 
   const updateForm = (name, value) => {
@@ -33,20 +34,23 @@ export default function TransportPage() {
     navigate(`/transport/vehicles/${type}?${params.toString()}`);
   };
 
+  const handleSearch = () => {
+    vehicleTypeSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <main className="min-h-screen bg-[#071923] text-white">
-      
-
+      <Navbar/>
       <TransportHeroSection
         service={service}
         setService={setService}
         form={form}
         updateForm={updateForm}
-        onSearch={() => openVehicles("all")}
+        onSearch={handleSearch}
       />
 
-      <section className="px-14 py-8 max-lg:px-5">
-        <h2 className="text-[22px] font-bold">Choose Vehicle Type</h2>
+      <section ref={vehicleTypeSectionRef} className="px-14 py-8 max-lg:px-5">
+        <h2 className="text-[22px] font-bold">Select your vehicle type</h2>
         <p className="mt-1 text-[#d5dde2]">
           All vehicles are with professional drivers
         </p>
@@ -62,7 +66,7 @@ export default function TransportPage() {
         </div>
       </section>
 
-      
+      <Footer/>
     </main>
   );
 }
