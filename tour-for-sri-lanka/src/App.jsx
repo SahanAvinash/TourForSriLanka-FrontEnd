@@ -38,6 +38,9 @@ import TransportPage from './pages/transport/TransportPage';
 import VehicleList from './pages/transport/VehicleList';
 import BookingPage from './pages/transport/BookingPage';
 import TransportOwnerDashboard from './pages/vehicle_owner/Dashboard';
+import GuidePage from './pages/guides/GuidePage';
+import GuideDetailsPage from './pages/guides/GuideDetailsPage';
+import GuideDashboard from './pages/GuideDashboard/Dashboard';
 
 
 function App() {
@@ -84,6 +87,10 @@ function App() {
         <Route path="/transport/vehicles/:type" element={<VehicleList/>}/>
         <Route path="/transport/book/:vehicleId" element={<BookingPage/>}/>
         <Route path="/vehicle_owner/dashboard" element={<TransportOwnerDashboard/>}/>
+
+        <Route path="/guides" element={<GuidePage/>}/>
+        <Route path="/guide/:id" element={<GuideDetailsPage/>}/>
+        <Route path="/guide/dashboard" element={<GuideDashboard/>}/>
       </Routes>
     </BrowserRouter>
   )

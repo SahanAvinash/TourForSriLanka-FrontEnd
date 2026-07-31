@@ -40,6 +40,10 @@ export default function LoginPage(){
             navigate("/hotel_owner/dashboard")
         }else if(role === "vehicle_owner"){
             navigate("/vehicle_owner/dashboard")
+        }else if(role === "guide"){
+            navigate("/guide/dashboard")
+        }else{
+            navigate("/")
         }
        }).catch((err)=>{
         console.log(err)
