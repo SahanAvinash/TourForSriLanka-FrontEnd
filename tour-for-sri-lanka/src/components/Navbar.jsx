@@ -82,6 +82,12 @@ const Navbar = () => {
         location.pathname.startsWith("/guide/")
       )
     }
+    if(path === "/tours"){
+      return(
+        location.pathname.startsWith("/tours") ||
+        location.pathname.startsWith("/tour/")
+      )
+    }
     return location.pathname.startsWith(path);
   };
 

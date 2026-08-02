@@ -41,6 +41,9 @@ import TransportOwnerDashboard from './pages/vehicle_owner/Dashboard';
 import GuidePage from './pages/guides/GuidePage';
 import GuideDetailsPage from './pages/guides/GuideDetailsPage';
 import GuideDashboard from './pages/GuideDashboard/Dashboard';
+import TourDestinationSelect from './pages/tour/TourDestinationSelect';
+import TourPage from './pages/tour/TourPage';
+import TourPreview from './pages/tour/TourPreview';
 
 
 function App() {
@@ -91,6 +94,10 @@ function App() {
         <Route path="/guides" element={<GuidePage/>}/>
         <Route path="/guide/:id" element={<GuideDetailsPage/>}/>
         <Route path="/guide/dashboard" element={<GuideDashboard/>}/>
+
+        <Route path="/tours" element={<TourPage/>}/>
+        <Route path="/tours/plan" element={<TourDestinationSelect/>}/>
+        <Route path="/tour/preview" element={<TourPreview/>}/>
       </Routes>
     </BrowserRouter>
   )
