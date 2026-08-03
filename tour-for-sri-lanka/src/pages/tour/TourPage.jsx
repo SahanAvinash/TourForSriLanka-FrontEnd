@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-import { MapPin, Route, Users } from "lucide-react";
+import { MapPin, Route, Users, Compass, X, Download } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 const districtOptions = [
   "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
@@ -49,12 +51,213 @@ const getTodayString = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+const formatDate = (d) => {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+};
+
 const TourPage = () => {
   const navigate = useNavigate();
   const [startDistrict, setStartDistrict] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [numberOfGuests, setNumberOfGuests] = useState(null); // NEW
   const [error, setError] = useState("");
+
+  // --- "Your Tour" floating button + modal state ---
+  const [activeTour, setActiveTour] = useState(null);
+  const [showTourModal, setShowTourModal] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("activeTourSummary");
+    if (saved) {
+      try {
+        setActiveTour(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem("activeTourSummary");
+      }
+    }
+  }, []);
+
+  const handleClearTour = () => {
+    localStorage.removeItem("activeTourSummary");
+    setActiveTour(null);
+    setShowTourModal(false);
+  };
+  const handleDownloadPdf = () => {
+    if (!activeTour) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const accent = [0, 200, 150]; // #00C896
+    const dark = [17, 33, 45]; // #11212D
+    let y = 0;
+
+    // --- Header band ---
+    doc.setFillColor(...accent);
+    doc.rect(0, 0, pageWidth, 32, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Tour For Sri Lanka", 14, 14);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Your Trip Summary & Budget Estimate", 14, 23);
+
+    y = 42;
+
+    // --- Generated date ---
+    doc.setTextColor(120, 120, 120);
+    doc.setFontSize(9);
+    doc.text(`Generated on ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`, 14, y);
+    y += 10;
+
+    // --- Trip route section ---
+    doc.setTextColor(...dark);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Trip Route", 14, y);
+    y += 3;
+
+    const routeRows = (activeTour.destinations || []).map((dest, i) => [
+      `${i + 1}`,
+      dest.name || "-",
+      dest.location || "-",
+    ]);
+
+    autoTable(doc, {
+      startY: y + 4,
+      head: [["#", "Destination", "Location"]],
+      body: routeRows,
+      theme: "striped",
+      headStyles: { fillColor: accent, textColor: 255, fontStyle: "bold" },
+      styles: { fontSize: 10, cellPadding: 4 },
+      margin: { left: 14, right: 14 },
+    });
+
+    y = doc.lastAutoTable.finalY + 12;
+
+    // --- Guide bookings ---
+    if (activeTour.guideBookings?.length > 0) {
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      doc.text("Guide Bookings", 14, y);
+
+      const guideRows = activeTour.guideBookings.map((g) => [
+        g.displayName || "-",
+        formatDate(g.date),
+        `${g.quantity} ${g.durationType === "hourly" ? "hr(s)" : "day(s)"}`,
+        `${g.numberOfGuests}`,
+        `${g.currency || "LKR"} ${Number(g.totalPrice || 0).toLocaleString()}`,
+      ]);
+
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Guide", "Date", "Duration", "Guests", "Price"]],
+        body: guideRows,
+        theme: "striped",
+        headStyles: { fillColor: accent, textColor: 255, fontStyle: "bold" },
+        styles: { fontSize: 9.5, cellPadding: 4 },
+        margin: { left: 14, right: 14 },
+      });
+      y = doc.lastAutoTable.finalY + 12;
+    }
+
+    // --- Hotel bookings ---
+    if (activeTour.hotelBookings?.length > 0) {
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      doc.text("Hotel Bookings", 14, y);
+
+      const hotelRows = activeTour.hotelBookings.map((h) => [
+        h.displayName || "-",
+        formatDate(h.checkInDate),
+        formatDate(h.checkOutDate),
+        `${h.numberOfGuests}`,
+        `LKR ${Number(h.totalPrice || 0).toLocaleString()}`,
+      ]);
+
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Hotel / Room", "Check-in", "Check-out", "Guests", "Price"]],
+        body: hotelRows,
+        theme: "striped",
+        headStyles: { fillColor: accent, textColor: 255, fontStyle: "bold" },
+        styles: { fontSize: 9.5, cellPadding: 4 },
+        margin: { left: 14, right: 14 },
+      });
+      y = doc.lastAutoTable.finalY + 12;
+    }
+
+    // --- Transport bookings ---
+    if (activeTour.transportBookings?.length > 0) {
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      doc.text("Transport Bookings", 14, y);
+
+      const transportRows = activeTour.transportBookings.map((t) => [
+        t.displayName || "-",
+        formatDate(t.pickupDate),
+        formatDate(t.returnDate),
+        `${t.numberOfGuests}`,
+        `LKR ${Number(t.totalPrice || 0).toLocaleString()}`,
+      ]);
+
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Vehicle", "Pickup", "Return", "Passengers", "Price"]],
+        body: transportRows,
+        theme: "striped",
+        headStyles: { fillColor: accent, textColor: 255, fontStyle: "bold" },
+        styles: { fontSize: 9.5, cellPadding: 4 },
+        margin: { left: 14, right: 14 },
+      });
+      y = doc.lastAutoTable.finalY + 12;
+    }
+
+    // --- Budget summary box ---
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setFillColor(...dark);
+    doc.roundedRect(14, y, pageWidth - 28, 44, 3, 3, "F");
+
+    doc.setTextColor(230, 230, 230);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Guides", 20, y + 10);
+    doc.text(`LKR ${Number(activeTour.guideBudget || 0).toLocaleString()}`, pageWidth - 20, y + 10, { align: "right" });
+
+    doc.text("Hotels", 20, y + 18);
+    doc.text(`LKR ${Number(activeTour.hotelBudget || 0).toLocaleString()}`, pageWidth - 20, y + 18, { align: "right" });
+
+    doc.text("Transport", 20, y + 26);
+    doc.text(`LKR ${Number(activeTour.transportBudget || 0).toLocaleString()}`, pageWidth - 20, y + 26, { align: "right" });
+
+    doc.setDrawColor(90, 100, 110);
+    doc.line(20, y + 30, pageWidth - 20, y + 30);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.text("Total Estimated Budget", 20, y + 39);
+    doc.setTextColor(...accent);
+    doc.text(`LKR ${Number(activeTour.totalBudget || 0).toLocaleString()}`, pageWidth - 20, y + 39, { align: "right" });
+
+    // --- Footer ---
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Tour For Sri Lanka — Booking requests are subject to confirmation by guides, hotels and vehicle owners.", 14, 290);
+    }
+
+    doc.save(`TourForSriLanka-Trip-Summary-${Date.now()}.pdf`);
+  };
 
   const handleStart = () => {
     if (!startDistrict) {
@@ -179,6 +382,126 @@ const TourPage = () => {
       <div className="mt-16">
         <Footer />
       </div>
+
+      {/* --- "Your Tour" floating circle button --- */}
+      {activeTour && (
+        <button
+          onClick={() => setShowTourModal(true)}
+          className="fixed right-5 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full bg-[#00C896] text-[#11212D] flex flex-col items-center justify-center shadow-lg hover:scale-105 transition-transform"
+          title="Your Tour"
+        >
+          <Compass size={22} />
+          <span className="text-[9px] font-semibold mt-0.5">Your Tour</span>
+        </button>
+      )}
+
+      {/* --- "Your Tour" details modal --- */}
+      {showTourModal && activeTour && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] px-4"
+          onClick={() => setShowTourModal(false)}
+        >
+          <div
+            className="bg-[#1B2B34] rounded-xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-[#00C896]">Your Booked Tour</h3>
+              <button onClick={() => setShowTourModal(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+
+            {/* Trip route */}
+            <div className="mb-5">
+              <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Trip Route</h4>
+              <div className="flex flex-col gap-1.5 mt-2">
+                {activeTour.destinations?.map((dest, index) => (
+                  <div key={dest.id || `dest-${index}`} className="text-sm text-gray-300">
+                    {index + 1}. {dest.name} {dest.location && `(${dest.location})`}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Guide bookings */}
+            {activeTour.guideBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Guide Bookings</h4>
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.guideBookings.map((g) => (
+                    <div key={g.cartId} className="bg-[#253745] rounded-lg px-3 py-2">
+                      <p className="text-sm text-white">{g.displayName}</p>
+                      <p className="text-xs text-gray-400">{formatDate(g.date)} · {g.quantity} day(s) · {g.numberOfGuests} guest(s)</p>
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">{g.currency} {g.totalPrice?.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hotel bookings */}
+            {activeTour.hotelBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Hotel Bookings</h4>
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.hotelBookings.map((h) => (
+                    <div key={h.cartId} className="bg-[#253745] rounded-lg px-3 py-2">
+                      <p className="text-sm text-white">{h.displayName}</p>
+                      <p className="text-xs text-gray-400">{formatDate(h.checkInDate)} → {formatDate(h.checkOutDate)} · {h.numberOfGuests} guest(s)</p>
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">LKR {h.totalPrice?.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Transport bookings */}
+            {activeTour.transportBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Transport Bookings</h4>
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.transportBookings.map((t) => (
+                    <div key={t.cartId} className="bg-[#253745] rounded-lg px-3 py-2">
+                      <p className="text-sm text-white">{t.displayName}</p>
+                      <p className="text-xs text-gray-400">{formatDate(t.pickupDate)} → {formatDate(t.returnDate)} · {t.numberOfGuests} pax</p>
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">LKR {t.totalPrice?.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Budget summary */}
+            <div className="bg-[#11212D] rounded-lg p-4 mt-2">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Guides</span><span>LKR {activeTour.guideBudget?.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Hotels</span><span>LKR {activeTour.hotelBudget?.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Transport</span><span>LKR {activeTour.transportBudget?.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 mt-2 border-t border-white/10">
+                <span className="text-sm font-semibold text-white">Total Budget</span>
+                <span className="text-lg font-bold text-[#00C896]">LKR {activeTour.totalBudget?.toLocaleString()}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleDownloadPdf}
+              className="w-full mt-4 flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold text-sm py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+            >
+              <Download size={14} /> Download as PDF
+            </button>
+
+            <button
+              onClick={handleClearTour}
+              className="w-full mt-2 flex items-center justify-center gap-2 border border-red-400/40 text-red-400 text-sm py-2 rounded-md hover:bg-red-400/10 transition-colors"
+            >
+              <X size={14} /> Clear this tour from view
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

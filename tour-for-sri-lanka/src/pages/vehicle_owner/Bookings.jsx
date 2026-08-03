@@ -39,7 +39,7 @@ export default function Bookings() {
 
     function fetchBookings() {
         setLoadingBookings(true);
-        axios.get(`http://localhost:3000/api/booking/transport/${transportId}`)
+        axios.get(`http://localhost:3000/api/transport/bookings/vehicle/${transportId}`)
             .then((res) => {
                 setBookings(res.data);
             }).catch((error) => {
@@ -51,7 +51,7 @@ export default function Bookings() {
     }
 
     function handleStatusChange(bookingId, newStatus) {
-        axios.patch(`http://localhost:3000/api/booking/transport/${bookingId}/status`, { status: newStatus }, {
+        axios.patch(`http://localhost:3000/api/transport/booking/${bookingId}/status`, { status: newStatus }, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success(`Booking marked as ${newStatus}`);
