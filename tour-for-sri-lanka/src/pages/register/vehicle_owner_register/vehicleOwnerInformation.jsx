@@ -25,7 +25,7 @@ export default function VehicleOwnerInformation(){
     const [ratePerKm, setRatePerKm] = useState("")
 
     const registrationNoRegex = /^([A-Za-z]{1,3}[\s-]?\d{1,4}|\d{1,3}[\s-]\d{4})$/
-    const chassisNumberRegex = /^[A-Za-z0-9-]{5,17}$/
+    const chassisNumberRegex = /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9-]{5,17}$/
 
     const years = Array.from({length : 50}, (_,i) =>{
         const year = new Date().getFullYear() - i
@@ -475,7 +475,11 @@ export default function VehicleOwnerInformation(){
                             
                         </div>
                         <div className="mt-[20px] gap-[10px] text-[12px] flex justify-between items-center">
-                            <input placeholder="Chassis Number" value={chassisNumber} onChange={(e)=> setChassisNumber(e.target.value.replace(/[^a-zA-Z0-9-]/g, "").toUpperCase())} className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
+                            <input 
+                                placeholder="Chassis Number"
+                                value={chassisNumber} 
+                                onChange={(e)=> setChassisNumber(e.target.value.replace(/[^a-zA-Z0-9-]/g, "").slice(0, 17).toUpperCase())}
+                                className="w-[225px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"/>
                             <Select 
                                 options={vehicleColors}
                                 value={vehicleColor}

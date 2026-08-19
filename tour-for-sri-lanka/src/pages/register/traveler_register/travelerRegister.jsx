@@ -30,7 +30,7 @@ export default function TravelerRegister(){
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-    const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12}$)/
+    const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/
     const passportRegex = /^[A-Za-z0-9]{6,9}$/
 
     const options = COUNTRIES.map((c) => ({

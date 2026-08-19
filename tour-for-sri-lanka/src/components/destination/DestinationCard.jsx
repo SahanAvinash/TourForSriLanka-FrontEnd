@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-const hideLocationIds = ["v-1", "v-2", "v-3", "v-4"];
-
 const DestinationCard = ({ destination }) => {
   return (
     <div className="bg-[#253745] rounded-2xl overflow-hidden shadow-lg hover:-translate-y-2 transition duration-300">
@@ -18,7 +16,7 @@ const DestinationCard = ({ destination }) => {
           {destination.name}
         </h2>
 
-        {!hideLocationIds.includes(destination.id) && (
+        {destination.location && (
           <div className="flex items-center gap-3 mt-5 text-[#00C896]">
             <FaMapMarkerAlt />
             <span>{destination.location}</span>
@@ -30,7 +28,7 @@ const DestinationCard = ({ destination }) => {
         </p>
 
         <Link
-          to={`/destinations/${destination.category}/${destination.id}`}
+          to={`/destinations/${destination.category}/${destination._id}`}
           className="inline-block mt-6 bg-[#00C896] px-6 py-3 rounded-xl text-white font-semibold hover:bg-[#00b383] transition duration-300"
         >
           View Destination

@@ -1,9 +1,9 @@
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Select from "react-select"
 import { useNavigate } from "react-router-dom";
-import { FaCheck, FaMap } from "react-icons/fa";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet"
+import { FaCheck, FaMap, FaSearch } from "react-icons/fa";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
@@ -31,11 +31,24 @@ function LocationClickHandler({ onPick }) {
     return null
 }
 
+function RecenterMap({ position }) {
+    const map = useMap()
+    useEffect(() => {
+        map.flyTo(position, map.getZoom())
+    }, [position])
+    return null
+}
+
 function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     const [position, setPosition] = useState(initialPosition || DEFAULT_MAP_CENTER)
     const [address, setAddress] = useState("")
     const [loadingAddress, setLoadingAddress] = useState(false)
     const [locating, setLocating] = useState(false)
+
+    const [searchQuery, setSearchQuery] = useState("")
+    const [searchResults, setSearchResults] = useState([])
+    const [searching, setSearching] = useState(false)
+    const searchTimeoutRef = useRef(null)
 
     const reverseGeocode = async (lat, lng) => {
         setLoadingAddress(true)
@@ -52,6 +65,26 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     useEffect(() => {
         reverseGeocode(position.lat, position.lng)
     }, [])
+
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setSearchResults([])
+            return
+        }
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+        searchTimeoutRef.current = setTimeout(async () => {
+            setSearching(true)
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&countrycodes=lk`)
+                const data = await res.json()
+                setSearchResults(data)
+            } catch (error) {
+                setSearchResults([])
+            }
+            setSearching(false)
+        }, 500)
+        return () => clearTimeout(searchTimeoutRef.current)
+    }, [searchQuery])
 
     const handlePick = (latlng) => {
         setPosition(latlng)
@@ -72,12 +105,48 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
         )
     }
 
+    const handleSelectResult = (result) => {
+        const latlng = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) }
+        setPosition(latlng)
+        setAddress(result.display_name)
+        setSearchQuery("")
+        setSearchResults([])
+    }
+
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] px-[20px]">
             <div className="w-[600px] max-w-full bg-[#253745] text-[#CCD0CF] rounded-[20px] p-[20px] flex flex-col items-center">
                 <h2 className="text-[18px] font-bold mb-[10px]">Pick your hotel location</h2>
 
-                <div className="w-full h-[350px] rounded-[15px] overflow-hidden">
+                <div className="w-full relative">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for a place (e.g. Galle Fort, Kandy)"
+                        className="w-full h-[45px] text-[12px] bg-[#4A5C6A]/50 rounded-[15px] pl-[40px] pr-[15px] text-[#CCD0CF] placeholder:text-[#CCD0CF]/50"
+                    />
+                    <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#00C896]/70 text-[12px]" />
+
+                    {(searching || searchResults.length > 0) && (
+                        <div className="absolute top-[50px] left-0 w-full bg-[#4A5C6A] rounded-[15px] overflow-hidden z-[1001] max-h-[200px] overflow-y-auto">
+                            {searching && (
+                                <div className="px-[15px] py-[10px] text-[12px] text-[#CCD0CF]/70">Searching...</div>
+                            )}
+                            {!searching && searchResults.map((result, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => handleSelectResult(result)}
+                                    className="px-[15px] py-[10px] text-[12px] text-[#CCD0CF] cursor-pointer hover:bg-[#00C896]/40 border-b border-[#CCD0CF]/10 last:border-none"
+                                >
+                                    {result.display_name}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="w-full h-[350px] rounded-[15px] overflow-hidden mt-[15px]">
                     <MapContainer center={position} zoom={13} style={{ height: "100%", width: "100%" }}>
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -85,6 +154,7 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
                         />
                         <Marker position={position} />
                         <LocationClickHandler onPick={handlePick} />
+                        <RecenterMap position={position} />
                     </MapContainer>
                 </div>
 

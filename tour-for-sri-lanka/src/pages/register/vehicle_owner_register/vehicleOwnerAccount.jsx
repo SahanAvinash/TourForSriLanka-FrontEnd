@@ -13,7 +13,7 @@ export default function VehicleOwnerRegister(){
 
     const role = sessionStorage.getItem("role")
     const [checkingEmail,setCheckingEmail] = useState(false)
-    const nicRegex = /^([0-9]{9}[vVxX]|[0-9]{12}$)/
+    const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/
     const passportRegex = /^[A-Za-z0-9]{6,9}$/
 
     const [country, setCountry] = useState(null)

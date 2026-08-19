@@ -1,24 +1,28 @@
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Select from "react-select"
 import { useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import COUNTRIES from "../../../data/countryCode";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"]
 const MARITAL_OPTIONS = ["Single", "Married", "Divorced", "Widowed"]
+const ETHNICITY_OPTIONS = ["Sinhalese", "Tamil", "Moor", "Burgher", "Malay", "Other"]
 const PROVINCE_OPTIONS = [
     "Western", "Central", "Southern", "Northern", "Eastern",
     "North Western", "North Central", "Uva", "Sabaragamuwa"
 ]
-const DISTRICT_OPTIONS = [
-    "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
-    "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-    "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-    "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-    "Monaragala", "Ratnapura", "Kegalle"
-]
+const PROVINCE_DISTRICTS = {
+    "Western": ["Colombo", "Gampaha", "Kalutara"],
+    "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+    "Southern": ["Galle", "Matara", "Hambantota"],
+    "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+    "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
+    "North Western": ["Kurunegala", "Puttalam"],
+    "North Central": ["Anuradhapura", "Polonnaruwa"],
+    "Uva": ["Badulla", "Monaragala"],
+    "Sabaragamuwa": ["Ratnapura", "Kegalle"],
+}
 
 const selectStyles = {
     control: (base) => ({
@@ -55,15 +59,28 @@ const selectStyles = {
         color: "#CCD0CF",
     }),
 }
+const calculateAge = (dob) => {
+    const birthDate = new Date(dob)
+    const today = new Date()
+
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+    }
+    return age
+}
 
 export default function GuideInformation() {
     const navigate = useNavigate()
+    const dobRef = useRef(null)
 
     const [dateOfBirth, setDateOfBirth] = useState("")
     const [address, setAddress] = useState("")
     const [gender, setGender] = useState(null)
     const [maritalStatus, setMaritalStatus] = useState(null)
-    const [nationality, setNationality] = useState(null)
+    const [ethnicity, setEthnicity] = useState(null)
     const [province, setProvince] = useState(null)
     const [NIC, setNIC] = useState("")
     const [district, setDistrict] = useState(null)
@@ -73,9 +90,14 @@ export default function GuideInformation() {
 
     const genderOptions = GENDER_OPTIONS.map((g) => ({ label: g, value: g }))
     const maritalOptions = MARITAL_OPTIONS.map((m) => ({ label: m, value: m }))
-    const nationalityOptions = COUNTRIES.map((c) => ({ label: `${c.flag} ${c.name}`, value: c.name }))
+    const ethnicityOptions = ETHNICITY_OPTIONS.map((e) => ({ label: e, value: e }))
     const provinceOptions = PROVINCE_OPTIONS.map((p) => ({ label: p, value: p }))
-    const districtOptions = DISTRICT_OPTIONS.map((d) => ({ label: d, value: d }))
+    const districtOptions = (PROVINCE_DISTRICTS[province?.value] || []).map((d) => ({ label: d, value: d }))
+
+    const handleProvinceChange = (selected) => {
+        setProvince(selected)
+        setDistrict(null)
+    }
 
     useEffect(() => {
         const saved = sessionStorage.getItem("GuideRegister")
@@ -93,9 +115,8 @@ export default function GuideInformation() {
             if (data.maritalStatus) {
                 setMaritalStatus({ label: data.maritalStatus, value: data.maritalStatus })
             }
-            if (data.nationality) {
-                const found = COUNTRIES.find((c) => c.name === data.nationality)
-                setNationality(found ? { label: `${found.flag} ${found.name}`, value: found.name } : null)
+            if (data.ethnicity) {
+                setEthnicity({ label: data.ethnicity, value: data.ethnicity })
             }
             if (data.province) {
                 setProvince({ label: data.province, value: data.province })
@@ -114,7 +135,7 @@ export default function GuideInformation() {
             address,
             gender: gender?.value,
             maritalStatus: maritalStatus?.value,
-            nationality: nationality?.value,
+            ethnicity: ethnicity?.value,
             province: province?.value,
             NIC,
             district: district?.value,
@@ -128,9 +149,25 @@ export default function GuideInformation() {
     }
 
     const handleNext = () => {
-        if (!dateOfBirth || !address || !gender || !maritalStatus || !nationality || !province || !NIC || !district) {
+        if (!dateOfBirth || !address || !gender || !maritalStatus || !ethnicity || !province || !NIC || !district) {
             setErr("Please fill all required fields")
             return;
+        }
+        const dobDate = new Date(dateOfBirth)
+        const today = new Date()
+
+        if(dobDate > today){
+            setErr("Date of birth cannot be in the future")
+            return
+        }
+        if(calculateAge(dateOfBirth) < 18){
+            setErr("You must be at least 18 years old to register as a guide")
+            return
+        }
+        const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/
+        if(!nicRegex.test(NIC)){
+            setErr("Please enter a valid NIC Number")
+            return
         }
 
         setErr("")
@@ -185,9 +222,16 @@ export default function GuideInformation() {
 
                 <div className="w-[465px] mt-[15px] relative">
                     <input
+                        ref={dobRef}
                         type="date"
                         value={dateOfBirth}
+                        max={new Date().toISOString().split("T")[0]}
                         onChange={(e) => setDateOfBirth(e.target.value)}
+                        onClick={() => {
+                            try{
+                                dobRef.current?.showPicker() 
+                            }catch(error){}
+                        }} 
                         className={`w-full h-[50px] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pr-[45px] [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 ${dateOfBirth ? "text-[#CCD0CF]" : "text-transparent"}`}
                     />
                     <FaRegCalendarAlt className="absolute right-[20px] top-1/2 -translate-y-1/2 text-[#00C896]/70 pointer-events-none" />
@@ -231,10 +275,10 @@ export default function GuideInformation() {
                 <div className="w-[465px] mt-[15px] flex justify-between">
                     <div className="w-[220px] text-[12px]">
                         <Select
-                            options={nationalityOptions}
-                            value={nationality}
-                            onChange={setNationality}
-                            placeholder="Nationality"
+                            options={ethnicityOptions}
+                            value={ethnicity}
+                            onChange={setEthnicity}
+                            placeholder="Ethnicity"
                             menuPosition="fixed"
                             styles={selectStyles}
                         />
@@ -243,7 +287,7 @@ export default function GuideInformation() {
                         <Select
                             options={provinceOptions}
                             value={province}
-                            onChange={setProvince}
+                            onChange={handleProvinceChange}
                             placeholder="Province"
                             menuPosition="fixed"
                             styles={selectStyles}
@@ -255,7 +299,13 @@ export default function GuideInformation() {
                     <input
                         placeholder="NIC"
                         value={NIC}
-                        onChange={(e) => setNIC(e.target.value)}
+                        maxLength={12}
+                        onChange={(e) => {
+                            const value = e.target.value
+                            if(/^[0-9]{0,12}$/.test(value) || /^[0-9]{9}[vVxX]$/.test(value)){
+                                setNIC(value)
+                            }
+                        }}
                         className="w-[220px] h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
                     />
                     <div className="w-[220px] text-[12px]">
@@ -263,7 +313,8 @@ export default function GuideInformation() {
                             options={districtOptions}
                             value={district}
                             onChange={setDistrict}
-                            placeholder="District"
+                            placeholder={province ? "District" : "Select province first"}
+                            isDisabled={!province}
                             menuPosition="fixed"
                             styles={selectStyles}
                         />
@@ -284,10 +335,10 @@ export default function GuideInformation() {
                 </div>
 
                 <div className="mt-[20px] w-[465px] flex justify-between">
-                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95">
+                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer">
                         <GrFormPreviousLink className="font-bold text-[20px]" />Previous
                     </button>
-                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
                         Next <GrFormNextLink className="font-bold text-[20px]" />
                     </button>
                 </div>

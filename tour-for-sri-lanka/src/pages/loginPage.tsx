@@ -42,6 +42,8 @@ export default function LoginPage(){
             navigate("/vehicle_owner/dashboard")
         }else if(role === "guide"){
             navigate("/guide/dashboard")
+        }else if(role === "admin"){
+            navigate("/admin")
         }else{
             navigate("/")
         }
@@ -83,7 +85,7 @@ export default function LoginPage(){
                         <input type="checkbox" id="rememberMe" className="cursor-pointer" checked={rememberMe} onChange={(e)=> setRememberMe(e.target.checked)}/>
                         <label className="text-[12px] text-[#CCD0CF] pl-[5px]">Remember Me</label>
                     </div>
-                    <label className="text-[12px] text-[#CCD0CF] mt-[5px] hover:text-[#00C896]/50 transition-all duration-300 cursor-pointer hover:underline">Forget Password?</label>
+                    <Link to="/forgot-password" className="text-[12px] text-[#CCD0CF] mt-[5px] hover:text-[#00C896]/50 transition-all duration-300 cursor-pointer hover:underline">Forget Password?</Link>
                 </div>
                 <button className="w-[400px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] text-[#CCD0CF] text-[20px] font-bold hover:bg-[#00C896]/80 transition-all duration-300 cursor-pointer">Sign in</button>
                 <div className=" mt-[10px] w-[400px] flex justify-end">

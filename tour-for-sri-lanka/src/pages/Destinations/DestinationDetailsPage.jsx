@@ -1,16 +1,30 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../../components/Navbar";
-import destinations from "../../data/destinations";
-
 import DestinationGallery from "../../components/destination/DestinationGallery";
 import DestinationInfo from "../../components/destination/DestinationInfo";
 
 const DestinationDetailsPage = () => {
   const { id } = useParams();
+  const [destination, setDestination] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const destination = destinations.find(
-    (item) => item.id === id
-  );
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/api/destination/single/${id}`)
+      .then((res) => setDestination(res.data))
+      .catch((err) => console.log("Failed to load destination", err))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#11212D] flex items-center justify-center">
+        <h1 className="text-white text-2xl">Loading...</h1>
+      </div>
+    );
+  }
 
   if (!destination) {
     return (

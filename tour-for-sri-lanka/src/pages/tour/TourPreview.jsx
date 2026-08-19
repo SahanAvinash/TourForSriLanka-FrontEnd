@@ -638,6 +638,32 @@ const TourPreview = () => {
 
     setStartingTour(true);
 
+    let tourId = null;
+    try {
+      const tourRes = await axios.post(
+        "http://localhost:3000/api/tour",
+        {
+          destinations: destinations.map((d, i) => ({
+            id: d.id || `stop-${i}`,
+            name: d.name || d.district || `Stop ${i + 1}`,
+            location: d.location,
+            latitude: d.latitude,
+            longitude: d.longitude,
+            order: i,
+          })),
+          routeGeometry: JSON.stringify(route),
+          totalDistanceKm: route.distanceKm,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      tourId = tourRes.data._id;
+    } catch (err) {
+      console.error("Failed to create tour:", err.response?.data);
+      setStartTourError("Failed to start your tour, please try again");
+      setStartingTour(false);
+      return;
+    }
+
     const failedNames = [];
     const remainingGuides = [];
     const remainingTransports = [];
@@ -658,6 +684,7 @@ const TourPreview = () => {
             numberOfGuests: item.numberOfGuests,
             message: item.message,
             totalPrice: item.totalPrice,
+            tourId,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -686,6 +713,7 @@ const TourPreview = () => {
             numberOfPassengers: item.numberOfGuests,
             bags: item.bags,
             isReturnTrip: true,
+            tourId,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -707,6 +735,7 @@ const TourPreview = () => {
           checkInDate: item.checkInDate,
           checkOutDate: item.checkOutDate,
           numberOfGuests: item.numberOfGuests,
+          tourId,
         });
         successfulHotels.push(item);
       } catch (err) {
@@ -716,11 +745,11 @@ const TourPreview = () => {
         remainingHotels.push(item);
       }
     }
-    const finalGuideBudget = successfulGuides.reduce((sum, g) => sum + g.totalPrice, 0)
+
+    const finalGuideBudget = successfulGuides.reduce((sum, g) => sum + g.totalPrice, 0);
     const finalHotelBudget = successfulHotels.reduce((sum, h) => sum + h.totalPrice, 0);
     const finalTransportBudget = successfulTransports.reduce((sum, t) => sum + t.totalPrice, 0);
 
-    // Success una bookings walт් witharai email eka yawanawa
     if (successfulGuides.length > 0 || successfulTransports.length > 0 || successfulHotels.length > 0) {
       try {
         await axios.post("http://localhost:3000/api/tour/send-summary", {
@@ -731,11 +760,26 @@ const TourPreview = () => {
           transportBookings: successfulTransports,
           guideBudget: finalGuideBudget,
           hotelBudget: finalHotelBudget,
-          transportBudget: finalTransportBudget
+          transportBudget: finalTransportBudget,
         });
       } catch (err) {
         console.error("Trip summary email failed:", err.response?.data);
-        // Email eka fail unath, bookings ewi wela thiyenawa, so user ta block karanna epa
+      }
+    }
+
+    if (tourId && (successfulGuides.length > 0 || successfulTransports.length > 0 || successfulHotels.length > 0)) {
+      try {
+        await axios.put(
+          `http://localhost:3000/api/tour/${tourId}/confirm`,
+          {
+            selectedGuide: successfulGuides[0]?.guideId,
+            selectedHotels: successfulHotels.map((h) => h.hotelId),
+            selectedTransport: successfulTransports[0]?.vehicleId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        console.error("Failed to confirm tour:", err.response?.data);
       }
     }
 
@@ -746,22 +790,22 @@ const TourPreview = () => {
     setHotelBudget(remainingHotels.reduce((sum, h) => sum + h.totalPrice, 0));
 
     if (failedNames.length === 0) {
-        const tripSummary ={
-            destinations,
-            guideBookings: successfulGuides,
-            hotelBookings: successfulHotels,
-            transportBookings: successfulTransports,
-            guideBudget: finalGuideBudget,
-            hotelBudget: finalHotelBudget,
-            transportBudget: finalTransportBudget,
-            totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
-            savedAt: Date.now(),
-        }
-        localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary))
-        navigate("/tours")
-        } else {
-            setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
-        }
+      const tripSummary = {
+        destinations,
+        guideBookings: successfulGuides,
+        hotelBookings: successfulHotels,
+        transportBookings: successfulTransports,
+        guideBudget: finalGuideBudget,
+        hotelBudget: finalHotelBudget,
+        transportBudget: finalTransportBudget,
+        totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
+      navigate("/tours");
+    } else {
+      setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
+    }
   };
 
   return (

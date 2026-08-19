@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IoEye } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
+import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js";
 
 export default function GuideRegister(){
     const navigate = useNavigate()
@@ -62,6 +63,10 @@ export default function GuideRegister(){
         }
         if(password.length<8){
             setErr("Password must be a least 8 characters")
+            return
+        }
+        if(!isValidPhoneNumber(mobile, country.value)){
+            setErr("Please enter a valid mobile number for the selected country")
             return
         }
 
@@ -272,6 +277,9 @@ export default function GuideRegister(){
                                 value={mobile}
                                 onChange={(e) => {
                                     const value = e.target.value.replace(/\D/g, "")
+                                    if(country && validatePhoneNumberLength(value, country.value) === "TOO_LONG"){
+                                        return
+                                    }
                                     setMobile(value)}
                                 }
                                 className="w-[225px] h-[50px] bg-[#4A5C6A80] rounded-[20px] text-[12px] pl-[70px] text-[#CCD0CF]"
@@ -279,8 +287,8 @@ export default function GuideRegister(){
                         </div>
                     </div>
                     <div className="mt-[20px] w-full flex justify-evenly">
-                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
-                        <button onClick={handleNext} disabled={checkingEmail} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                        <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer"><GrFormPreviousLink className="font-bold text-[20px]" />Previous</button>
+                        <button onClick={handleNext} disabled={checkingEmail} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
     {checkingEmail ? "Checking..." : (<>Next <GrFormNextLink className="font-bold text-[20px]"/></>)}
 </button>
                     </div>

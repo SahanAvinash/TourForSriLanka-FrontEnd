@@ -4,7 +4,7 @@ import { GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select"
 import { useNavigate, useLocation } from "react-router-dom";
 
-const GUEST_OPTIONS = Array.from({ length: 10 }, (_, i) => `${i + 1}`)
+const GUEST_OPTIONS = [...Array.from({length:10}, (_,i) => `${i + 1}`), "10+"]
 const CURRENCY_OPTIONS = ["LKR", "USD", "EUR", "GBP"]
 
 const selectStyles = {
@@ -280,10 +280,10 @@ export default function GuidePricing() {
                 </div>
 
                 <div className="mt-[25px] w-[465px] flex justify-between">
-                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95">
+                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer">
                         <GrFormPreviousLink className="font-bold text-[20px]" />Previous
                     </button>
-                    <button onClick={handleSaveAndContinue} disabled={sendingOtp} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                    <button onClick={handleSaveAndContinue} disabled={sendingOtp} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
                         {sendingOtp ? "Sending OTP..." : "Save & Continue"}
                     </button>
                 </div>

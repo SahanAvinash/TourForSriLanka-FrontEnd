@@ -44,6 +44,7 @@ import GuideDashboard from './pages/GuideDashboard/Dashboard';
 import TourDestinationSelect from './pages/tour/TourDestinationSelect';
 import TourPage from './pages/tour/TourPage';
 import TourPreview from './pages/tour/TourPreview';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 
 function App() {
@@ -98,6 +99,8 @@ function App() {
         <Route path="/tours" element={<TourPage/>}/>
         <Route path="/tours/plan" element={<TourDestinationSelect/>}/>
         <Route path="/tour/preview" element={<TourPreview/>}/>
+
+        <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
       </Routes>
     </BrowserRouter>
   )

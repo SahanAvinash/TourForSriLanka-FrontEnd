@@ -1,7 +1,19 @@
-import categories from "../../data/categories";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import CategoryCard from "./CategoryCard";
 
 const CategorySection = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/category")
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.log("Failed to load categories", err))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <section className="max-w-7xl mx-auto px-8 py-16">
 
@@ -17,16 +29,18 @@ const CategorySection = () => {
       </div>
 
       {/* Category Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        {categories.map((category) => (
-          <CategoryCard
-            key={category.id}
-            category={category}
-          />
-        ))}
-
-      </div>
+      {loading ? (
+        <p className="text-center text-gray-400">Loading categories...</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category._id}
+              category={category}
+            />
+          ))}
+        </div>
+      )}
 
     </section>
   );

@@ -7,6 +7,7 @@ export default function TravelerProfilePhoto(){
     const [photo,setPhoto] = useState(null)
     const [photoFile,setPhotoFile] = useState(null)
     const fileInputRef = useRef(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     const [err,setErr] = useState("")
     
@@ -76,6 +77,7 @@ export default function TravelerProfilePhoto(){
                 setErr("Please fill all required fields before continuing")
                 return
             }
+            setIsLoading(true)
             const response = await fetch("http://localhost:3000/api/traveler/send-otp",{
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -90,48 +92,10 @@ export default function TravelerProfilePhoto(){
             navigate("/verify-otp",{state: {photoFile}})
         }catch(error){
             setErr("Something went wrong. Please try again"+error.message)
+        }finally{
+            setIsLoading(false)
         }
     }
-    // const handleSignUp = async () =>{
-    //     try{
-    //         const saved = JSON.parse(sessionStorage.getItem("TravelerRegister"))
-
-    //         if(!saved){
-    //             setErr("Something went wrong")
-    //             return
-    //         }
-    //         const formData = new FormData()
-            
-    //         formData.append("role",saved.role)
-    //         formData.append("firstName",saved.firstName)
-    //         formData.append("lastName",saved.lastName)
-    //         formData.append("email",saved.email)
-    //         formData.append("password",saved.password)
-    //         formData.append("NIC",saved.NIC)
-    //         formData.append("country",saved.country)
-    //         formData.append("mobile",saved.mobile)
-
-    //         if(photoFile){
-    //             formData.append("image",photoFile)
-    //         }
-
-    //         const response = await fetch("http://localhost:3000/api/traveler/register",{
-    //             method : "POST",
-    //             body : formData
-    //         })
-    //         const data = await response.json()
-
-    //         if(!response.ok){
-    //             setErr(data.message || "Signup failed.  Please try again later")
-    //             return
-    //         }
-    //         localStorage.setItem("token",data.token)
-    //         sessionStorage.removeItem("TravelerRegister")
-    //         navigate("/login")
-    //     }catch(error){
-    //         setErr("Somthing went wrong. Please try again"+ error.message)
-    //     }
-    // }
     
     return(
 
@@ -197,7 +161,13 @@ export default function TravelerProfilePhoto(){
                         <button onClick={handleRemovePhoto} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] mt-[10px] border border-[#4A5C6A]/50 hover:border-[#9E4444]/80 transition-all duration-300 cursor-pointer">Remove Photo</button>
                     </div>
                 </div>
-                        <button onClick={handleSignUp} className="text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">Sign Up</button>
+                        <button 
+                            onClick={handleSignUp} 
+                            disabled={isLoading}
+                            className="text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled::hover:scale-100"
+                            >
+                                {isLoading ? "Signing Up..." : "sign Up"}
+                            </button>
                         <button onClick={handlePrevious} className="w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[10px] hover:scale-95 text-[20px] font-bold cursor-pointer"><GrFormPreviousLink/>Previous</button>
             </div>
 

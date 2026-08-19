@@ -15,6 +15,7 @@ const SKILL_OPTIONS = [
     { label: "Historical Tours", value: "HistoricalTours" },
     { label: "City Tours", value: "CityTours" },
     { label: "Nature Guide", value: "NatureGuide" },
+    { label: "Other", value: "Other"}
 ]
 const LANGUAGE_OPTIONS = [
     { label: "English", value: "english" },
@@ -25,7 +26,7 @@ const LANGUAGE_OPTIONS = [
     { label: "Chinese", value: "chaina" },
     { label: "Korean", value: "korean" },
 ]
-const YEARS_OPTIONS = Array.from({ length: 20 }, (_, i) => `${i + 1}`)
+const YEARS_OPTIONS = [...Array.from({length: 20}, (_,i) => `${i+1}`), "20+"]
 
 const selectStyles = {
     control: (base) => ({
@@ -193,7 +194,11 @@ export default function GuideLanguageSkills() {
             setErr("Please fill all required fields")
             return;
         }
-
+        const licenseRegex = /^GL\/\d{4}\/\d{6}$/
+        if(!licenseRegex.test(licenseNumber)){
+            setErr("Guide License Number must be in the form GL/xxxx/xxxxxx")
+            return
+        }
         setErr("")
         sessionStorage.setItem("GuideRegister", JSON.stringify(buildFormData()))
         navigate("/guidepricing", { state: { nicFile, licenseFile } })
@@ -256,9 +261,9 @@ export default function GuideLanguageSkills() {
                 </div>
 
                 <input
-                    placeholder="Guide License Number"
+                    placeholder="Guide License Number (eg: GL/xxxx/xxxxxx)"
                     value={licenseNumber}
-                    onChange={(e) => setLicenseNumber(e.target.value)}
+                    onChange={(e) => setLicenseNumber(e.target.value.toUpperCase())}
                     className="w-[465px] h-[50px] mt-[15px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px]"
                 />
 
@@ -291,12 +296,12 @@ export default function GuideLanguageSkills() {
                     <textarea
                         placeholder="Additional Fields"
                         value={additionalFields}
-                        maxLength={100}
+                        maxLength={200}
                         onChange={(e) => setAdditionalFields(e.target.value)}
                         className="w-full h-[70px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none"
                     />
                     <span className="absolute right-[20px] bottom-[10px] text-[10px] text-[#CCD0CF]/50">
-                        {additionalFields.length}/100
+                        {additionalFields.length}/200
                     </span>
                 </div>
 
@@ -364,10 +369,10 @@ export default function GuideLanguageSkills() {
                 </div>
 
                 <div className="mt-[20px] w-[465px] flex justify-between">
-                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95">
+                    <button onClick={handlePrevious} className="w-[225px] h-[50px] bg-[#4A5C6A]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#4A5C6A]/80 transition-all duration-300 hover:scale-95 cursor-pointer">
                         <GrFormPreviousLink className="font-bold text-[20px]" />Previous
                     </button>
-                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105">
+                    <button onClick={handleNext} className="w-[225px] h-[50px] bg-[#00C896]/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer">
                         Next <GrFormNextLink className="font-bold text-[20px]" />
                     </button>
                 </div>
