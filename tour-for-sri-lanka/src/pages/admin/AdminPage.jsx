@@ -1,5 +1,5 @@
 import { MdDashboard, MdHotel, MdDirectionsCar, MdPerson } from "react-icons/md";
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import AdminHotels from "./AdminHotels";
 import AdminTransport from "./AdminTransport";
 import AdminGuides from "./AdminGuides";
@@ -8,8 +8,24 @@ import AdminCategories from "./AdminCategories";
 import AdminCategoryDestinations from "./AdminCategoryDestinations";
 
 export default function AdminPage() {
-  const linkClass =
-    "w-[220px] h-[45px] text-[#CCD0CF] text-[15px] flex items-center rounded-xl relative hover:bg-[#4A5C6A] transition-all duration-300";
+  const location = useLocation();
+
+  const navItems = [
+    { path: "/admin", label: "Dashboard", icon: MdDashboard, match: (p) => p === "/admin" },
+    { path: "/admin/tours", label: "Tours", icon: MdDashboard, match: (p) => p.startsWith("/admin/tours") },
+    { path: "/admin/hotels", label: "Hotels", icon: MdHotel, match: (p) => p.startsWith("/admin/hotels") },
+    { path: "/admin/transport", label: "Transport", icon: MdDirectionsCar, match: (p) => p.startsWith("/admin/transport") },
+    { path: "/admin/guides", label: "Guides", icon: MdPerson, match: (p) => p.startsWith("/admin/guides") },
+    { path: "/admin/categories", label: "Categories", icon: MdDashboard, match: (p) => p.startsWith("/admin/categories") },
+  ];
+
+  function getLinkClass(isActive) {
+    return `w-[220px] h-[45px] text-[15px] flex items-center rounded-[20px] relative transition-all duration-300 ${
+      isActive
+        ? "bg-[#00C896]/20 text-[#00C896]"
+        : "text-[#CCD0CF] hover:bg-[#4A5C6A]"
+    }`;
+  }
 
   return (
     <div className="w-full h-screen bg-gradient-to-r from-[#06141B] to-[#253745]">
@@ -18,35 +34,18 @@ export default function AdminPage() {
         <div className="h-[80px] flex items-center justify-center"></div>
 
         <div className="flex flex-col items-center gap-4 mt-[30px]">
-          <Link to="/admin" className={linkClass}>
-            <MdDashboard className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Dashboard</span>
-          </Link>
-
-          <Link to="/admin/tours" className={linkClass}>
-            <MdDashboard className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Tours</span>
-          </Link>
-
-          <Link to="/admin/categories" className={linkClass}>
-            <MdDashboard className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Categories</span>
-          </Link>
-
-          <Link to="/admin/hotels" className={linkClass}>
-            <MdHotel className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Hotels</span>
-          </Link>
-
-          <Link to="/admin/transport" className={linkClass}>
-            <MdDirectionsCar className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Transport</span>
-          </Link>
-
-          <Link to="/admin/guides" className={linkClass}>
-            <MdPerson className="text-[#00C896] absolute left-5 text-xl" />
-            <span className="font-medium ml-12">Guides</span>
-          </Link>
+          {navItems.map((item) => {
+            const isActive = item.match(location.pathname);
+            const Icon = item.icon;
+            return (
+              <Link key={item.path} to={item.path} className={getLinkClass(isActive)}>
+                <Icon
+                  className={`absolute left-5 text-xl ${isActive ? "text-[#00C896]" : "text-[#00C896]"}`}
+                />
+                <span className="font-medium ml-12">{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -61,7 +60,6 @@ export default function AdminPage() {
           <Route path="/tours" element={<AdminTours/>}></Route>
           <Route path="/categories" element={<AdminCategories />}></Route>
           <Route path="/categories/:categoryId" element={<AdminCategoryDestinations />}></Route>
-          <Route path="/bookings" element={<h1>Booking</h1>}></Route>
           <Route path="/hotels" element={<AdminHotels />}></Route>
           <Route path="/transport" element={<AdminTransport />}></Route>
           <Route path="/guides" element={<AdminGuides />}></Route>

@@ -111,7 +111,7 @@ export default function AdminCategories() {
   }
 
   const filtered = categories.filter((c) =>
-    JSON.stringify(c).toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -128,7 +128,7 @@ export default function AdminCategories() {
           />
           <button
             onClick={openAddModal}
-            className="bg-[#00C896] text-white px-4 py-2 rounded-[20px] font-semibold hover:opacity-80 transition text-[14px]"
+            className="bg-[#00C896]/80 text-[#CCD0CF] px-4 py-2 rounded-[20px] font-semibold hover:opacity-80 transition duration-300 text-[14px]"
           >
             + Add Category
           </button>
@@ -138,7 +138,7 @@ export default function AdminCategories() {
       {loading ? (
         <p className="text-[#CCD0CF]">Loading...</p>
       ) : (
-        <div className="bg-[#1B2B34] rounded-xl overflow-hidden">
+        <div className="bg-[#1B2B34] rounded-[20px] overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-[#253745]">
               <tr>
@@ -169,19 +169,19 @@ export default function AdminCategories() {
                     <div className="flex gap-2">
                       <Link
                         to={`/admin/categories/${category._id}`}
-                        className="bg-[#00C896] text-[#06141B] px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition"
+                        className="bg-[#00C896]/80 text-[#CCD0CF] px-3 py-1 rounded-[20px] font-semibold hover:opacity-80 transition duration-300"
                       >
                         Destinations
                       </Link>
                       <button
                         onClick={() => openEditModal(category)}
-                        className="bg-[#4A5C6A] text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition"
+                        className="bg-[#4A5C6A] text-[#CCD0CF] px-3 py-1 rounded-[20px] font-semibold hover:opacity-80 transition duration-300"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(category)}
-                        className="bg-red-500/80 text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition"
+                        className="bg-red-500/80 text-[#CCD0CF] px-3 py-1 rounded-[20px] font-semibold hover:opacity-80 transition duration-300"
                       >
                         Delete
                       </button>
