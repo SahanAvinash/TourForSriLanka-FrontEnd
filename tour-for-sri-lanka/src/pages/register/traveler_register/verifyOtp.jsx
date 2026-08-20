@@ -91,21 +91,24 @@ export default function VerifyOtp(){
     }
 
     return(
-        <div className="w-full h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex justify-center items-center relative">
-            <div className="absolute left-[80px]">
-                <img src="/main_logo.png" alt="main_logo.png"/>
-            </div>
+        <div className="w-full min-h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-16 lg:gap-24 px-4 sm:px-6 py-10 md:py-12">
 
-            <div className="w-[450px] bg-[#253745] text-[#CCD0CF] rounded-[20px] flex flex-col items-center p-[30px] absolute right-[10%]">
+            <img
+                src="/main_logo.png"
+                alt="main_logo"
+                className="w-[100px] sm:w-[150px] md:w-[220px] lg:w-[360px] xl:w-[480px] 2xl:w-[600px] shrink-0 transition-transform duration-300"
+            />
 
-                <h1 className="text-[25px] font-bold text-[#CCD0CF] text-center">Verify your email</h1>
+            <div className="w-full max-w-[450px] bg-[#253745] text-[#CCD0CF] rounded-[20px] flex flex-col items-center p-[20px] sm:p-[30px]">
+
+                <h1 className="text-[20px] sm:text-[25px] font-bold text-[#CCD0CF] text-center">Verify your email</h1>
 
                 <p className="text-[12px] text-[#CCD0CF]/70 mt-[10px] text-center">
                     We sent a 6-digit code to <span className="font-bold">{email}</span>
                 </p>
 
-                {err && <div className="text-[12px] text-[#9E4444] mt-[10px]">{err}</div>}
-                {resendMsg && <div className="text-[12px] text-[#00C896] mt-[10px]">{resendMsg}</div>}
+                {err && <div className="text-[12px] text-[#9E4444] mt-[10px] text-center">{err}</div>}
+                {resendMsg && <div className="text-[12px] text-[#00C896] mt-[10px] text-center">{resendMsg}</div>}
 
                 <input
                     type="text"
@@ -133,7 +136,7 @@ export default function VerifyOtp(){
 
                 <button
                     onClick={handlePrevious}
-                    className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer"
+                    className="w-full h-[50px] flex justify-center items-center gap-1 rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer"
                 >
                     <GrFormPreviousLink/>Previous
                 </button>

@@ -10,7 +10,7 @@ export default function TravelerProfilePhoto(){
     const [isLoading, setIsLoading] = useState(false)
 
     const [err,setErr] = useState("")
-    
+
     const navigate = useNavigate()
 
     const handleDrop = (e) =>{
@@ -96,42 +96,38 @@ export default function TravelerProfilePhoto(){
             setIsLoading(false)
         }
     }
-    
+
     return(
+        <div className="w-full min-h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-16 lg:gap-24 px-4 sm:px-6 py-10 md:py-12">
 
-         <div className="w-full h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex justify-center items-center relative">
+            <img
+                src="/main_logo.png"
+                alt="main_logo"
+                className="w-[100px] sm:w-[150px] md:w-[220px] lg:w-[360px] xl:w-[480px] 2xl:w-[600px] shrink-0 transition-transform duration-300"
+            />
 
-            <div className="absolute left-[80px]">
+            <div className="w-full max-w-[500px] bg-[#253745] text-[#CCD0CF] rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
 
-                <img src="/main_logo.png" alt="main_logo.png"/>
+                <h1 className="text-[20px] sm:text-[25px] font-bold text-[#CCD0CF] text-center">Sign up as a Traveler</h1>
 
-            </div>
-
-            <div className="w-[500px] h-[380px] bg-[#253745] text-[#CCD0CF] absolute right-[10%] rounded-[20px] flex flex-col items-center">
-                
-                <h1 className="text-[25px] mt-[20px] font-bold text-[#CCD0CF]">Sign up as a Traveler</h1>
                 {err && (
-                    <div className="text-[12px] text-[#9E4444]">
+                    <div className="text-[12px] text-[#9E4444] text-center mt-[5px]">
                         {err}
                     </div>
                 )}
 
-                <div className="w-full flex justify-between items-center p-[30px] mt-[10px]">
+                <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 py-[20px] sm:p-[30px] mt-[10px]">
 
-                    <div className="w-[110px]">
-
+                    <div className="w-full sm:w-[110px] text-center sm:text-left">
                         <h2 className="font-bold text-[#CCD0CF] text-[16px]">Profile Photo</h2>
-
                         <h1 className="text-[12px] text-[#CCD0CF]/80 pt-[10px]">Upload a clear photo of yourself</h1>
-
                         <h1 className="text-[12px] text-[#CCD0CF]/80 pt-[10px]">JPG,PNG format Max size 2MB</h1>
-
                     </div>
 
                     <div onClick={()=> fileInputRef.current.click()}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop} 
-                    className="w-[120px] h-[120px] overflow-hidden bg-[#4A5C6A]/50 rounded-full border-2 border-dotted border-[#00C896]/50 flex flex-col justify-center items-center cursor-pointer group hover:border-[#00C896]/80 transition-all duration-300">
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        className="w-[120px] h-[120px] shrink-0 overflow-hidden bg-[#4A5C6A]/50 rounded-full border-2 border-dotted border-[#00C896]/50 flex flex-col justify-center items-center cursor-pointer group hover:border-[#00C896]/80 transition-all duration-300">
 
                         {photo ? (
                             <img
@@ -142,7 +138,6 @@ export default function TravelerProfilePhoto(){
                         ) : (
                             <>
                                 <FaCamera className="text-[#00C896]/50 text-[20px] group-hover:text-[#00C896]/80 transition-all duration-300"/>
-
                                 <p className="text-[10px] text-[#CCD0CF]/50 mt-[5px] text-center pl-[5px] pr-[5px]">Drag & Drop your photo</p>
                                 <p className="text-[10px] text-[#CCD0CF]/50 text-center">or</p>
                                 <p className="text-[#00C896]/50 text-[10px] group-hover:text-[#00C896]/80 transition-all duration-300">Browse Files</p>
@@ -156,23 +151,24 @@ export default function TravelerProfilePhoto(){
                         className="hidden"
                         onChange={handlePhotoChange}
                     />
-                    <div className="flex flex-col">
+                    <div className="flex flex-row sm:flex-col gap-[10px]">
                         <button onClick={() => fileInputRef.current.click()} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] border border-[#4A5C6A]/50 hover:border-[#00C896]/80 transition-all duration-300 cursor-pointer">Change Photo</button>
-                        <button onClick={handleRemovePhoto} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] mt-[10px] border border-[#4A5C6A]/50 hover:border-[#9E4444]/80 transition-all duration-300 cursor-pointer">Remove Photo</button>
+                        <button onClick={handleRemovePhoto} className="rounded-[20px] bg-[#4A5C6A]/50 p-[5px] text-[12px] text-[#CCD0CF] border border-[#4A5C6A]/50 hover:border-[#9E4444]/80 transition-all duration-300 cursor-pointer">Remove Photo</button>
                     </div>
                 </div>
-                        <button 
-                            onClick={handleSignUp} 
-                            disabled={isLoading}
-                            className="text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled::hover:scale-100"
-                            >
-                                {isLoading ? "Signing Up..." : "sign Up"}
-                            </button>
-                        <button onClick={handlePrevious} className="w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[10px] hover:scale-95 text-[20px] font-bold cursor-pointer"><GrFormPreviousLink/>Previous</button>
+
+                <button
+                    onClick={handleSignUp}
+                    disabled={isLoading}
+                    className="text-[16px] sm:text-[20px] font-bold w-[90%] h-[50px] flex justify-center items-center rounded-[20px] bg-[#00C896]/50 hover:bg-[#00C896]/80 transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                    {isLoading ? "Signing Up..." : "Sign Up"}
+                </button>
+                <button onClick={handlePrevious} className="w-[90%] h-[50px] flex justify-center items-center gap-1 rounded-[20px] bg-[#4A5C6A]/50 hover:bg-[#4A5C6A]/80 transition-all duration-300 mt-[10px] hover:scale-95 text-[16px] sm:text-[20px] font-bold cursor-pointer">
+                    <GrFormPreviousLink/>Previous
+                </button>
             </div>
 
-         </div>
-
+        </div>
     )
-
 }

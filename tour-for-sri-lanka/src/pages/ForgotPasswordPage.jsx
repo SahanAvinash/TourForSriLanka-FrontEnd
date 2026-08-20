@@ -56,7 +56,14 @@ export default function ForgotPasswordPage(){
     }
 
     return (
-        <div className="w-full h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex justify-center items-center">
+        <div className="w-full min-h-screen bg-gradient-to-r from-[#06141B] to-[#253745] flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-16 lg:gap-24 px-4 sm:px-6 py-10 md:py-12">
+
+            <img
+                src="/main_logo.png"
+                alt="main_logo"
+                className="w-[100px] xs:w-[120px] sm:w-[150px] md:w-[220px] lg:w-[360px] xl:w-[480px] 2xl:w-[600px] shrink-0 transition-transform duration-300"
+            />
+
             <div className="w-[450px] bg-[#253745] text-[#CCD0CF] rounded-[20px] flex flex-col items-center py-[30px]">
 
                 {step === 1 && (
@@ -69,7 +76,7 @@ export default function ForgotPasswordPage(){
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="text-[12px] w-[350px] h-[50px] bg-[#4A5C6A] rounded-[20px] pl-[50px]"/>
                         </div>
-                        <button disabled={loading} className="w-[350px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] font-bold hover:bg-[#00C896]/80 transition-all">
+                        <button disabled={loading} className="w-[350px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] font-bold hover:bg-[#00C896]/80 transition-all cursor-pointer duration-300">
                             {loading ? "Sending..." : "Send OTP"}
                         </button>
                     </form>
@@ -82,10 +89,10 @@ export default function ForgotPasswordPage(){
                         <input type="text" required maxLength={6} placeholder="Enter OTP" value={otp}
                             onChange={(e) => setOtp(e.target.value)}
                             className="text-[16px] tracking-[10px] text-center w-[350px] h-[50px] bg-[#4A5C6A] rounded-[20px] mt-[20px]"/>
-                        <button disabled={loading} className="w-[350px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] font-bold hover:bg-[#00C896]/80 transition-all">
+                        <button disabled={loading} className="w-[350px] h-[50px] bg-[#00C896]/50 rounded-[20px] mt-[20px] font-bold hover:bg-[#00C896]/80 transition-all duration-300 cursor-pointer">
                             {loading ? "Verifying..." : "Verify OTP"}
                         </button>
-                        <label className="text-[12px] mt-[15px] cursor-pointer hover:underline" onClick={() => setStep(1)}>
+                        <label className="text-[12px] mt-[15px] cursor-pointer hover:underline hover:text-primary-green/50" onClick={() => setStep(1)}>
                             Wrong email? Go back
                         </label>
                     </form>

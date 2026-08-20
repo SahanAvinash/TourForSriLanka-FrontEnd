@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { MdEmail, MdLock } from "react-icons/md";
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import axios from "axios"
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
@@ -15,6 +15,7 @@ const ROLE_REDIRECTS = {
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -72,7 +73,7 @@ export default function LoginPage() {
           <img
             src="/main_logo.png"
             alt="main_logo"
-            className="login-logo-anim w-[100px] xs:w-[120px] sm:w-[150px] md:w-[300px] lg:w-[450px] xl:w-[550px] 2xl:w-[550px] shrink-0 transition-transform duration-300"
+            className="login-logo-anim w-[100px] xs:w-[120px] sm:w-[150px] md:w-[220px] lg:w-[360px] xl:w-[480px] 2xl:w-[600px] shrink-0 transition-transform duration-300"
           />
 
           <div className="login-card-anim w-full max-w-[420px] sm:max-w-[450px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-8 px-6 sm:px-10 shadow-lg shadow-black/10 transition-shadow duration-300 hover:shadow-xl">
@@ -96,13 +97,22 @@ export default function LoginPage() {
             <div className="group relative flex items-center w-full mt-[16px] sm:mt-[20px]">
               <MdLock className="ml-[20px] text-primary-green absolute outline-none opacity-[50%] group-focus-within:opacity-100 group-hover:opacity-[80%] transition-opacity duration-300" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="text-text text-[12px] w-full h-[48px] sm:h-[50px] bg-border rounded-[20px] pl-[50px] outline-none ring-2 ring-transparent focus:ring-primary-green/60 transition-all duration-300"
+                className="text-text text-[12px] w-full h-[48px] sm:h-[50px] bg-border rounded-[20px] pl-[50px] pr-[45px] outline-none ring-2 ring-transparent focus:ring-primary-green/60 transition-all duration-300"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="mr-[15px] text-primary-green absolute right-0 outline-none opacity-[50%] hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+              </button>
             </div>
 
             <div className="w-full mt-[12px] sm:mt-[10px] flex flex-wrap justify-between items-center gap-y-2">
