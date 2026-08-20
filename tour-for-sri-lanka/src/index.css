@@ -2,4 +2,10 @@
 
 @theme {
   --font-antonsc: "Anton SC", sans-serif;
+
+  --color-primary-1: #06141B;
+  --color-primary-2: #253745;
+  --color-primary-green: #00C896;
+  --color-text: #CCD0CF;
+  --color-border: #4A5C6A;
 }
