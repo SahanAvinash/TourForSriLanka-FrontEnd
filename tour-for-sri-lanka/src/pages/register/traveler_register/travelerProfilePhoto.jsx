@@ -117,7 +117,7 @@ export default function TravelerProfilePhoto() {
                     />
                 </div>
 
-                <div className="w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
+                <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
 
                     <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">Sign up as a Traveler</h1>
 

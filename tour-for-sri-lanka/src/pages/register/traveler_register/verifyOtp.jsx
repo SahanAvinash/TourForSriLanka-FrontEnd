@@ -102,11 +102,11 @@ export default function VerifyOtp() {
                     <img
                         src="/main_logo.png"
                         alt="Tours for Sri Lanka"
-                        className="w-full h-auto object-contain"
+                        className=" w-full h-auto object-contain"
                     />
                 </div>
 
-                <div className="w-full max-w-[450px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center p-[20px] sm:p-[30px]">
+                <div className="login-card-anim w-full max-w-[450px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center p-[20px] sm:p-[30px]">
 
                     <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">Verify your email</h1>
 
