@@ -7,8 +7,11 @@ import {
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 
+
 const STORAGE_KEY = "VehicleOwnerRegister";
+
 const MAX_PHOTOS = 5;
+
 const API_URL = "http://localhost:3000/api/transport/upload-photo";
 
 const LUGGAGE_OPTIONS = {
@@ -72,24 +75,10 @@ const DISTRICTS = [
 ];
 
 const STEPS = [
-    {
-        label: "Account",
-        done: true,
-    },
-    {
-        label: "Vehicle Information",
-        done: true,
-    },
-    {
-        label: "Facilities",
-        done: true,
-        active: true,
-        number: "3",
-    },
-    {
-        label: "Verification",
-        number: "4",
-    },
+    { label: "Account", done: true, number: "1" },
+    { label: "Vehicle Information", done: true, number: "2" },
+    { label: "Facilities", number: "3", current: true },
+    { label: "Verification", number: "4" },
 ];
 
 const selectStyles = {
@@ -98,7 +87,8 @@ const selectStyles = {
         width: "100%",
         minHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "rgb(74 92 106 / 50%)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
     }),
@@ -109,6 +99,12 @@ const selectStyles = {
         zIndex: 100,
     }),
 
+    
+    menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+    }),
+
     option: (base, state) => ({
         ...base,
         backgroundColor: state.isFocused
@@ -116,6 +112,7 @@ const selectStyles = {
             : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
+        fontSize: "12px"
     }),
 
     singleValue: (base) => ({
@@ -204,6 +201,7 @@ const miniSelectStyles = {
 export default function VehicleFacilities() {
     const navigate = useNavigate();
 
+    // Facilities form state
     const [passengerCapacity, setPassengerCapacity] = useState(null);
     const [luggageCapacity, setLuggageCapacity] = useState(null);
     const [fuelType, setFuelType] = useState(null);
@@ -403,256 +401,265 @@ export default function VehicleFacilities() {
     };
 
     return (
-        <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden flex flex-col">
-            <div className="w-full flex justify-center lg:justify-start px-4 sm:px-6 lg:pl-[50px] pt-6 sm:pt-8 lg:pt-[50px] shrink-0">
-                <div className="w-[230px] xs:w-[290px] sm:w-[380px] lg:w-[560px] flex items-start">
-                    {STEPS.map((step, index) => (
-                        <Fragment key={step.label}>
-                            <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
-                                <div
-                                    className={`w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] lg:w-[30px] lg:h-[30px] rounded-full flex items-center justify-center shrink-0 ${
-                                        step.done
-                                            ? "bg-primary-green/80"
-                                            : "bg-border/80"
-                                    }`}
-                                >
-                                    <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                        {step.done &&
-                                        !step.active ? (
-                                            <FaCheck />
-                                        ) : (
-                                            step.number
-                                        )}
+        <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
+
+            <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
+                <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
+                    <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
+                        {STEPS.map((step, index) => (
+                            <Fragment key={step.label}>
+                                <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
+                                    <div
+                                        className={`w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] lg:w-[30px] lg:h-[30px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                                            step.done
+                                                ? "bg-primary-green/80"
+                                                : step.current
+                                                ? "bg-primary-green/30"
+                                                : "bg-border/80"
+                                        }`}
+                                    >
+                                        <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
+                                            {step.done ? <FaCheck /> : step.number}
+                                        </span>
+                                    </div>
+
+                                    <span className="mt-1 text-text text-[6px] sm:text-[8px] lg:text-[12px] text-center leading-tight whitespace-nowrap">
+                                        {step.label}
                                     </span>
                                 </div>
 
-                                <span className="mt-1 text-text text-[6px] sm:text-[8px] lg:text-[12px] text-center leading-tight whitespace-nowrap">
-                                    {step.label}
-                                </span>
-                            </div>
-
-                            {index < STEPS.length - 1 && (
-                                <div className="flex-1 h-0 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
-                            )}
-                        </Fragment>
-                    ))}
+                                {index < STEPS.length - 1 && (
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                )}
+                            </Fragment>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div className="flex-1 w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-8 lg:gap-8 px-4 sm:px-6 lg:pl-[80px] lg:pr-[8%] py-8">
-                <img
-                    src="/main_logo.png"
-                    alt="Tours for Sri Lanka"
-                    className="w-[220px] xs:w-[260px] sm:w-[340px] md:w-[380px] lg:w-[500px] xl:w-[550px] shrink-0 object-contain animate-logo"
-                />
+            <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
+                <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
 
-                <div className="w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
-                    <h1 className="text-[20px] xs:text-[22px] sm:text-[25px] font-bold text-text text-center">
-                        Sign up as a Vehicle Owner
-                    </h1>
-
-                    {error && (
-                        <p className="text-[#9E4444] text-[12px] text-center mt-2 px-2">
-                            {error}
-                        </p>
-                    )}
-
-                    <div className="mt-[20px] w-full text-[12px]">
-                        <Select
-                            options={DISTRICTS}
-                            isMulti
-                            value={availableArea}
-                            onChange={(selected) =>
-                                setAvailableArea(selected || [])
-                            }
-                            placeholder="Available Districts"
-                            menuPosition="fixed"
-                            styles={selectStyles}
+                    <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
+                        <img
+                            src="/main_logo.png"
+                            alt="Tours for Sri Lanka"
+                            className="w-full h-auto object-contain"
                         />
                     </div>
 
-                    <div className="w-full bg-border/50 rounded-[20px] mt-[10px] p-3 sm:p-4">
-                        <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                            <div className="flex flex-col items-center min-w-0">
-                                <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
-                                    Passenger
-                                    <br />
-                                    Capacity
+                    <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
+                        <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">
+                            Sign up as a Vehicle Owner
+                        </h1>
+
+                        {error && (
+                            <p className="text-[#9E4444] text-[12px] text-center mt-2 px-2">
+                                {error}
+                            </p>
+                        )}
+
+                        <div className="mt-[20px] w-full text-[12px]">
+                            <Select
+                                options={DISTRICTS}
+                                isMulti
+                                value={availableArea}
+                                onChange={(selected) =>
+                                    setAvailableArea(selected || [])
+                                }
+                                placeholder="Available Districts"
+                                menuPosition="fixed"
+                                menuPortalTarget={document.body}
+                                styles={selectStyles}
+                            />
+                        </div>
+
+                        <div className="w-full bg-border/50 rounded-[20px] mt-[10px] p-3 sm:p-4">
+                            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                                <div className="flex flex-col items-center min-w-0">
+                                    <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
+                                        Passenger
+                                        <br />
+                                        Capacity
+                                    </div>
+
+                                    <div className="w-full">
+                                        <Select
+                                            options={passengerOptions}
+                                            value={passengerCapacity}
+                                            onChange={setPassengerCapacity}
+                                            placeholder="0"
+                                            menuPosition="fixed"
+                                            menuPortalTarget={document.body}
+                                            styles={miniSelectStyles}
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="w-full">
-                                    <Select
-                                        options={passengerOptions}
-                                        value={passengerCapacity}
-                                        onChange={setPassengerCapacity}
-                                        placeholder="0"
-                                        menuPosition="fixed"
-                                        styles={miniSelectStyles}
-                                    />
-                                </div>
-                            </div>
+                                <div className="flex flex-col items-center min-w-0">
+                                    <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
+                                        Luggage
+                                        <br />
+                                        Capacity
+                                    </div>
 
-                            <div className="flex flex-col items-center min-w-0">
-                                <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
-                                    Luggage
-                                    <br />
-                                    Capacity
-                                </div>
-
-                                <div className="w-full">
-                                    <Select
-                                        options={luggageOptions}
-                                        value={luggageCapacity}
-                                        onChange={setLuggageCapacity}
-                                        placeholder="Select"
-                                        menuPosition="fixed"
-                                        styles={miniSelectStyles}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col items-center min-w-0">
-                                <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
-                                    Fuel
-                                    <br />
-                                    Type
+                                    <div className="w-full">
+                                        <Select
+                                            options={luggageOptions}
+                                            value={luggageCapacity}
+                                            onChange={setLuggageCapacity}
+                                            placeholder="Select"
+                                            menuPosition="fixed"
+                                            menuPortalTarget={document.body}
+                                            styles={miniSelectStyles}
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="w-full">
-                                    <Select
-                                        options={FUEL_TYPES}
-                                        value={fuelType}
-                                        onChange={setFuelType}
-                                        placeholder="Select"
-                                        menuPosition="fixed"
-                                        styles={miniSelectStyles}
-                                    />
+                                <div className="flex flex-col items-center min-w-0">
+                                    <div className="text-text/80 text-[9px] sm:text-[11px] mb-2 text-center leading-tight">
+                                        Fuel
+                                        <br />
+                                        Type
+                                    </div>
+
+                                    <div className="w-full">
+                                        <Select
+                                            options={FUEL_TYPES}
+                                            value={fuelType}
+                                            onChange={setFuelType}
+                                            placeholder="Select"
+                                            menuPosition="fixed"
+                                            menuPortalTarget={document.body}
+                                            styles={miniSelectStyles}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="w-full bg-border/50 rounded-[20px] mt-[10px] p-4">
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div className="w-full sm:w-[130px] text-center sm:text-left">
-                                <h2 className="font-bold text-text text-[16px]">
-                                    Vehicle Photos
-                                </h2>
+                        <div className="w-full bg-border/50 rounded-[20px] mt-[10px] p-4">
+                            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div className="w-full sm:w-[130px] text-center sm:text-left">
+                                    <h2 className="font-bold text-text text-[16px]">
+                                        Vehicle Photos
+                                    </h2>
 
-                                <p className="text-[11px] text-text/80 pt-2">
-                                    Upload clear photos of your vehicle
-                                </p>
+                                    <p className="text-[11px] text-text/80 pt-2">
+                                        Upload clear photos of your vehicle
+                                    </p>
 
-                                <p className="text-[11px] text-text/80 pt-2">
-                                    JPG, PNG format
-                                </p>
+                                    <p className="text-[11px] text-text/80 pt-2">
+                                        JPG, PNG format
+                                    </p>
 
-                                <p className="text-[11px] text-text/80 pt-1">
-                                    Maximum {MAX_PHOTOS} photos
-                                </p>
-                            </div>
+                                    <p className="text-[11px] text-text/80 pt-1">
+                                        Maximum {MAX_PHOTOS} photos
+                                    </p>
+                                </div>
 
-                            <div className="flex flex-col items-center w-full sm:w-auto">
-                                <input
-                                    type="file"
-                                    id="vehiclePhotos"
-                                    multiple
-                                    accept="image/png,image/jpeg,image/jpg"
-                                    className="hidden"
-                                    onChange={handlePhotoChange}
-                                />
+                                <div className="flex flex-col items-center w-full sm:w-auto">
+                                    <input
+                                        type="file"
+                                        id="vehiclePhotos"
+                                        multiple
+                                        accept="image/png,image/jpeg,image/jpg"
+                                        className="hidden"
+                                        onChange={handlePhotoChange}
+                                    />
 
-                                <label
-                                    htmlFor="vehiclePhotos"
-                                    className="w-[220px] h-[80px] overflow-x-auto bg-border/50 rounded-[15px] border-2 border-dotted border-primary-green/50 flex flex-col justify-center items-center cursor-pointer hover:border-primary-green/80 transition-all duration-300"
-                                >
-                                    {photos.length === 0 ? (
-                                        <>
-                                            <FaUpload className="text-primary-green/60 text-[22px]" />
+                                    <label
+                                        htmlFor="vehiclePhotos"
+                                        className="w-[220px] h-[80px] overflow-x-auto bg-border/50 rounded-[15px] border-2 border-dotted border-primary-green/50 flex flex-col justify-center items-center cursor-pointer hover:border-primary-green/80 transition-all duration-300"
+                                    >
+                                        {photos.length === 0 ? (
+                                            <>
+                                                <FaUpload className="text-primary-green/60 text-[22px]" />
 
-                                            <p className="text-[10px] text-text/50 mt-2 text-center px-2">
-                                                Click to Upload
-                                            </p>
+                                                <p className="text-[10px] text-text/50 mt-2 text-center px-2">
+                                                    Click to Upload
+                                                </p>
 
-                                            <p className="text-[10px] text-text/50">
-                                                or Drag & Drop
-                                            </p>
+                                                <p className="text-[10px] text-text/50">
+                                                    or Drag & Drop
+                                                </p>
 
-                                            <p className="text-primary-green/60 text-[10px] mt-1">
-                                                Browse Files
-                                            </p>
-                                        </>
-                                    ) : (
-                                        <div className="flex gap-2 w-full h-full p-2 items-center">
-                                            {photos
-                                                .slice(0, MAX_PHOTOS)
-                                                .map((photo, index) => (
-                                                    <div
-                                                        key={`${photo.name}-${index}`}
-                                                        className="relative min-w-[42px] w-[42px] h-full"
-                                                    >
-                                                        {photo.uploading ? (
-                                                            <div className="w-full h-full rounded-lg bg-border flex items-center justify-center">
-                                                                <span className="text-[8px] text-text/80 text-center">
-                                                                    Uploading...
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <img
-                                                                src={photo.url}
-                                                                alt={`Vehicle ${
-                                                                    index + 1
-                                                                }`}
-                                                                className="w-full h-full object-cover rounded-lg"
-                                                            />
-                                                        )}
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={(event) => {
-                                                                event.preventDefault();
-                                                                event.stopPropagation();
-                                                                removePhoto(index);
-                                                            }}
-                                                            className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-border hover:bg-[#9E4444] text-text text-[10px] flex items-center justify-center transition-all duration-300"
+                                                <p className="text-primary-green/60 text-[10px] mt-1">
+                                                    Browse Files
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <div className="flex gap-2 w-full h-full p-2 items-center">
+                                                {photos
+                                                    .slice(0, MAX_PHOTOS)
+                                                    .map((photo, index) => (
+                                                        <div
+                                                            key={`${photo.name}-${index}`}
+                                                            className="relative min-w-[42px] w-[42px] h-full"
                                                         >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                        </div>
-                                    )}
-                                </label>
+                                                            {photo.uploading ? (
+                                                                <div className="w-full h-full rounded-lg bg-border flex items-center justify-center">
+                                                                    <span className="text-[8px] text-text/80 text-center">
+                                                                        Uploading...
+                                                                    </span>
+                                                                </div>
+                                                            ) : (
+                                                                <img
+                                                                    src={photo.url}
+                                                                    alt={`Vehicle ${
+                                                                        index + 1
+                                                                    }`}
+                                                                    className="w-full h-full object-cover rounded-lg"
+                                                                />
+                                                            )}
 
-                                {photos.length > 0 &&
-                                    photos.length < MAX_PHOTOS && (
-                                        <p className="text-[9px] text-primary-green/70 mt-2 text-center">
-                                            Click to add more photos (
-                                            {photos.length}/{MAX_PHOTOS})
-                                        </p>
-                                    )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={(event) => {
+                                                                    event.preventDefault();
+                                                                    event.stopPropagation();
+                                                                    removePhoto(index);
+                                                                }}
+                                                                className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-border hover:bg-[#9E4444] text-text text-[10px] flex items-center justify-center transition-all duration-300"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </label>
+
+                                    {photos.length > 0 &&
+                                        photos.length < MAX_PHOTOS && (
+                                            <p className="text-[9px] text-primary-green/70 mt-2 text-center">
+                                                Click to add more photos (
+                                                {photos.length}/{MAX_PHOTOS})
+                                            </p>
+                                        )}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="mt-[20px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <button
-                            type="button"
-                            onClick={handlePrevious}
-                            className="w-full h-[50px] bg-border/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-border/80 transition-all duration-300 hover:scale-95 cursor-pointer"
-                        >
-                            <GrFormPreviousLink className="font-bold text-[20px]" />
-                            Previous
-                        </button>
+                        <div className="mt-[20px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <button
+                                type="button"
+                                onClick={handlePrevious}
+                                className="w-full h-[50px] bg-border/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-border/80 transition-all duration-300 hover:scale-95 cursor-pointer"
+                            >
+                                <GrFormPreviousLink className="font-bold text-[20px]" />
+                                Previous
+                            </button>
 
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full h-[50px] bg-primary-green/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 cursor-pointer"
-                        >
-                            Next
-                            <GrFormNextLink className="font-bold text-[20px]" />
-                        </button>
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="w-full h-[50px] bg-primary-green/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 cursor-pointer"
+                            >
+                                Next
+                                <GrFormNextLink className="font-bold text-[20px]" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
