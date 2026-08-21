@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   FaMapMarkerAlt, FaWifi, FaSwimmingPool, FaParking, FaSnowflake,
@@ -32,6 +32,44 @@ const roomFacilityLabels = {
 
 const API_BASE = "http://localhost:3000/api"
 
+// Scroll-triggered reveal hook, reused across facilities & room cards
+function useInView(threshold = 0.15) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.unobserve(el)
+        }
+      },
+      { threshold }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return [ref, inView]
+}
+
+// Small wrapper for staggered scroll-in badges (facilities)
+function AnimatedBadge({ children, index = 0, className = "" }) {
+  const [ref, inView] = useInView()
+  return (
+    <div
+      ref={ref}
+      className={`category-card-anim ${inView ? "in-view" : ""} ${className}`}
+      style={{ animationDelay: inView ? `${index * 60}ms` : undefined }}
+    >
+      {children}
+    </div>
+  )
+}
+
 function RoomImageCarousel ({images, isHovered}){
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -61,13 +99,16 @@ function RoomImageCarousel ({images, isHovered}){
     )
 }
 
-function RoomCard({ room, onBook }) {
+function RoomCard({ room, onBook, index = 0 }) {
     const [isHovered, setIsHovered] = useState(false)
+    const [ref, inView] = useInView()
     const images = room.images && room.images.length > 0 ? room.images : ["/room_placeholder.jpg"]
 
     return (
         <div
-            className="bg-[#253745] rounded-[18px] overflow-hidden"
+            ref={ref}
+            className={`bg-[#253745] rounded-[18px] overflow-hidden destination-card-anim ${inView ? "in-view" : ""}`}
+            style={{ animationDelay: inView ? `${index * 80}ms` : undefined }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -256,7 +297,7 @@ export default function HotelDetailsPage(){
         <Navbar/>
         {/* Hero image gallery */}
         <div className="relative h-[420px] px-4">
-            <div className="relative h-full rounded-[30px] overflow-hidden group">
+            <div className="relative h-full rounded-[30px] overflow-hidden group destination-gallery-anim">
                 {imagesArray.map((img, i) => (
                     <img
                         key={i}
@@ -296,7 +337,7 @@ export default function HotelDetailsPage(){
       <div className="max-w-[1100px] mx-auto px-[20px] -mt-[60px] relative z-10">
 
         {/* Hotel header card */}
-        <div className="bg-[#253745] rounded-[20px] p-[24px] shadow-xl">
+        <div className="bg-[#253745] rounded-[20px] p-[24px] shadow-xl destination-info-anim">
           <div className="flex items-start justify-between flex-wrap gap-[12px]">
             <div>
               <div className="flex items-center gap-[10px]">
@@ -342,17 +383,25 @@ export default function HotelDetailsPage(){
           <div className="flex flex-wrap gap-[10px]">
             {Object.entries(facilityMeta)
               .filter(([key]) => hotel.facilities?.[key])
-              .map(([key, meta]) => (
-                <div key={key} className="bg-[#253745] rounded-[14px] px-[14px] py-[8px] flex items-center gap-[8px] text-center">
+              .map(([key, meta], i) => (
+                <AnimatedBadge
+                  key={key}
+                  index={i}
+                  className="bg-[#253745] rounded-[14px] px-[14px] py-[8px] flex items-center gap-[8px] text-center"
+                >
                   <span className="text-[#00C896] text-[14px]">{meta.icon}</span>
                   <span className="text-gray-300 text-[12px]">{meta.label}</span>
-                </div>
+                </AnimatedBadge>
               ))}
             {hotel.otherFacility?.map((f, i) => (
-              <div key={`other-${i}`} className="bg-[#253745] rounded-full px-[14px] py-[8px] flex items-center gap-[6px] text-center">
+              <AnimatedBadge
+                key={`other-${i}`}
+                index={i}
+                className="bg-[#253745] rounded-full px-[14px] py-[8px] flex items-center gap-[6px] text-center"
+              >
                 <span className="text-[#00C896] text-[20px]"><FaCheckCircle /></span>
                 <span className="text-gray-300 text-[12px]">{f}</span>
-              </div>
+              </AnimatedBadge>
             ))}
           </div>
         </div>
@@ -365,8 +414,8 @@ export default function HotelDetailsPage(){
             <p className="text-gray-400 text-[14px]">No rooms have been added for this hotel yet.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-                {rooms.filter((room) => room.status !== "maintenance").map((room) => (
-                    <RoomCard key={room._id} room={room} onBook={setSelectedRoom} />
+                {rooms.filter((room) => room.status !== "maintenance").map((room, i) => (
+                    <RoomCard key={room._id} room={room} onBook={setSelectedRoom} index={i} />
                 ))}
             </div>
           )}
@@ -391,8 +440,8 @@ export default function HotelDetailsPage(){
 
       {/* Booking modal */}
       {selectedRoom && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-[16px]">
-          <div className="bg-[#253745] rounded-[20px] p-[24px] w-full max-w-[420px] relative">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-[16px] modal-backdrop-anim">
+          <div className="animate-box bg-[#253745] rounded-[20px] p-[24px] w-full max-w-[420px] relative">
             <button onClick={() => setSelectedRoom(null)} className="absolute top-[16px] right-[16px] text-gray-400 hover:text-white">
               <FaTimes />
             </button>

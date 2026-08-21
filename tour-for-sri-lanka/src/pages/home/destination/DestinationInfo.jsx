@@ -45,7 +45,7 @@ const DestinationInfo = ({ destination }) => {
 
         <button
           onClick={handleAddToTrip}
-          className={`inline-block duration-300 px-8 py-4 rounded-full font-semibold border-2 ${
+          className={`inline-block duration-300 px-8 py-4 rounded-full font-semibold border-2 cursor-pointer ${
             inTrip
               ? "bg-[#00C896] border-[#00C896] text-white hover:bg-[#00b383]"
               : "bg-transparent border-[#00C896] text-[#00C896] hover:bg-[#00C896]/10"
