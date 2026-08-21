@@ -45,7 +45,7 @@ export default function RegisterRole() {
     <div className="w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 flex items-center justify-center px-4 sm:px-6 py-10">
       <div className="w-full max-w-[1200px] flex flex-col md:flex-row items-center justify-center md:justify-between gap-10 md:gap-14 lg:gap-20">
 
-        <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0 animate-logo">
+        <div className="w-[180px] sm:w-[220px] md:w-[380px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
           <img
             src="/main_logo.png"
             alt="Tours for Sri Lanka"
@@ -53,7 +53,7 @@ export default function RegisterRole() {
           />
         </div>
 
-        <div className="w-full max-w-[420px] flex flex-col items-center animate-box">
+        <div className="login-card-anim w-full max-w-[420px] flex flex-col items-center">
           <h1 className="text-[20px] xs:text-[22px] sm:text-[25px] mt-[10px] md:mt-[20px] font-bold text-text text-center">
             Sign up as
           </h1>
