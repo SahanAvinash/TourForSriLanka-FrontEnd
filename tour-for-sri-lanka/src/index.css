@@ -1,11 +1,84 @@
 @import "tailwindcss";
 
 @theme {
-  --font-antonsc: "Anton SC", sans-serif;
+    --font-antonsc: "Anton SC", sans-serif;
 
-  --color-primary-1: #06141B;
-  --color-primary-2: #253745;
-  --color-primary-green: #00C896;
-  --color-text: #CCD0CF;
-  --color-border: #4A5C6A;
+    --color-primary-1: #06141B;
+    --color-primary-2: #253745;
+    --color-primary-green: #00C896;
+    --color-text: #CCD0CF;
+    --color-border: #4A5C6A;
+}
+
+@keyframes logoEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes boxEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(25px) scale(0.96);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-logo {
+    animation: logoEntrance 0.7s ease-out forwards;
+}
+
+.animate-box {
+    animation: boxEntrance 0.6s ease-out forwards;
+}
+
+@keyframes loginLogoFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes loginCardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.login-logo-anim {
+    opacity: 0;
+    animation: loginLogoFadeIn 0.7s ease-out forwards;
+}
+
+.login-card-anim {
+    opacity: 0;
+    animation: loginCardSlideIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-logo-anim,
+    .login-card-anim {
+        animation: none;
+        opacity: 1;
+    }
 }
