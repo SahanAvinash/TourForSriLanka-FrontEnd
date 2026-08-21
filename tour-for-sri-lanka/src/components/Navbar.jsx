@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiUserCircle } from "react-icons/hi";
 import logo from "../assets/logo.png";
+import { useTrip } from "../context/TripContext";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { tripCount } = useTrip();
   const isProfileActive = location.pathname.startsWith("/profile")
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -92,11 +94,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#253745]/95 backdrop-blur-md border-b border-white/10 shadow-md">
+    <nav className="navbar-anim fixed top-0 w-full z-50 bg-[#253745]/95 backdrop-blur-md border-b border-white/10 shadow-md">
       <div className="max-w-7xl mx-auto px-10 lg:px-10">
         <div className="flex items-center justify-between h-20">
 
-          {/* Logo */}
           <Link to="/">
             <img
               src={logo}
@@ -105,13 +106,12 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-8">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-[15px] transition-all duration-300 pb-1
+                className={`relative text-[15px] transition-all duration-300 pb-1
                   ${
                     isActive(item.path)
                       ? "text-[#00C896] border-b-2 border-[#00C896] font-semibold"
@@ -119,11 +119,15 @@ const Navbar = () => {
                   }`}
               >
                 {item.name}
+                {item.path === "/tours" && tripCount > 0 && (
+                  <span className="absolute -top-2 -right-4 bg-[#00C896] text-[#06141B] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                    {tripCount}
+                  </span>
+                )}
               </Link>
             ))}
           </div>
 
-          {/* Desktop Buttons / Profile */}
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <div className="relative" ref={profileRef}>
@@ -183,7 +187,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden text-white text-3xl"
@@ -194,7 +197,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden bg-[#253745] border-t border-white/10">
           <div className="flex flex-col px-6 py-4">
@@ -203,7 +205,7 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`py-3 transition
+                className={`relative py-3 transition flex items-center gap-2
                   ${
                     isActive(item.path)
                       ? "text-[#00C896] font-semibold"
@@ -211,6 +213,11 @@ const Navbar = () => {
                   }`}
               >
                 {item.name}
+                {item.path === "/tours" && tripCount > 0 && (
+                  <span className="bg-[#00C896] text-[#06141B] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                    {tripCount}
+                  </span>
+                )}
               </Link>
             ))}
 

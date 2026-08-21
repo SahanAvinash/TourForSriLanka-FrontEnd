@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import {
   FaFacebook,
   FaInstagram,
@@ -18,16 +19,60 @@ import badge2 from "../assets/badge2.png";
 import badge3 from "../assets/badge3.png";
 
 export default function Footer() {
+  const footerRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    let intersectionObserver;
+    let settleTimer;
+
+    const startObserving = () => {
+      if (intersectionObserver) return;
+
+      intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            intersectionObserver.disconnect();
+            resizeObserver.disconnect();
+          }
+        },
+        {
+          threshold: 0.15,
+          rootMargin: "0px 0px -50px 0px",
+        }
+      );
+
+      if (footerRef.current) intersectionObserver.observe(footerRef.current);
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(startObserving, 300);
+    });
+
+    resizeObserver.observe(document.body);
+
+    return () => {
+      clearTimeout(settleTimer);
+      resizeObserver.disconnect();
+      if (intersectionObserver) intersectionObserver.disconnect();
+    };
+  }, []);
+
   return (
-    <footer className="bg-[#253745] text-white text-[12px]">
+    <footer
+      ref={footerRef}
+      className={`bg-[#253745] text-white text-[12px] footer-fade-anim ${
+        isVisible ? "in-view" : ""
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 py-5">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
 
-          {/* LEFT */}
           <div className="flex justify-between items-start gap-6 pr-6">
 
-            {/* Explore */}
             <div>
               <h3 className="text-2xl font-semibold mb-2">
                 Explore
@@ -36,8 +81,8 @@ export default function Footer() {
               <ul className="space-y-1 text-s text-gray-300">
 
                 <li>
-                  <Link 
-                    to="/" 
+                  <Link
+                    to="/"
                     onClick={() => window.scrollTo({top: 0, left: 0, behavior: 'smooth'})}
                     className="flex items-center gap-2 hover:text-[#00C896] transition">
                     <FaChevronRight className="text-[10px]" />
@@ -90,7 +135,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Contact */}
             <div>
 
               <h3 className="text-2xl font-semibold mb-2">
@@ -132,7 +176,7 @@ export default function Footer() {
                     <br/>
                     SLTDA Reg No : SLTDA/SQA/TA/2011
                     <br />
-                    Civil Aviation License : A1478      
+                    Civil Aviation License : A1478
                   </div>
                 </div>
 
@@ -140,7 +184,6 @@ export default function Footer() {
 
             </div>
 
-            {/* Tripadvisor + Badges */}
             <div className="flex flex-col items-center gap-3 self-center">
 
               <img
@@ -159,7 +202,6 @@ export default function Footer() {
 
           </div>
 
-          {/* RIGHT */}
           <div className="flex flex-col items-center justify-center border-l-3 border-gray-500 pl-6 min-h-[200px]">
 
             <img

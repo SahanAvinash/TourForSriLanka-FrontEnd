@@ -1,70 +1,63 @@
-// pages/tour/TourDestinationSelect.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import destinations from "../../data/destinations";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useTrip } from "../../context/TripContext";
 
 const categories = ["beaches", "ancient", "mountains", "cities", "villages", "wildlife"];
 
 const TourDestinationSelect = () => {
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState("beaches");
-  const [selected, setSelected] = useState([]);
   const [startDistrict, setStartDistrict] = useState(null);
+
+  const { tripDestinations, toggleDestination, removeDestination, setTripDestinations } = useTrip();
 
   useEffect(() => {
     const savedDistrict =
-        location.state?.startDistrict || sessionStorage.getItem("tourStartDistrict");
+      location.state?.startDistrict || sessionStorage.getItem("tourStartDistrict");
     setStartDistrict(savedDistrict);
-
-    const saved = sessionStorage.getItem("TourBooking");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.selectedDestinations) setSelected(parsed.selectedDestinations);
-    }
   }, []);
 
   const toggleSelect = (dest) => {
-    const exists = selected.find((d) => d.id === dest.id);
-    if (exists) {
-      setSelected(selected.filter((d) => d.id !== dest.id));
-    } else {
-      setSelected([...selected, dest]);
-    }
+    toggleDestination(dest);
   };
 
   const moveUp = (index) => {
     if (index === 0) return;
-    const updated = [...selected];
+    const updated = [...tripDestinations];
     [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
-    setSelected(updated);
+    setTripDestinations(updated);
   };
 
   const moveDown = (index) => {
-    if (index === selected.length - 1) return;
-    const updated = [...selected];
+    if (index === tripDestinations.length - 1) return;
+    const updated = [...tripDestinations];
     [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
-    setSelected(updated);
+    setTripDestinations(updated);
   };
 
   const removeSelected = (id) => {
-    setSelected(selected.filter((d) => d.id !== id));
+    removeDestination(id);
   };
 
   const handleNext = () => {
-    if (selected.length < 2) {
+    if (tripDestinations.length < 2) {
       toast.error("Select at least 2 destinations to generate a trip");
       return;
     }
-    if(!startDistrict){
-        toast.error("Select your starting district first");
-        navigate("/tours");
-        return;
+    if (!startDistrict) {
+      toast.error("Select your starting district first");
+      navigate("/tours");
+      return;
     }
-    sessionStorage.setItem("TourBooking", JSON.stringify({ selectedDestinations: selected, startDistrict }));
+    sessionStorage.setItem(
+      "TourBooking",
+      JSON.stringify({ selectedDestinations: tripDestinations, startDistrict })
+    );
     navigate("/tour/preview");
   };
 
@@ -72,10 +65,10 @@ const TourDestinationSelect = () => {
 
   return (
     <div className="min-h-screen bg-[#11212D] text-white">
-        <Navbar/>
-        <div className="max-w-7xl mx-auto px-6 pt-28 pb-5">
-            <h1 className="text-2xl font-bold mb-6">Plan Your Trip</h1>
-        </div>
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-6 pt-28 pb-5">
+        <h1 className="text-2xl font-bold mb-6">Plan Your Trip</h1>
+      </div>
 
       <div className="flex gap-3 mb-6 flex-wrap pl-6">
         {categories.map((cat) => (
@@ -96,7 +89,7 @@ const TourDestinationSelect = () => {
       <div className="flex flex-col lg:flex-row gap-8 pl-6">
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {filteredDestinations.map((dest) => {
-            const isSelected = selected.some((d) => d.id === dest.id);
+            const isSelected = tripDestinations.some((d) => d.id === dest.id);
             return (
               <div
                 key={dest.id}
@@ -122,10 +115,10 @@ const TourDestinationSelect = () => {
 
         <div className="w-full lg:w-80 lg:mr-6 bg-[#253745] rounded-xl p-4 h-fit">
           <h2 className="text-lg font-semibold mb-3">Your Trip Order</h2>
-          {selected.length === 0 && (
+          {tripDestinations.length === 0 && (
             <p className="text-sm text-gray-400">Select destinations to add to your trip.</p>
           )}
-          {selected.map((dest, index) => (
+          {tripDestinations.map((dest, index) => (
             <div key={dest.id} className="flex items-center justify-between bg-[#11212D] rounded-lg px-3 py-2 mb-2">
               <span className="text-sm">{index + 1}. {dest.name}</span>
               <div className="flex gap-1">
@@ -145,7 +138,7 @@ const TourDestinationSelect = () => {
         </div>
       </div>
       <div className="mt-10">
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );

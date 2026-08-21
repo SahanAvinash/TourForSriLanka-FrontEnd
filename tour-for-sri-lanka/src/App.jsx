@@ -23,8 +23,8 @@ import HotelInformation from './pages/register/hotel_register/hotelInformation';
 import HotelFacilities from './pages/register/hotel_register/hotelFacilities';
 import HotelVerification from './pages/register/hotel_register/hotelVerification';
 import VerifyOtpHotel from './pages/register/hotel_register/verifyOtpHotel';
-import DestinationCategoryPage from "./pages/Destinations/DestinationCategoryPage";
-import DestinationDetailsPage from './pages/Destinations/DestinationDetailsPage';
+import DestinationCategoryPage from "./pages/home/destination/DestinationCategoryPage";
+import DestinationDetailsPage from './pages/home/destination/DestinationDetailsPage';
 import ScrollToTop from './components/ScrollToTop';
 import HotelPage from './pages/hotels/HotelPage';
 import HotelsDetailsPage from './pages/hotels/HotelDetailsPage';
@@ -45,10 +45,12 @@ import TourDestinationSelect from './pages/tour/TourDestinationSelect';
 import TourPage from './pages/tour/TourPage';
 import TourPreview from './pages/tour/TourPreview';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import { TripProvider } from './context/TripContext';
 
 
 function App() {
   return (
+    <TripProvider>
     <BrowserRouter>
     <ScrollToTop/>
     <Toaster/>
@@ -103,6 +105,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
       </Routes>
     </BrowserRouter>
+    </TripProvider>
   )
 }
 

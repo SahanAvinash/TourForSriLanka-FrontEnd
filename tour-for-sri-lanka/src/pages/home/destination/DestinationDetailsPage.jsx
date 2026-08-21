@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../../components/Navbar";
-import DestinationGallery from "../../components/destination/DestinationGallery";
-import DestinationInfo from "../../components/destination/DestinationInfo";
+import Navbar from "../../../components/Navbar";
+import DestinationGallery from "./DestinationGallery";
+import DestinationInfo from "./DestinationInfo";
 
 const DestinationDetailsPage = () => {
   const { id } = useParams();
@@ -38,8 +38,12 @@ const DestinationDetailsPage = () => {
     <div className="min-h-screen bg-[#11212D]">
       <Navbar />
       <div className="pt-20">
-        <DestinationGallery destination={destination} />
-        <DestinationInfo destination={destination} />
+        <div className="destination-gallery-anim">
+          <DestinationGallery destination={destination} />
+        </div>
+        <div className="destination-info-anim">
+          <DestinationInfo destination={destination} />
+        </div>
       </div>
     </div>
   );

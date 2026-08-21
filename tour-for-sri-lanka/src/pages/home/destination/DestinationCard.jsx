@@ -1,12 +1,40 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-const DestinationCard = ({ destination }) => {
-  return (
-    <div className="bg-[#253745] rounded-2xl overflow-hidden shadow-lg hover:-translate-y-2 transition duration-300">
+const DestinationCard = ({ destination, delay = 0 }) => {
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px 0px -150px 0px",
+      }
+    );
+
+    if (cardRef.current) observer.observe(cardRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className={`bg-[#253745] rounded-2xl overflow-hidden shadow-lg hover:-translate-y-2 transition duration-300 destination-card-anim ${
+        isVisible ? "in-view" : ""
+      }`}
+      style={{ animationDelay: isVisible ? `${delay}s` : "0s" }}
+    >
       <img
-        src={destination.image}
+        src={destination.images?.[0]}
         alt={destination.name}
         className="w-full h-60 object-cover"
       />
@@ -33,9 +61,7 @@ const DestinationCard = ({ destination }) => {
         >
           View Destination
         </Link>
-
       </div>
-
     </div>
   );
 };

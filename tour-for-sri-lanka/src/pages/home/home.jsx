@@ -1,5 +1,5 @@
-import HeroSection from "../../components/Home/HeroSection";
-import CategorySection  from "../../components/Home/CategorySection";
+import HeroSection from "./HeroSection";
+import CategorySection  from "./CategorySection";
 import Footer from "../../components/Footer";
 
 const HomePage = () => {

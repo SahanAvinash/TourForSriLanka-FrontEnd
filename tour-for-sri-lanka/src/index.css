@@ -97,3 +97,211 @@
     opacity: 0;
     animation: stepBarFadeIn 0.6s ease-out 1s forwards;
 }
+@keyframes navbarFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes heroBgFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes heroTextFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar-anim {
+    opacity: 0;
+    animation: navbarFadeIn 0.6s ease-out forwards;
+}
+
+.hero-bg-anim {
+    opacity: 0;
+    animation: heroBgFadeIn 0.8s ease-out 0.3s forwards;
+}
+
+.hero-title-anim {
+    opacity: 0;
+    animation: heroTextFadeIn 0.7s ease-out 0.8s forwards;
+}
+
+.hero-desc-anim {
+    opacity: 0;
+    animation: heroTextFadeIn 0.7s ease-out 1.2s forwards;
+}
+
+.hero-btn-anim {
+    opacity: 0;
+    animation: heroTextFadeIn 0.7s ease-out 1.6s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar-anim,
+    .hero-bg-anim,
+    .hero-title-anim,
+    .hero-desc-anim,
+    .hero-btn-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes categoryCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.category-card-anim {
+    opacity: 0;
+}
+
+.category-card-anim.in-view {
+    animation: categoryCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .category-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes footerFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.footer-fade-anim {
+    opacity: 0;
+}
+
+.footer-fade-anim.in-view {
+    animation: footerFadeIn 0.8s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-fade-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes pageTitleFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pageDescFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-title-anim {
+    opacity: 0;
+    animation: pageTitleFadeIn 0.7s ease-out 0.2s forwards;
+}
+
+.page-desc-anim {
+    opacity: 0;
+    animation: pageDescFadeIn 0.7s ease-out 0.4s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-title-anim,
+    .page-desc-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes detailSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.destination-gallery-anim {
+    opacity: 0;
+    animation: detailSectionFadeIn 0.7s ease-out 0.15s forwards;
+}
+
+.destination-info-anim {
+    opacity: 0;
+    animation: detailSectionFadeIn 0.7s ease-out 0.35s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .destination-gallery-anim,
+    .destination-info-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes destinationCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.destination-card-anim {
+    opacity: 0;
+}
+
+.destination-card-anim.in-view {
+    animation: destinationCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .destination-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
