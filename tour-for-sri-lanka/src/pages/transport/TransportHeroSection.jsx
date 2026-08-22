@@ -49,25 +49,30 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
     <section className="mt-6 pt-20 pb-24">
       <div
         className="relative h-[430px] rounded-[30px] overflow-visible bg-cover bg-center mx-5"
-        style={{
-          backgroundImage: `linear-gradient(rgba(7,25,35,.25), rgba(7,25,35,.55)), url(${heroBg})`,
-        }}
       >
+        {/* Background image layer (animated) */}
+        <div
+          className="hero-bg-anim absolute inset-0 rounded-[30px] overflow-hidden bg-cover bg-center"
+          style={{
+            backgroundImage: `linear-gradient(rgba(7,25,35,.25), rgba(7,25,35,.55)), url(${heroBg})`,
+          }}
+        />
+
         {/* Hero Text */}
         <div className="absolute left-12 top-16 z-10">
-          <h1 className="text-white text-6xl font-bold leading-tight">
+          <h1 className="hero-title-anim text-white text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
             Ride
           </h1>
 
-          <p className="text-gray-300 text-lg mt-5">
+          <p className="hero-desc-anim text-gray-300 text-lg mt-5">
             Discover and book the best vehicles with professional drivers
           </p>
         </div>
 
         {/* Search Box */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[1100px] px-5 z-20">
+        <div className="animate-box absolute -bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[1100px] px-5 z-20">
           <div className="bg-[#455766]/80 backdrop-blur-xl rounded-[28px] border border-white/10 shadow-2xl h-[100px] grid grid-cols-[1.4fr_1fr_1fr_1fr_170px] items-center px-8">
 
             <SearchField icon={<MapPin size={24} />} label="Pick Up Location">

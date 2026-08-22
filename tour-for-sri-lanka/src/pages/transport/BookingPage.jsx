@@ -6,53 +6,52 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
 import TransportReviews from "./TransportReviews";
+import MapPickerModal from "../../components/MapPickerModal";
 
-const districts = [
-    "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
-    "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-    "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-    "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-    "Monaragala", "Ratnapura", "Kegalle"
-];
-const districtOptions = districts.map((d) => ({ value: d, label: d }));
-const passengerOptions = Array.from({length:15}, (_, i) => i + 1).map((num) => ({
-    value: num,
-    label: `${num} ${num === 1 ? "Passenger" : "Passengers"}`,
-}))
+const passengerOptions = Array.from({ length: 15 }, (_, i) => i + 1).map((num) => ({
+  value: num,
+  label: `${num} ${num === 1 ? "Passenger" : "Passengers"}`,
+}));
+
 const luggageByVehicle = {
-    car: [
-        { value: 1, label: "Small (1 bag)" },
-        { value: 2, label: "Medium (2 bags)" }
-    ],
-    van: [
-        { value: 2, label: "Medium (2–4 bags)" },
-        { value: 3, label: "Large (5–8 bags)" }
-    ],
-    bus: [
-        { value: 3, label: "Medium storage" },
-        { value: 4, label: "Large storage" }
-    ],
-    jeep: [
-        { value: 1, label: "Small (1–2 bags)" }
-    ]
+  car: [
+    { value: 1, label: "Small (1 bag)" },
+    { value: 2, label: "Medium (2 bags)" },
+  ],
+  van: [
+    { value: 2, label: "Medium (2–4 bags)" },
+    { value: 3, label: "Large (5–8 bags)" },
+  ],
+  bus: [
+    { value: 3, label: "Medium storage" },
+    { value: 4, label: "Large storage" },
+  ],
+  jeep: [{ value: 1, label: "Small (1–2 bags)" }],
 };
 
 const selectStyles = {
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   container: (base) => ({ ...base, width: "100%" }),
   control: (base) => ({
-    ...base, minHeight: "38px", borderRadius: "12px",
-    backgroundColor: "#4A5C6A80", border: "none", boxShadow: "none",
+    ...base,
+    minHeight: "38px",
+    borderRadius: "12px",
+    backgroundColor: "#4A5C6A80",
+    border: "none",
+    boxShadow: "none",
   }),
   option: (base, state) => ({
-    ...base, backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
-    color: "#CCD0CF", cursor: "pointer",
+    ...base,
+    backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
+    color: "#CCD0CF",
+    cursor: "pointer",
   }),
   menu: (base) => ({ ...base, backgroundColor: "#4A5C6A" }),
   singleValue: (base) => ({ ...base, color: "#CCD0CF" }),
   placeholder: (base) => ({ ...base, color: "#CCD0CF", opacity: 0.5 }),
   input: (base) => ({ ...base, color: "#CCD0CF" }),
 };
+
 const passengerSelectStyles = {
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   container: (base) => ({ ...base, width: "100%" }),
@@ -77,28 +76,32 @@ const passengerSelectStyles = {
 };
 
 export default function BookingPage() {
-    const { vehicleId } = useParams();
-    const location = useLocation();
-    const navigate = useNavigate();
+  const { vehicleId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const vehicle = location.state?.vehicle;
-    const luggageOptions = luggageByVehicle[vehicle?.vehicleType?.toLowerCase()] || []
-
+  const vehicle = location.state?.vehicle;
+  const searchContext = location.state?.searchContext;
+  const luggageOptions = luggageByVehicle[vehicle?.vehicleType?.toLowerCase()] || [];
 
   const storedUser = JSON.parse(
     localStorage.getItem("user") || sessionStorage.getItem("user") || "null"
   );
   const travelerId = storedUser?._id;
 
+  const [pickupCoordinates, setPickupCoordinates] = useState(null);
+  const [dropoffCoordinates, setDropoffCoordinates] = useState(null);
+  const [mapPickerTarget, setMapPickerTarget] = useState(null);
+
   const [form, setForm] = useState({
     pickupLocation: "",
     dropoffLocation: "",
-    pickupDate: "",
+    pickupDate: searchContext?.pickupDate || "",
     returnDate: "",
-    numberOfPassengers: "",
-    bags: "",
+    numberOfPassengers: searchContext?.numberOfPassengers || "",
+    bags: searchContext?.bags || "",
   });
-  const [isReturnTrip, setIsReturnTrip] = useState(false)
+  const [isReturnTrip, setIsReturnTrip] = useState(false);
   const [estimate, setEstimate] = useState(null);
   const [estimating, setEstimating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -110,66 +113,84 @@ export default function BookingPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleConfirmLocation = (picked) => {
+    if (mapPickerTarget === "pickup") {
+      updateForm("pickupLocation", picked.address);
+      setPickupCoordinates({ lat: picked.lat, lng: picked.lng });
+    } else if (mapPickerTarget === "dropoff") {
+      updateForm("dropoffLocation", picked.address);
+      setDropoffCoordinates({ lat: picked.lat, lng: picked.lng });
+    }
+    setMapPickerTarget(null);
+  };
+
   useEffect(() => {
     const allFieldsFilled =
-        form.pickupLocation &&
-        form.dropoffLocation &&
-        form.pickupDate &&
-        (!isReturnTrip || form.returnDate) &&
-        form.numberOfPassengers &&
-        form.bags
+      form.pickupLocation &&
+      pickupCoordinates &&
+      form.dropoffLocation &&
+      dropoffCoordinates &&
+      form.pickupDate &&
+      (!isReturnTrip || form.returnDate) &&
+      form.numberOfPassengers &&
+      form.bags;
 
-    if(!allFieldsFilled){
-        setEstimate(null)
-        return
+    if (!allFieldsFilled) {
+      setEstimate(null);
+      return;
     }
+
     const fetchEstimate = async () => {
-        setEstimating(true)
-        try {
-            const params = new URLSearchParams({
-                vehicleId,
-                pickupLocation: form.pickupLocation,
-                dropoffLocation: form.dropoffLocation,
-                isReturnTrip: isReturnTrip
-            })
-            const res = await fetch(`http://localhost:3000/api/transport/booking-estimate?${params}`)
-            const data = await res.json()
+      setEstimating(true);
+      try {
+        const params = new URLSearchParams({
+          vehicleId,
+          pickupLat: pickupCoordinates.lat,
+          pickupLng: pickupCoordinates.lng,
+          dropoffLat: dropoffCoordinates.lat,
+          dropoffLng: dropoffCoordinates.lng,
+          isReturnTrip: isReturnTrip,
+        });
+        const res = await fetch(`http://localhost:3000/api/transport/booking-estimate?${params}`);
+        const data = await res.json();
 
-            if(!res.ok) throw new Error(data.message || "Could not calculate estimate")
-            setEstimate(data)
-        }catch(err){
-            toast.error(err.message)
-            setEstimate(null)
-        }finally{
-            setEstimating(false)
-        }
-    }
-    fetchEstimate()
+        if (!res.ok) throw new Error(data.message || "Could not calculate estimate");
+        setEstimate(data);
+      } catch (err) {
+        toast.error(err.message);
+        setEstimate(null);
+      } finally {
+        setEstimating(false);
+      }
+    };
+    fetchEstimate();
   }, [
-        form.pickupLocation,
-        form.dropoffLocation,
-        form.pickupDate,
-        form.returnDate,
-        form.numberOfPassengers,
-        form.bags,
-        isReturnTrip,
-        vehicleId
-    ]);
+    form.pickupLocation,
+    pickupCoordinates,
+    form.dropoffLocation,
+    dropoffCoordinates,
+    form.pickupDate,
+    form.returnDate,
+    form.numberOfPassengers,
+    form.bags,
+    isReturnTrip,
+    vehicleId,
+  ]);
 
   useEffect(() => {
     const fetchReviews = async () => {
-        setLoadingReviews(true)
-        try {
-            const res = await fetch(`http://localhost:3000/api/transport-review/vehicle/${vehicleId}`)
-            const data = await res.json()
-            setReviews(data)
-        } catch (err) {
-            console.log(err)
-        } finally {
-            setLoadingReviews(false)
-        }
-    }
-    if (vehicleId) fetchReviews()
+      setLoadingReviews(true);
+      try {
+        const res = await fetch(`http://localhost:3000/api/transport-review/vehicle/${vehicleId}`);
+        const data = await res.json();
+        setReviews(data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+    if (vehicleId) fetchReviews();
   }, [vehicleId]);
 
   const handleSubmit = async (e) => {
@@ -181,7 +202,15 @@ export default function BookingPage() {
       return;
     }
 
-    if (!form.pickupLocation || !form.dropoffLocation || !form.pickupDate || (isReturnTrip && !form.returnDate) || !form.numberOfPassengers) {
+    if (
+      !form.pickupLocation ||
+      !pickupCoordinates ||
+      !form.dropoffLocation ||
+      !dropoffCoordinates ||
+      !form.pickupDate ||
+      (isReturnTrip && !form.returnDate) ||
+      !form.numberOfPassengers
+    ) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -191,7 +220,16 @@ export default function BookingPage() {
       const res = await fetch("http://localhost:3000/api/transport/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vehicleId, travelerId, ...form, isReturnTrip }),
+        body: JSON.stringify({
+          vehicleId,
+          travelerId,
+          ...form,
+          pickupLat: pickupCoordinates.lat,
+          pickupLng: pickupCoordinates.lng,
+          dropoffLat: dropoffCoordinates.lat,
+          dropoffLng: dropoffCoordinates.lng,
+          isReturnTrip,
+        }),
       });
       const data = await res.json();
 
@@ -228,10 +266,8 @@ export default function BookingPage() {
         </button>
 
         <div className="grid grid-cols-[1fr_1.2fr] gap-8 max-lg:grid-cols-1">
-
-          {/* LEFT: Vehicle + Owner details */}
           <div className="space-y-6">
-            <div className="bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
+            <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
               <img
                 src={vehicle.addVehiclePhotos?.[0]}
                 alt={`${vehicle.vehicleBrand} ${vehicle.vehicleModel}`}
@@ -249,7 +285,7 @@ export default function BookingPage() {
               </div>
             </div>
 
-            <div className="bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
+            <div className="booking-owner-anim bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
               <h3 className="text-sm font-semibold text-[#d5dde2] mb-3">Vehicle Owner</h3>
               <div className="flex items-center gap-3">
                 {vehicle.profilePhoto && (
@@ -268,72 +304,76 @@ export default function BookingPage() {
             </div>
           </div>
 
-          {/* RIGHT: Booking form */}
-          <form onSubmit={handleSubmit} className="bg-[#1B2B34] rounded-[20px] p-6 border border-white/10 space-y-4 h-fit">
-            
+          <form onSubmit={handleSubmit} className="booking-form-anim bg-[#1B2B34] rounded-[20px] p-6 border border-white/10 space-y-4 h-fit">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold">Book this vehicle</h2>
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsReturnTrip(false);
-                            updateForm("returnDate", "");
-                        }}
-                        className={`h-[32px] px-4 rounded-full font-semibold text-xs transition ${
-                            !isReturnTrip
-                            ? "bg-[#00C896] text-white"
-                            : "bg-[#4A5C6A80] text-[#d5dde2]"
-                        }`}
+              <h2 className="text-lg font-bold">Book this vehicle</h2>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsReturnTrip(false);
+                    updateForm("returnDate", "");
+                  }}
+                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition ${
+                    !isReturnTrip ? "bg-[#00C896] text-white" : "bg-[#4A5C6A80] text-[#d5dde2]"
+                  }`}
                 >
-                    One Way
+                  One Way
                 </button>
-        <button
-            type="button"
-            onClick={() => setIsReturnTrip(true)}
-            className={`h-[32px] px-4 rounded-full font-semibold text-xs transition ${
-                isReturnTrip
-                    ? "bg-[#00C896] text-white"
-                    : "bg-[#4A5C6A80] text-[#d5dde2]"
-            }`}
-        >
-            Round Trip
-        </button>
-    </div>
-</div>
+                <button
+                  type="button"
+                  onClick={() => setIsReturnTrip(true)}
+                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition ${
+                    isReturnTrip ? "bg-[#00C896] text-white" : "bg-[#4A5C6A80] text-[#d5dde2]"
+                  }`}
+                >
+                  Round Trip
+                </button>
+              </div>
+            </div>
 
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">Pickup Location</label>
-              <Select
-                options={districtOptions}
-                value={districtOptions.find((o) => o.value === form.pickupLocation) || null}
-                onChange={(s) => updateForm("pickupLocation", s ? s.value : "")}
-                placeholder="Select District"
-                menuPosition="fixed"
-                menuPortalTarget={document.body}
-                styles={selectStyles}
-              />
+              <div className="relative">
+                <input
+                  readOnly
+                  value={form.pickupLocation}
+                  onClick={() => setMapPickerTarget("pickup")}
+                  placeholder="Click to pick location on map"
+                  className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-4 pr-10 outline-none cursor-pointer text-sm"
+                />
+                <MapPin
+                  size={16}
+                  onClick={() => setMapPickerTarget("pickup")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
+                />
+              </div>
             </div>
 
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">Drop-off Location</label>
-              <Select
-                options={districtOptions}
-                value={districtOptions.find((o) => o.value === form.dropoffLocation) || null}
-                onChange={(s) => updateForm("dropoffLocation", s ? s.value : "")}
-                placeholder="Select District"
-                menuPosition="fixed"
-                menuPortalTarget={document.body}
-                styles={selectStyles}
-              />
+              <div className="relative">
+                <input
+                  readOnly
+                  value={form.dropoffLocation}
+                  onClick={() => setMapPickerTarget("dropoff")}
+                  placeholder="Click to pick location on map"
+                  className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-4 pr-10 outline-none cursor-pointer text-sm"
+                />
+                <MapPin
+                  size={16}
+                  onClick={() => setMapPickerTarget("dropoff")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
+                />
+              </div>
             </div>
 
-            <div 
-                className= "grid transition-all duration-300 ease-in-out"
-                style={{
-                    gridTemplateColumns: isReturnTrip ? "1fr 1fr" : "1fr 0fr",
-                    gap: isReturnTrip ? "1rem" : "0rem"
-                }}
+            <div
+              className="grid transition-all duration-300 ease-in-out"
+              style={{
+                gridTemplateColumns: isReturnTrip ? "1fr 1fr" : "1fr 0fr",
+                gap: isReturnTrip ? "1rem" : "0rem",
+              }}
             >
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">Pickup Date</label>
@@ -347,7 +387,7 @@ export default function BookingPage() {
               </div>
               <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isReturnTrip ? "opacity-100 max-h-[80px]" : "opacity-0 max-h-0"
+                  isReturnTrip ? "opacity-100 max-h-[80px]" : "opacity-0 max-h-0"
                 }`}
               >
                 <label className="block text-sm text-[#d5dde2] mb-1">Return Date</label>
@@ -365,30 +405,29 @@ export default function BookingPage() {
               <div>
                 <label className="block text-sm text-[#d5dde2] mb-1">Passengers</label>
                 <Select
-                    options={passengerOptions}
-                    value={passengerOptions.find((o) => o.value === form.numberOfPassengers) || null}
-                    onChange={(s) => updateForm("numberOfPassengers", s ? s.value : "")}
-                    placeholder="Select passengers"
-                    menuPosition="fixed"
-                    menuPortalTarget={document.body}
-                    styles={passengerSelectStyles}
+                  options={passengerOptions}
+                  value={passengerOptions.find((o) => o.value === form.numberOfPassengers) || null}
+                  onChange={(s) => updateForm("numberOfPassengers", s ? s.value : "")}
+                  placeholder="Select passengers"
+                  menuPosition="fixed"
+                  menuPortalTarget={document.body}
+                  styles={passengerSelectStyles}
                 />
               </div>
               <div>
                 <label className="block text-sm text-[#d5dde2] mb-1">Bags</label>
                 <Select
-                    options={luggageOptions}
-                    value={luggageOptions.find((o) => o.value === form.bags) || null}
-                    onChange={(s) => updateForm("bags", s ? s.value : "")}
-                    placeholder="Select bag capacity"
-                    menuPosition="fixed"
-                    menuPortalTarget={document.body}
-                    styles={selectStyles}
+                  options={luggageOptions}
+                  value={luggageOptions.find((o) => o.value === form.bags) || null}
+                  onChange={(s) => updateForm("bags", s ? s.value : "")}
+                  placeholder="Select bag capacity"
+                  menuPosition="fixed"
+                  menuPortalTarget={document.body}
+                  styles={selectStyles}
                 />
               </div>
             </div>
 
-            {/* Auto-calculated distance + price */}
             {estimating && <p className="text-sm text-[#d5dde2]">Calculating distance & price...</p>}
             {estimate && !estimating && (
               <div className="bg-[#4A5C6A80] rounded-[12px] p-4 space-y-1">
@@ -413,8 +452,7 @@ export default function BookingPage() {
           </form>
         </div>
 
-        {/* Reviews Section */}
-        <section className="mt-10">
+        <section className="booking-reviews-anim mt-10">
           {loadingReviews ? (
             <p className="text-sm text-[#d5dde2]">Loading reviews...</p>
           ) : (
@@ -433,6 +471,15 @@ export default function BookingPage() {
       </section>
 
       <Footer />
+
+      {mapPickerTarget && (
+        <MapPickerModal
+          initialPosition={mapPickerTarget === "pickup" ? pickupCoordinates : dropoffCoordinates}
+          title={mapPickerTarget === "pickup" ? "Pick your pickup location" : "Pick your drop-off location"}
+          onClose={() => setMapPickerTarget(null)}
+          onConfirm={handleConfirmLocation}
+        />
+      )}
     </main>
   );
 }

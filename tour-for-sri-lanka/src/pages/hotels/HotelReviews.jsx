@@ -33,8 +33,15 @@ function timeAgo(dateString){
     const hours = Math.floor(minutes / 60)
     if(hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`
 
-    const years = Math.floor(months /12)
+    const days = Math.floor(hours / 24)
+    if(days < 30) return `${days} day${days > 1 ? "s" : ""} ago`
+
+    const months = Math.floor(days / 30)
+    if(months < 12) return `${months} month${months > 1 ? "s" : ""} ago`
+
+    const years = Math.floor(months / 12)
     return `${years} year${years > 1 ? "s" : ""} ago`
+
 }
 export default function HotelReviews({ hotelId, reviews, onReviewAdded, onReviewDeleted }) {
   const [reviewRating, setReviewRating] = useState(5);
@@ -102,7 +109,7 @@ export default function HotelReviews({ hotelId, reviews, onReviewAdded, onReview
     try{
         const res = await fetch(`${API_BASE}/review/${currentUserEmail}`,{
             method: "DELETE",
-            headers: {...getAuthHeader}
+            headers: {...getAuthHeader()}
         })
         if(!res.ok) throw new Error("failed")
         onReviewDeleted(myReview._id)

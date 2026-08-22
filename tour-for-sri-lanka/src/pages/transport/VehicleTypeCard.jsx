@@ -1,11 +1,34 @@
+import { useEffect, useRef, useState } from "react";
 import { Bus } from "lucide-react";
 
+export default function VehicleTypeCard({ item, onClick, index = 0 }) {
+  const cardRef = useRef(null);
+  const [inView, setInView] = useState(false);
 
-export default function VehicleTypeCard({ item, onClick }) {
+  useEffect(() => {
+    const node = cardRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <button
+      ref={cardRef}
       onClick={onClick}
-      className="relative overflow-hidden rounded-xl bg-[#243b4a] text-left text-white transition hover:-translate-y-1 transition-all duration-300"
+      style={{ animationDelay: inView ? `${index * 0.1}s` : undefined }}
+      className={`category-card-anim ${inView ? "in-view" : ""} relative overflow-hidden rounded-xl bg-[#243b4a] text-left text-white transition hover:-translate-y-1 hover:shadow-xl transition-all duration-300`}
     >
       <Bus className="absolute left-3 top-3 text-[#00d1a3]" size={16} />
 

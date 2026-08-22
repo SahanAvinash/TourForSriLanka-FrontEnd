@@ -245,7 +245,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
               className="ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-8 py-4 rounded-full flex items-center gap-2 font-semibold"
             >
               <FaSearch />
-              Search
+              Search Hotels
             </button>
           </div>
         </div>

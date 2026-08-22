@@ -325,3 +325,65 @@
         opacity: 1;
     }
 }
+@keyframes vehicleCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.vehicle-card-anim {
+    opacity: 0;
+    animation: vehicleCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vehicle-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes bookingSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.booking-vehicle-anim {
+    opacity: 0;
+    animation: bookingSectionFadeIn 0.7s ease-out 0.15s forwards;
+}
+
+.booking-owner-anim {
+    opacity: 0;
+    animation: bookingSectionFadeIn 0.7s ease-out 0.35s forwards;
+}
+
+.booking-form-anim {
+    opacity: 0;
+    animation: bookingSectionFadeIn 0.7s ease-out 0.3s forwards;
+}
+
+.booking-reviews-anim {
+    opacity: 0;
+    animation: bookingSectionFadeIn 0.7s ease-out 0.55s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .booking-vehicle-anim,
+    .booking-owner-anim,
+    .booking-form-anim,
+    .booking-reviews-anim {
+        animation: none;
+        opacity: 1;
+    }
+}

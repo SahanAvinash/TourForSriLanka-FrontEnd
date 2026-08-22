@@ -88,10 +88,11 @@ export default function VehicleList() {
         )}
 
         <div className="mt-8 grid grid-cols-2 gap-6 max-lg:grid-cols-1">
-          {vehicles.map((v) => (
+          {vehicles.map((v, i) => (
             <div
               key={v._id}
-              className="flex gap-4 bg-[#1B2B34] rounded-[20px] p-4 border border-white/10"
+              className="vehicle-card-anim flex gap-4 bg-[#1B2B34] rounded-[20px] p-4 border border-white/10"
+              style={{animationDelay: `${i * 0.12}s`}}
             >
               <img
                 src={v.addVehiclePhotos?.[0]}
@@ -137,7 +138,18 @@ export default function VehicleList() {
 
                     <button 
                         className="px-4 py-1.5 rounded-full bg-[#00C896] text-white text-sm font-medium hover:bg-[#00b383] transition"
-                        onClick={() => navigate(`/transport/book/${v._id}`,{state:{vehicle: v} })}
+                        onClick={() =>
+                            navigate(`/transport/book/${v._id}`,{
+                                state: {
+                                    vehicle: v,
+                                    searchContext: {
+                                        pickupDate,
+                                        numberOfPassengers: passengers ? Number(passengers) : "",
+                                        bags: bags ? Number(bags) : "",
+                                    },
+                                },
+                             })
+                            }
                     >
                     Book Now
                   </button>
