@@ -52,12 +52,14 @@ const selectStyles = {
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
+        fontSize: "12px",
     }),
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
+        fontSize: "12px",
     }),
     input: (base) => ({
         ...base,
@@ -74,81 +76,40 @@ export default function HotelOwnerRegister() {
     const [country, setCountry] = useState(null);
     const [mobile, setMobile] = useState("");
     const [dialCode, setDialCode] = useState("");
-
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [NIC, setNIC] = useState("");
-
+    const [err, setErr] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [err, setErr] = useState("");
 
-    const countryOptions = COUNTRIES.map((item) => ({
-        label: `${item.flag} ${item.name}`,
-        value: item.code,
+    const options = COUNTRIES.map((countryItem) => ({
+        label: `${countryItem.flag} ${countryItem.name}`,
+        value: countryItem.code,
     }));
-
-    useEffect(() => {
-        const saved = sessionStorage.getItem(STORAGE_KEY);
-
-        if (!saved) return;
-
-        const data = JSON.parse(saved);
-
-        setFirstName(data.firstName || "");
-        setLastName(data.lastName || "");
-        setEmail(data.email || "");
-        setPassword(data.password || "");
-        setConfirmPassword(data.confirmPassword || "");
-        setNIC(data.NIC || "");
-
-        if (!data.country) {
-            setMobile(data.mobile || "");
-            return;
-        }
-
-        const selectedCountry = countryOptions.find(
-            (option) => option.label === data.country
-        );
-
-        setCountry(selectedCountry || null);
-
-        if (!data.mobile) return;
-
-        const countryData = COUNTRIES.find(
-            (item) => item.code === selectedCountry?.value
-        );
-
-        if (countryData && data.mobile.startsWith(countryData.dial)) {
-            setDialCode(countryData.dial);
-            setMobile(data.mobile.slice(countryData.dial.length));
-        } else {
-            setMobile(data.mobile);
-        }
-    }, []);
 
     const handleCountryChange = (selected) => {
         setCountry(selected);
 
         const selectedCountry = COUNTRIES.find(
-            (item) => item.code === selected.value
+            (countryItem) => countryItem.code === selected.value
         );
 
-        if (!selectedCountry) return;
-
-        setDialCode(selectedCountry.dial);
-        setMobile("");
+        if (selectedCountry) {
+            setDialCode(selectedCountry.dial);
+            setMobile("");
+        }
     };
 
     const buildFormData = () => {
-        const saved = sessionStorage.getItem(STORAGE_KEY);
-        const oldData = saved ? JSON.parse(saved) : {};
+        const savedData =
+            JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
 
         return {
-            ...oldData,
+            ...savedData,
             role,
             firstName,
             lastName,
@@ -161,7 +122,7 @@ export default function HotelOwnerRegister() {
         };
     };
 
-    const validateForm = () => {
+    const handleNext = async () => {
         if (
             !firstName ||
             !lastName ||
@@ -172,33 +133,27 @@ export default function HotelOwnerRegister() {
             !country ||
             !mobile
         ) {
-            return "Please fill all required fields";
+            setErr("Please fill all required fields");
+            return;
         }
 
         if (!emailRegex.test(email)) {
-            return "Please enter a valid email address";
+            setErr("Please enter a valid email address");
+            return;
         }
 
         if (!nicRegex.test(NIC) && !passportRegex.test(NIC)) {
-            return "Please enter a valid NIC or Passport number";
+            setErr("Please enter a valid NIC or Passport number");
+            return;
         }
 
         if (password.length < 8) {
-            return "Password must be at least 8 characters";
+            setErr("Password must be at least 8 characters");
+            return;
         }
 
         if (password !== confirmPassword) {
-            return "Passwords do not match";
-        }
-
-        return "";
-    };
-
-    const handleNext = async () => {
-        const validationError = validateForm();
-
-        if (validationError) {
-            setErr(validationError);
+            setErr("Passwords do not match");
             return;
         }
 
@@ -208,9 +163,13 @@ export default function HotelOwnerRegister() {
         try {
             const response = await fetch(
                 `http://localhost:3000/api/hotel/check-email?email=${encodeURIComponent(
-                    email
+                    email.trim()
                 )}`
             );
+
+            if (!response.ok) {
+                throw new Error("Email verification failed");
+            }
 
             const result = await response.json();
 
@@ -232,44 +191,65 @@ export default function HotelOwnerRegister() {
         }
     };
 
+    useEffect(() => {
+        const saved = sessionStorage.getItem(STORAGE_KEY);
+
+        if (!saved) return;
+
+        try {
+            const data = JSON.parse(saved);
+
+            setFirstName(data.firstName || "");
+            setLastName(data.lastName || "");
+            setEmail(data.email || "");
+            setPassword(data.password || "");
+            setConfirmPassword(data.confirmPassword || "");
+            setNIC(data.NIC || "");
+
+            if (data.country) {
+                const selectedCountry = options.find(
+                    (option) => option.label === data.country
+                );
+
+                setCountry(selectedCountry || null);
+
+                if (selectedCountry && data.mobile) {
+                    const countryData = COUNTRIES.find(
+                        (countryItem) =>
+                            countryItem.code === selectedCountry.value
+                    );
+
+                    if (
+                        countryData &&
+                        data.mobile.startsWith(countryData.dial)
+                    ) {
+                        setDialCode(countryData.dial);
+                        setMobile(
+                            data.mobile.slice(countryData.dial.length)
+                        );
+                    } else {
+                        setMobile(data.mobile);
+                    }
+                }
+            } else if (data.mobile) {
+                setMobile(data.mobile);
+            }
+        } catch (error) {
+            sessionStorage.removeItem(STORAGE_KEY);
+        }
+    }, []);
+
     const handlePrevious = () => {
         sessionStorage.setItem(
             STORAGE_KEY,
             JSON.stringify(buildFormData())
         );
-
         navigate(-1);
-    };
-
-    const handleNameChange = (setter) => (event) => {
-        setter(event.target.value.replace(/[^a-zA-Z]/g, ""));
-    };
-
-    const handleNICChange = (event) => {
-        setNIC(
-            event.target.value
-                .replace(/[^a-zA-Z0-9]/g, "")
-                .slice(0, 12)
-                .toUpperCase()
-        );
-    };
-
-    const handleMobileChange = (event) => {
-        const value = event.target.value.replace(/\D/g, "");
-
-        if (
-            country &&
-            validatePhoneNumberLength(value, country.value) === "TOO_LONG"
-        ) {
-            return;
-        }
-
-        setMobile(value);
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-            <div className="step-bar-anim absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
+            <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
                         {STEPS.map((step, index) => (
@@ -277,7 +257,9 @@ export default function HotelOwnerRegister() {
                                 <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
                                     <div
                                         className={`w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] lg:w-[30px] lg:h-[30px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                                            step.current
+                                            step.done
+                                                ? "bg-primary-green/80"
+                                                : step.current
                                                 ? "bg-primary-green/30"
                                                 : "bg-border/80"
                                         }`}
@@ -330,14 +312,28 @@ export default function HotelOwnerRegister() {
                             <input
                                 placeholder="First Name"
                                 value={firstName}
-                                onChange={handleNameChange(setFirstName)}
+                                onChange={(e) =>
+                                    setFirstName(
+                                        e.target.value.replace(
+                                            /[^a-zA-Z]/g,
+                                            ""
+                                        )
+                                    )
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
 
                             <input
                                 placeholder="Last Name"
                                 value={lastName}
-                                onChange={handleNameChange(setLastName)}
+                                onChange={(e) =>
+                                    setLastName(
+                                        e.target.value.replace(
+                                            /[^a-zA-Z]/g,
+                                            ""
+                                        )
+                                    )
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
@@ -357,19 +353,25 @@ export default function HotelOwnerRegister() {
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 placeholder="Password"
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
 
                             {showPassword ? (
                                 <IoEye
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 cursor-pointer"
-                                    onClick={() => setShowPassword(false)}
+                                    onClick={() =>
+                                        setShowPassword(false)
+                                    }
                                 />
                             ) : (
                                 <FaEyeSlash
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 cursor-pointer"
-                                    onClick={() => setShowPassword(true)}
+                                    onClick={() =>
+                                        setShowPassword(true)
+                                    }
                                 />
                             )}
                         </div>
@@ -410,14 +412,24 @@ export default function HotelOwnerRegister() {
                             <input
                                 placeholder="Passport Number/NIC"
                                 value={NIC}
-                                onChange={handleNICChange}
+                                onChange={(e) =>
+                                    setNIC(
+                                        e.target.value
+                                            .replace(
+                                                /[^a-zA-Z0-9]/g,
+                                                ""
+                                            )
+                                            .slice(0, 12)
+                                            .toUpperCase()
+                                    )
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
 
                         <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
                             <Select
-                                options={countryOptions}
+                                options={options}
                                 value={country}
                                 onChange={handleCountryChange}
                                 placeholder="Country"
@@ -435,7 +447,25 @@ export default function HotelOwnerRegister() {
                                     type="text"
                                     placeholder="Mobile"
                                     value={mobile}
-                                    onChange={handleMobileChange}
+                                    onChange={(e) => {
+                                        const value =
+                                            e.target.value.replace(
+                                                /\D/g,
+                                                ""
+                                            );
+
+                                        if (
+                                            country &&
+                                            validatePhoneNumberLength(
+                                                value,
+                                                country.value
+                                            ) === "TOO_LONG"
+                                        ) {
+                                            return;
+                                        }
+
+                                        setMobile(value);
+                                    }}
                                     className="w-full h-[50px] bg-transparent rounded-[20px] text-[12px] pl-[60px] text-text"
                                 />
                             </div>

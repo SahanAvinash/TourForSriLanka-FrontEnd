@@ -3,16 +3,23 @@ import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { FaCheck, FaMap, FaSearch } from "react-icons/fa";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import {
+    MapContainer,
+    Marker,
+    TileLayer,
+    useMap,
+    useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import COUNTRIES from "../../../data/countryCode";
 import { isValidPhoneNumber, validatePhoneNumberLength } from "libphonenumber-js";
+import COUNTRIES from "../../../data/countryCode";
 
 delete L.Icon.Default.prototype._getIconUrl;
+
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
@@ -21,21 +28,47 @@ L.Icon.Default.mergeOptions({
 
 const STORAGE_KEY = "HotelOwnerRegister";
 
-const DEFAULT_MAP_CENTER = { lat: 6.9271, lng: 79.8612 };
+const DEFAULT_MAP_CENTER = {
+    lat: 6.9271,
+    lng: 79.8612,
+};
 
 const HOTEL_TYPE_OPTIONS = [
-    "Hotel", "Resort", "Boutique Hotel", "Guest House", "Villa",
-    "Homestay", "Bed & Breakfast", "Eco Lodge", "Apartment Hotel", "Hostel"
+    "Hotel",
+    "Resort",
+    "Boutique Hotel",
+    "Guest House",
+    "Villa",
+    "Homestay",
+    "Bed & Breakfast",
+    "Eco Lodge",
+    "Apartment Hotel",
+    "Hostel",
 ];
+
 const PROVINCE_OPTIONS = [
-    "Western", "Central", "Southern", "Northern", "Eastern",
-    "North Western", "North Central", "Uva", "Sabaragamuwa"
+    "Western",
+    "Central",
+    "Southern",
+    "Northern",
+    "Eastern",
+    "North Western",
+    "North Central",
+    "Uva",
+    "Sabaragamuwa",
 ];
+
 const PROVINCE_DISTRICTS = {
     Western: ["Colombo", "Gampaha", "Kalutara"],
     Central: ["Kandy", "Matale", "Nuwara Eliya"],
     Southern: ["Galle", "Matara", "Hambantota"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+    Northern: [
+        "Jaffna",
+        "Kilinochchi",
+        "Mannar",
+        "Vavuniya",
+        "Mullaitivu",
+    ],
     Eastern: ["Batticaloa", "Ampara", "Trincomalee"],
     "North Western": ["Kurunegala", "Puttalam"],
     "North Central": ["Anuradhapura", "Polonnaruwa"],
@@ -45,7 +78,7 @@ const PROVINCE_DISTRICTS = {
 
 const STEPS = [
     { label: "Account", done: true, number: "1" },
-    { label: "Hotel Information", number: "2", current: true },
+    { label: "Hotel Information", current: true, number: "2" },
     { label: "Facilities", number: "3" },
     { label: "Verification", number: "4" },
 ];
@@ -56,36 +89,34 @@ const selectStyles = {
         width: "100%",
         minHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "color-mix(in srgb, var(--color-border) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
     }),
-
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
     }),
-
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? "var(--color-primary-green)" : "var(--color-border)",
+        backgroundColor: state.isFocused
+            ? "var(--color-primary-green)"
+            : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
         fontSize: "12px",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
         fontSize: "12px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
@@ -93,7 +124,6 @@ const selectStyles = {
         paddingLeft: "10px",
         fontSize: "12px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
@@ -102,65 +132,102 @@ const selectStyles = {
 
 function LocationClickHandler({ onPick }) {
     useMapEvents({
-        click(e) {
-            onPick(e.latlng);
+        click(event) {
+            onPick(event.latlng);
         },
     });
+
     return null;
 }
 
 function RecenterMap({ position }) {
     const map = useMap();
+
     useEffect(() => {
         map.flyTo(position, map.getZoom());
-    }, [position]);
+    }, [map, position]);
+
     return null;
 }
 
 function MapPickerModal({ initialPosition, onClose, onConfirm }) {
-    const [position, setPosition] = useState(initialPosition || DEFAULT_MAP_CENTER);
+    const [position, setPosition] = useState(
+        initialPosition || DEFAULT_MAP_CENTER
+    );
     const [address, setAddress] = useState("");
     const [loadingAddress, setLoadingAddress] = useState(false);
     const [locating, setLocating] = useState(false);
-
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searching, setSearching] = useState(false);
+
     const searchTimeoutRef = useRef(null);
 
     const reverseGeocode = async (lat, lng) => {
         setLoadingAddress(true);
+
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-            const data = await res.json();
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Reverse geocoding failed");
+            }
+
+            const data = await response.json();
             setAddress(data.display_name || "");
         } catch (error) {
             setAddress("");
+        } finally {
+            setLoadingAddress(false);
         }
-        setLoadingAddress(false);
     };
 
     useEffect(() => {
         reverseGeocode(position.lat, position.lng);
+
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
     }, []);
 
     useEffect(() => {
         if (!searchQuery.trim()) {
             setSearchResults([]);
+            setSearching(false);
             return;
         }
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
         searchTimeoutRef.current = setTimeout(async () => {
             setSearching(true);
+
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&countrycodes=lk`);
-                const data = await res.json();
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                        searchQuery
+                    )}&limit=5&countrycodes=lk`
+                );
+
+                if (!response.ok) {
+                    throw new Error("Search failed");
+                }
+
+                const data = await response.json();
                 setSearchResults(data);
             } catch (error) {
                 setSearchResults([]);
+            } finally {
+                setSearching(false);
             }
-            setSearching(false);
         }, 500);
+
         return () => clearTimeout(searchTimeoutRef.current);
     }, [searchQuery]);
 
@@ -170,23 +237,37 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     };
 
     const handleUseMyLocation = () => {
-        if (!navigator.geolocation) return;
+        if (!navigator.geolocation) {
+            return;
+        }
+
         setLocating(true);
+
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            (positionData) => {
+                const latlng = {
+                    lat: positionData.coords.latitude,
+                    lng: positionData.coords.longitude,
+                };
+
                 setPosition(latlng);
                 reverseGeocode(latlng.lat, latlng.lng);
                 setLocating(false);
             },
-            () => setLocating(false)
+            () => {
+                setLocating(false);
+            }
         );
     };
 
     const handleSelectResult = (result) => {
-        const latlng = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
+        const latlng = {
+            lat: parseFloat(result.lat),
+            lng: parseFloat(result.lon),
+        };
+
         setPosition(latlng);
-        setAddress(result.display_name);
+        setAddress(result.display_name || "");
         setSearchQuery("");
         setSearchResults([]);
     };
@@ -194,7 +275,9 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] px-[20px]">
             <div className="w-[600px] max-w-full bg-primary-2 text-text rounded-[20px] p-[20px] flex flex-col items-center">
-                <h2 className="text-[18px] font-bold mb-[10px]">Pick your hotel location</h2>
+                <h2 className="text-[18px] font-bold mb-[10px]">
+                    Pick your hotel location
+                </h2>
 
                 <div className="w-full relative">
                     <input
@@ -204,40 +287,59 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
                         placeholder="Search for a place (e.g. Galle Fort, Kandy)"
                         className="w-full h-[45px] text-[12px] bg-border/50 rounded-[15px] pl-[40px] pr-[15px] text-text placeholder:text-text/50"
                     />
+
                     <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-primary-green/70 text-[12px]" />
 
                     {(searching || searchResults.length > 0) && (
                         <div className="absolute top-[50px] left-0 w-full bg-border rounded-[15px] overflow-hidden z-[1001] max-h-[200px] overflow-y-auto">
                             {searching && (
-                                <div className="px-[15px] py-[10px] text-[12px] text-text/70">Searching...</div>
-                            )}
-                            {!searching && searchResults.map((result, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => handleSelectResult(result)}
-                                    className="px-[15px] py-[10px] text-[12px] text-text cursor-pointer hover:bg-primary-green/40 border-b border-text/10 last:border-none"
-                                >
-                                    {result.display_name}
+                                <div className="px-[15px] py-[10px] text-[12px] text-text/70">
+                                    Searching...
                                 </div>
-                            ))}
+                            )}
+
+                            {!searching &&
+                                searchResults.map((result, index) => (
+                                    <div
+                                        key={`${result.place_id}-${index}`}
+                                        onClick={() =>
+                                            handleSelectResult(result)
+                                        }
+                                        className="px-[15px] py-[10px] text-[12px] text-text cursor-pointer hover:bg-primary-green/40 border-b border-text/10 last:border-none"
+                                    >
+                                        {result.display_name}
+                                    </div>
+                                ))}
                         </div>
                     )}
                 </div>
 
                 <div className="w-full h-[350px] rounded-[15px] overflow-hidden mt-[15px]">
-                    <MapContainer center={position} zoom={13} style={{ height: "100%", width: "100%" }}>
+                    <MapContainer
+                        center={position}
+                        zoom={13}
+                        style={{
+                            height: "100%",
+                            width: "100%",
+                        }}
+                    >
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; OpenStreetMap contributors'
+                            attribution="&copy; OpenStreetMap contributors"
                         />
+
                         <Marker position={position} />
+
                         <LocationClickHandler onPick={handlePick} />
+
                         <RecenterMap position={position} />
                     </MapContainer>
                 </div>
 
                 <div className="w-full mt-[15px] text-[12px] bg-border/50 rounded-[15px] p-[10px] min-h-[40px]">
-                    {loadingAddress ? "Finding address..." : (address || "Click on the map to drop a pin")}
+                    {loadingAddress
+                        ? "Finding address..."
+                        : address || "Click on the map to drop a pin"}
                 </div>
 
                 <button
@@ -245,7 +347,9 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
                     onClick={handleUseMyLocation}
                     className="w-full mt-[10px] text-[12px] text-left text-primary-green/80 underline cursor-pointer"
                 >
-                    {locating ? "Locating..." : "Use my current location"}
+                    {locating
+                        ? "Locating..."
+                        : "Use my current location"}
                 </button>
 
                 <div className="w-full mt-[15px] flex justify-between gap-3">
@@ -256,10 +360,17 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
                     >
                         Cancel
                     </button>
+
                     <button
                         type="button"
-                        onClick={() => onConfirm({ address, lat: position.lat, lng: position.lng })}
-                        disabled={!address}
+                        onClick={() =>
+                            onConfirm({
+                                address,
+                                lat: position.lat,
+                                lng: position.lng,
+                            })
+                        }
+                        disabled={!address || loadingAddress}
                         className="w-full h-[45px] bg-primary-green/50 font-bold text-[14px] rounded-[20px] hover:bg-primary-green/80 transition-all duration-300 disabled:opacity-50 cursor-pointer"
                     >
                         Confirm location
@@ -286,12 +397,24 @@ export default function HotelInformation() {
     const [dialCode, setDialCode] = useState("");
     const [countryCode, setCountryCode] = useState("");
     const [existingMobile, setExistingMobile] = useState("");
-
     const [err, setErr] = useState("");
 
-    const hotelTypeOptions = HOTEL_TYPE_OPTIONS.map((t) => ({ label: t, value: t }));
-    const provinceOptions = PROVINCE_OPTIONS.map((p) => ({ label: p, value: p }));
-    const districtOptions = (PROVINCE_DISTRICTS[province?.value] || []).map((d) => ({ label: d, value: d }));
+    const hotelTypeOptions = HOTEL_TYPE_OPTIONS.map((type) => ({
+        label: type,
+        value: type,
+    }));
+
+    const provinceOptions = PROVINCE_OPTIONS.map((provinceName) => ({
+        label: provinceName,
+        value: provinceName,
+    }));
+
+    const districtOptions = (
+        PROVINCE_DISTRICTS[province?.value] || []
+    ).map((districtName) => ({
+        label: districtName,
+        value: districtName,
+    }));
 
     const handleProvinceChange = (selected) => {
         setProvince(selected);
@@ -303,116 +426,170 @@ export default function HotelInformation() {
 
         if (!saved) return;
 
-        const data = JSON.parse(saved);
+        try {
+            const data = JSON.parse(saved);
 
-        setHotelName(data.hotelName || "");
-        setShortDescription(data.shortDescription || "");
-        setPhone1(data.phone1 || "");
-        setPhone2(data.phone2 || "");
-        setLocation(data.location || "");
+            setHotelName(data.hotelName || "");
+            setShortDescription(data.shortDescription || "");
+            setPhone1(data.phone1 || "");
+            setPhone2(data.phone2 || "");
+            setLocation(data.location || "");
 
-        if (data.latitude && data.longitude) {
-            setCoordinates({ lat: data.latitude, lng: data.longitude });
-        }
-
-        let matchedCountry = null;
-        if (data.country) {
-            matchedCountry = COUNTRIES.find((c) => `${c.flag} ${c.name}` === data.country);
-            if (matchedCountry) {
-                setDialCode(matchedCountry.dial);
-                setCountryCode(matchedCountry.code);
+            if (
+                data.latitude !== undefined &&
+                data.latitude !== null &&
+                data.longitude !== undefined &&
+                data.longitude !== null
+            ) {
+                setCoordinates({
+                    lat: Number(data.latitude),
+                    lng: Number(data.longitude),
+                });
             }
-        }
 
-        if (data.mobile) {
-            const cleanMobile = matchedCountry && data.mobile.startsWith(matchedCountry.dial)
-                ? data.mobile.slice(matchedCountry.dial.length)
-                : data.mobile;
-            setExistingMobile(cleanMobile);
-        }
+            let matchedCountry = null;
 
-        if (data.hotelType) {
-            setHotelType({ label: data.hotelType, value: data.hotelType });
-        }
+            if (data.country) {
+                matchedCountry = COUNTRIES.find(
+                    (country) =>
+                        `${country.flag} ${country.name}` === data.country
+                );
 
-        if (data.province) {
-            setProvince({ label: data.province, value: data.province });
-        }
+                if (matchedCountry) {
+                    setDialCode(matchedCountry.dial);
+                    setCountryCode(matchedCountry.code);
+                }
+            }
 
-        if (data.district) {
-            setDistrict({ label: data.district, value: data.district });
+            if (data.mobile) {
+                const savedMobile =
+                    matchedCountry &&
+                    data.mobile.startsWith(matchedCountry.dial)
+                        ? data.mobile.slice(matchedCountry.dial.length)
+                        : data.mobile;
+
+                setExistingMobile(savedMobile);
+            }
+
+            if (data.hotelType) {
+                setHotelType({
+                    label: data.hotelType,
+                    value: data.hotelType,
+                });
+            }
+
+            if (data.province) {
+                setProvince({
+                    label: data.province,
+                    value: data.province,
+                });
+            }
+
+            if (data.district) {
+                setDistrict({
+                    label: data.district,
+                    value: data.district,
+                });
+            }
+        } catch (error) {
+            sessionStorage.removeItem(STORAGE_KEY);
         }
     }, []);
 
     const buildFormData = () => {
-        const oldData = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
+        const savedData =
+            JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
 
         return {
-            ...oldData,
+            ...savedData,
             hotelName,
-            hotelType: hotelType?.value,
+            hotelType: hotelType?.value || "",
             shortDescription,
             phone1,
             phone2,
-            province: province?.value,
-            district: district?.value,
+            province: province?.value || "",
+            district: district?.value || "",
             location,
-            latitude: coordinates?.lat,
-            longitude: coordinates?.lng,
+            latitude: coordinates?.lat ?? null,
+            longitude: coordinates?.lng ?? null,
         };
     };
 
     const handlePrevious = () => {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
+        sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(buildFormData())
+        );
+
         navigate(-1);
     };
 
     const handleNext = () => {
-        if (!hotelName || !hotelType || !phone1 || !province || !district || !location) {
+        if (
+            !hotelName ||
+            !hotelType ||
+            !phone1 ||
+            !province ||
+            !district ||
+            !location
+        ) {
             setErr("Please fill all required fields");
             return;
         }
 
-        if (countryCode && !isValidPhoneNumber(phone1, countryCode)) {
-            setErr("Please enter a valid phone1 number");
+        if (
+            countryCode &&
+            !isValidPhoneNumber(phone1, countryCode)
+        ) {
+            setErr("Please enter a valid Phone 1 number");
             return;
         }
 
-        if (phone2 && countryCode && !isValidPhoneNumber(phone2, countryCode)) {
-            setErr("Please enter a valid phone2 number");
+        if (
+            phone2 &&
+            countryCode &&
+            !isValidPhoneNumber(phone2, countryCode)
+        ) {
+            setErr("Please enter a valid Phone 2 number");
             return;
         }
 
-        if (existingMobile && (phone1 === existingMobile || phone2 === existingMobile)) {
-            setErr("Phone1 or Phone2 cannot be the same as your mobile number");
+        if (
+            existingMobile &&
+            (phone1 === existingMobile || phone2 === existingMobile)
+        ) {
+            setErr(
+                "Phone 1 or Phone 2 cannot be the same as your mobile number"
+            );
             return;
         }
 
         if (phone1 && phone2 && phone1 === phone2) {
-            setErr("Phone 1 and Phone 2 cannote be the same");
+            setErr("Phone 1 and Phone 2 cannot be the same");
             return;
         }
 
         setErr("");
 
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
+        sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(buildFormData())
+        );
 
         navigate("/hotelfacilities");
     };
 
-    const handleOpenMap = () => {
-        setShowMapPicker(true);
-    };
-
-    const handleConfirmLocation = (picked) => {
-        setLocation(picked.address);
-        setCoordinates({ lat: picked.lat, lng: picked.lng });
+    const handleConfirmLocation = (pickedLocation) => {
+        setLocation(pickedLocation.address);
+        setCoordinates({
+            lat: pickedLocation.lat,
+            lng: pickedLocation.lng,
+        });
         setShowMapPicker(false);
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -429,7 +606,11 @@ export default function HotelInformation() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -439,7 +620,7 @@ export default function HotelInformation() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -449,7 +630,6 @@ export default function HotelInformation() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -473,7 +653,9 @@ export default function HotelInformation() {
                             <input
                                 placeholder="Hotel Name"
                                 value={hotelName}
-                                onChange={(e) => setHotelName(e.target.value)}
+                                onChange={(e) =>
+                                    setHotelName(e.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
@@ -495,9 +677,12 @@ export default function HotelInformation() {
                                 placeholder="Short Description"
                                 value={shortDescription}
                                 maxLength={1000}
-                                onChange={(e) => setShortDescription(e.target.value)}
+                                onChange={(e) =>
+                                    setShortDescription(e.target.value)
+                                }
                                 className="w-full h-[70px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none"
                             />
+
                             <span className="absolute right-[20px] bottom-[10px] text-[10px] text-text/50">
                                 {shortDescription.length}/1000
                             </span>
@@ -508,14 +693,27 @@ export default function HotelInformation() {
                                 <div className="absolute pl-[20px] text-[12px] text-text">
                                     {dialCode || "+"}
                                 </div>
+
                                 <input
                                     placeholder="Phone 1"
                                     value={phone1}
                                     onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        if (countryCode && validatePhoneNumberLength(value, countryCode) === "TOO_LONG") {
+                                        const value =
+                                            e.target.value.replace(
+                                                /\D/g,
+                                                ""
+                                            );
+
+                                        if (
+                                            countryCode &&
+                                            validatePhoneNumberLength(
+                                                value,
+                                                countryCode
+                                            ) === "TOO_LONG"
+                                        ) {
                                             return;
                                         }
+
                                         setPhone1(value);
                                     }}
                                     className="w-full h-[50px] text-text text-[12px] bg-transparent rounded-[20px] pl-[60px]"
@@ -526,14 +724,27 @@ export default function HotelInformation() {
                                 <div className="absolute pl-[20px] text-[12px] text-text">
                                     {dialCode || "+"}
                                 </div>
+
                                 <input
                                     placeholder="Phone 2"
                                     value={phone2}
                                     onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        if (countryCode && validatePhoneNumberLength(value, countryCode) === "TOO_LONG") {
+                                        const value =
+                                            e.target.value.replace(
+                                                /\D/g,
+                                                ""
+                                            );
+
+                                        if (
+                                            countryCode &&
+                                            validatePhoneNumberLength(
+                                                value,
+                                                countryCode
+                                            ) === "TOO_LONG"
+                                        ) {
                                             return;
                                         }
+
                                         setPhone2(value);
                                     }}
                                     className="w-full h-[50px] text-text text-[12px] bg-transparent rounded-[20px] pl-[60px]"
@@ -556,7 +767,11 @@ export default function HotelInformation() {
                                 options={districtOptions}
                                 value={district}
                                 onChange={setDistrict}
-                                placeholder={province ? "District" : "Select province first"}
+                                placeholder={
+                                    province
+                                        ? "District"
+                                        : "Select province first"
+                                }
                                 isDisabled={!province}
                                 menuPosition="fixed"
                                 menuPortalTarget={document.body}
@@ -569,12 +784,15 @@ export default function HotelInformation() {
                                 id="hotel-location-input"
                                 placeholder="Select your location on map or paste address"
                                 value={location}
-                                onChange={(e) => setLocation(e.target.value)}
+                                onChange={(e) =>
+                                    setLocation(e.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
+
                             <button
                                 type="button"
-                                onClick={handleOpenMap}
+                                onClick={() => setShowMapPicker(true)}
                                 className="absolute right-[15px] top-1/2 -translate-y-1/2 text-primary-green/80 cursor-pointer"
                             >
                                 <FaMap />
