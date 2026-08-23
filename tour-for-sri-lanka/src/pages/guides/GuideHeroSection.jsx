@@ -68,7 +68,7 @@ const GuideHeroSection = ({ onFilterChange }) => {
       <Navbar/>
       <div className="relative h-[430px] rounded-[30px] overflow-visible">
         {/* Background */}
-        <div className="absolute inset-y-0 left-4 right-4 rounded-[30px] overflow-hidden">
+        <div className="hero-bg-anim absolute inset-y-0 left-4 right-4 rounded-[30px] overflow-hidden">
           <img
             src={guide_bg}
             alt="Guide"
@@ -79,18 +79,18 @@ const GuideHeroSection = ({ onFilterChange }) => {
 
         {/* Hero Text */}
         <div className="absolute left-12 top-16 z-10">
-          <h1 className="text-white text-6xl font-bold leading-tight">
+          <h1 className="hero-title-anim text-white text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
             Local Guide
           </h1>
-          <p className="text-gray-300 text-lg mt-5">
+          <p className="hero-desc-anim text-gray-300 text-lg mt-5">
             Explore Sri Lanka with experienced, licensed local guides.
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-full max-w-[800px] px-5 z-20">
+        <div className="animate-box absolute -bottom-12 left-1/2 -translate-x-1/2 w-full max-w-[800px] px-5 z-20">
           <div className="bg-[#455766]/80 backdrop-blur-xl rounded-[28px] border border-white/10 shadow-2xl h-[100px] flex items-center px-8">
 
             <div className="flex items-center gap-3 flex-1">

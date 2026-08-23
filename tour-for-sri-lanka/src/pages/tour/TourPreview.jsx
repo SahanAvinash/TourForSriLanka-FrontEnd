@@ -159,7 +159,7 @@ const TourPreview = () => {
       const savedGuestCount = sessionStorage.getItem("tourNumberOfGuests");
       if (savedGuestCount) setTripGuestCount(Number(savedGuestCount));
 
-      const destinationIds = selectedDestinations.map((d) => d.id);
+      const destinationIds = selectedDestinations.map((d) => d._id);
 
       if (!startDistrict) {
         setError("Select your starting district first");

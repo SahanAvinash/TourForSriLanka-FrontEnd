@@ -121,7 +121,7 @@ export default function GuideDetailsPage(){
     <div className="min-h-screen bg-[#1a2530] pt-28">
       <Navbar/>
 
-      <div className="relative h-[420px] px-4">
+      <div className="guide-hero-anim relative h-[420px] px-4">
         <div className="relative h-full rounded-[30px] overflow-hidden">
           <img
             src={guide.profilePic || "/guide_placeholder.jpg"}
@@ -134,7 +134,7 @@ export default function GuideDetailsPage(){
 
       <div className="max-w-[1100px] mx-auto px-[20px] -mt-[60px] relative z-10">
 
-        <div className="bg-[#253745] rounded-[20px] p-[24px] shadow-xl">
+        <div className="guide-info-anim bg-[#253745] rounded-[20px] p-[24px] shadow-xl">
           <div className="flex items-start justify-between flex-wrap gap-[12px]">
             <div>
               <div className="flex items-center gap-[10px]">
@@ -163,7 +163,7 @@ export default function GuideDetailsPage(){
           </p>
         </div>
 
-        <div className="mt-[30px]">
+        <div className="guide-languages-anim mt-[30px]">
           <h2 className="text-white font-bold text-[20px] mb-[16px]">Languages</h2>
           <div className="flex flex-wrap gap-[10px]">
             {Object.entries(languageLabels)
@@ -177,7 +177,7 @@ export default function GuideDetailsPage(){
           </div>
         </div>
 
-        <div className="mt-[30px]">
+        <div className="guide-skills-anim mt-[30px]">
           <h2 className="text-white font-bold text-[20px] mb-[16px]">Tour Specialties</h2>
           <div className="flex flex-wrap gap-[10px]">
             {Object.entries(skillMeta)
@@ -191,7 +191,7 @@ export default function GuideDetailsPage(){
           </div>
         </div>
 
-        <div className="mt-[40px] bg-[#253745] rounded-[20px] p-[24px] flex flex-wrap items-center justify-between gap-[16px]">
+        <div className="guide-price-anim mt-[40px] bg-[#253745] rounded-[20px] p-[24px] flex flex-wrap items-center justify-between gap-[16px]">
           <div className="flex gap-[32px]">
             <div>
               <p className="text-[#00C896] font-bold text-[20px]">{guide.currency} {guide.pricePerHour}</p>
@@ -214,7 +214,7 @@ export default function GuideDetailsPage(){
           </button>
         </div>
         {myBookings.length > 0 && (
-          <div className="mt-[20px] bg-[#253745] rounded-[20px] p-[24px]">
+          <div className="guide-mybookings-anim mt-[20px] bg-[#253745] rounded-[20px] p-[24px]">
             <h3 className="text-white font-bold text-[16px] mb-[12px]">Your Bookings</h3>
             <div className="flex flex-col gap-[10px]">
               {myBookings.map((b) => (
@@ -235,12 +235,14 @@ export default function GuideDetailsPage(){
           </div>
         )}
 
-        <GuideReviews
-          guideId={guide._id}
-          reviews={reviews}
-          onReviewAdded={handleReviewAdded}
-          onReviewDeleted={handleReviewDeleted}
-        />
+        <div className="guide-reviews-anim">
+          <GuideReviews
+            guideId={guide._id}
+            reviews={reviews}
+            onReviewAdded={handleReviewAdded}
+            onReviewDeleted={handleReviewDeleted}
+          />
+        </div>
       </div>
       {showBookingModal && (
         <Booking 

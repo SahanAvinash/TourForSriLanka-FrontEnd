@@ -387,3 +387,279 @@
         opacity: 1;
     }
 }
+@keyframes tourFormFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tour-form-anim {
+    opacity: 0;
+    animation: tourFormFadeIn 0.7s ease-out 0.6s forwards;
+}
+
+@keyframes tourFeatureCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.tour-feature-card-anim {
+    opacity: 0;
+}
+
+.tour-feature-card-anim.in-view {
+    animation: tourFeatureCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tour-form-anim,
+    .tour-feature-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes guideHeroFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes guideDetailFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.guide-hero-anim {
+    opacity: 0;
+    animation: guideHeroFadeIn 0.8s ease-out forwards;
+}
+
+.guide-info-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.15s forwards;
+}
+
+.guide-languages-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.3s forwards;
+}
+
+.guide-skills-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.45s forwards;
+}
+
+.guide-price-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.6s forwards;
+}
+
+.guide-mybookings-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.75s forwards;
+}
+
+.guide-reviews-anim {
+    opacity: 0;
+    animation: guideDetailFadeIn 0.7s ease-out 0.9s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guide-hero-anim,
+    .guide-info-anim,
+    .guide-languages-anim,
+    .guide-skills-anim,
+    .guide-price-anim,
+    .guide-mybookings-anim,
+    .guide-reviews-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes aboutSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.about-section-anim {
+    opacity: 0;
+}
+
+.about-section-anim.in-view {
+    animation: aboutSectionFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes missionSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mission-section-anim {
+    opacity: 0;
+}
+
+.mission-section-anim.in-view {
+    animation: missionSectionFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes visionSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vision-section-anim {
+    opacity: 0;
+}
+
+.vision-section-anim.in-view {
+    animation: visionSectionFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes featureCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.feature-card-anim {
+    opacity: 0;
+}
+
+.feature-card-anim.in-view {
+    animation: featureCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-section-anim,
+    .mission-section-anim,
+    .vision-section-anim,
+    .feature-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes contactHeroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.contact-hero-anim {
+    opacity: 0;
+    animation: contactHeroFadeIn 0.7s ease-out 0.2s forwards;
+}
+
+@keyframes contactInfoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.contact-info-anim {
+    opacity: 0;
+}
+
+.contact-info-anim.in-view {
+    animation: contactInfoFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes officeLocationFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.office-location-anim {
+    opacity: 0;
+}
+
+.office-location-anim.in-view {
+    animation: officeLocationFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes faqSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.faq-section-anim {
+    opacity: 0;
+}
+
+.faq-section-anim.in-view {
+    animation: faqSectionFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contact-hero-anim,
+    .contact-info-anim,
+    .office-location-anim,
+    .faq-section-anim {
+        animation: none;
+        opacity: 1;
+    }
+}

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import aboutBg from "../../assets/about_bg.jpg";
 
 import {
@@ -13,6 +14,52 @@ import {
 } from "react-icons/fa";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+
+function useInView(threshold = 0.15) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.unobserve(el)
+        }
+      },
+      { threshold }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return [ref, inView]
+}
+
+function AnimatedFeatureCard({ item, index }) {
+  const [ref, inView] = useInView()
+  return (
+    <div
+      ref={ref}
+      className={`feature-card-anim ${inView ? "in-view" : ""} bg-[#243847]/80 rounded-3xl p-6 text-center hover:scale-105 duration-300`}
+      style={{ animationDelay: inView ? `${index * 60}ms` : undefined }}
+    >
+      <div className="text-[#00C896] text-3xl flex justify-center mb-4">
+        {item.icon}
+      </div>
+
+      <h3 className="text-white font-bold mb-3">
+        {item.title}
+      </h3>
+
+      <p className="text-gray-300 text-sm text-justify">
+        {item.desc}
+      </p>
+    </div>
+  )
+}
 
 export default function AboutUsPage() {
   const features = [
@@ -63,6 +110,10 @@ export default function AboutUsPage() {
     },
   ];
 
+  const [aboutRef, aboutInView] = useInView()
+  const [missionRef, missionInView] = useInView()
+  const [visionRef, visionInView] = useInView()
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#02131E] via-[#0D2434] to-[#213847] pt-20">
       
@@ -70,7 +121,7 @@ export default function AboutUsPage() {
       {/* Hero */}
       <section className="px-5 md:px-10 pt-6">
         <div
-          className="h-[430px] rounded-[30px] bg-cover bg-center relative overflow-hidden "
+          className="hero-bg-anim h-[430px] rounded-[30px] bg-cover bg-center relative overflow-hidden "
           style={{
             backgroundImage: `url(${aboutBg})`,
           }}
@@ -78,13 +129,13 @@ export default function AboutUsPage() {
           <div className="absolute inset-0 bg-black/45" />
 
           <div className="absolute left-8 top-16 text-white max-w-2xl">
-            <h1 className="text-5xl font-bold leading-tight">
+            <h1 className="hero-title-anim text-5xl font-bold leading-tight">
               Discover the Beauty of Sri Lanka
               <br />
               With Trusted Local Experts
             </h1>
 
-            <p className="mt-4 text-lg text-gray-200">
+            <p className="hero-desc-anim mt-4 text-lg text-gray-200">
               We are a Sri Lankan based tourism platform dedicated to helping
               travelers explore the island with comfort, safety and unforgettable
               experiences.
@@ -94,7 +145,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* About */}
-      <section className="px-5 md:px-10 py-10 text-white">
+      <section ref={aboutRef} className={`about-section-anim ${aboutInView ? "in-view" : ""} px-5 md:px-10 py-10 text-white`}>
         <h2 className="text-3xl font-bold mb-5">About Us</h2>
 
         <div className="bg-[#11212D]/80 p-6 rounded-3xl">
@@ -113,7 +164,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Mission */}
-      <section className="px-5 md:px-10">
+      <section ref={missionRef} className={`mission-section-anim ${missionInView ? "in-view" : ""} px-5 md:px-10`}>
         <div className="bg-[#253745]/80 rounded-3xl p-6 text-white">
           <div className="flex items-center gap-3 mb-5">
             <FaBullseye className="text-[#00C896] text-2xl" />
@@ -130,7 +181,7 @@ export default function AboutUsPage() {
       </section>
 
       {/* Vision */}
-      <section className="px-5 md:px-10 mt-6">
+      <section ref={visionRef} className={`vision-section-anim ${visionInView ? "in-view" : ""} px-5 md:px-10 mt-6`}>
         <div className="bg-[#253745]/80 rounded-3xl p-6 text-white">
           <div className="flex items-center gap-3 mb-5">
             <FaEye className="text-[#00C896] text-2xl" />
@@ -154,22 +205,7 @@ export default function AboutUsPage() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {features.map((item, index) => (
-            <div
-              key={index}
-              className="bg-[#243847]/80 rounded-3xl p-6 text-center hover:scale-105 duration-300"
-            >
-              <div className="text-[#00C896] text-3xl flex justify-center mb-4">
-                {item.icon}
-              </div>
-
-              <h3 className="text-white font-bold mb-3">
-                {item.title}
-              </h3>
-
-              <p className="text-gray-300 text-sm text-justify">
-                {item.desc}
-              </p>
-            </div>
+            <AnimatedFeatureCard key={index} item={item} index={index} />
           ))}
         </div>
       </section>

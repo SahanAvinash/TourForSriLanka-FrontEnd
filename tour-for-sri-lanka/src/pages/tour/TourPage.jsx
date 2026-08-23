@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { MapPin, Route, Users, Compass, X, Download } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const districtOptions = [
   "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
@@ -15,7 +15,6 @@ const districtOptions = [
   "Monaragala", "Ratnapura", "Kegalle",
 ].map((d) => ({ value: d, label: d }));
 
-// NEW: 1-10 guests walata dropdown options hadanawa
 const guestOptions = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => ({
   value: n,
   label: `${n} ${n === 1 ? "Guest" : "Guests"}`,
@@ -42,7 +41,6 @@ const selectStyles = {
   }),
 };
 
-// Date input eka past dates walata select karanna dena ne widihata, today eka minimum widihata set karanawa
 const getTodayString = () => {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -56,14 +54,65 @@ const formatDate = (d) => {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 };
 
+const FeatureCard = ({ icon, title, description, delay = 0 }) => {
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -100px 0px" }
+    );
+    if (cardRef.current) observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className={`bg-[#253745] rounded-xl p-6 text-center tour-feature-card-anim ${isVisible ? "in-view" : ""}`}
+      style={{ animationDelay: isVisible ? `${delay}s` : "0s" }}
+    >
+      {icon}
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-gray-400">{description}</p>
+    </div>
+  );
+};
+
 const TourPage = () => {
   const navigate = useNavigate();
-  const [startDistrict, setStartDistrict] = useState(null);
-  const [startDate, setStartDate] = useState("");
-  const [numberOfGuests, setNumberOfGuests] = useState(null); // NEW
+
+  const [startDistrict, setStartDistrict] = useState(() => {
+    const saved = sessionStorage.getItem("tourStartDistrict");
+    return saved ? { value: saved, label: saved } : null;
+  });
+  const [startDate, setStartDate] = useState(() => sessionStorage.getItem("tourStartDate") || "");
+  const [numberOfGuests, setNumberOfGuests] = useState(() => {
+    const saved = sessionStorage.getItem("tourNumberOfGuests");
+    if (!saved) return null;
+    const n = Number(saved);
+    return { value: n, label: `${n} ${n === 1 ? "Guest" : "Guests"}` };
+  });
   const [error, setError] = useState("");
 
-  // --- "Your Tour" floating button + modal state ---
+  useEffect(() => {
+    if (startDistrict) sessionStorage.setItem("tourStartDistrict", startDistrict.value);
+  }, [startDistrict]);
+
+  useEffect(() => {
+    if (startDate) sessionStorage.setItem("tourStartDate", startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    if (numberOfGuests) sessionStorage.setItem("tourNumberOfGuests", numberOfGuests.value);
+  }, [numberOfGuests]);
+
   const [activeTour, setActiveTour] = useState(null);
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -83,16 +132,16 @@ const TourPage = () => {
     setActiveTour(null);
     setShowTourModal(false);
   };
+
   const handleDownloadPdf = () => {
     if (!activeTour) return;
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const accent = [0, 200, 150]; // #00C896
-    const dark = [17, 33, 45]; // #11212D
+    const accent = [0, 200, 150];
+    const dark = [17, 33, 45];
     let y = 0;
 
-    // --- Header band ---
     doc.setFillColor(...accent);
     doc.rect(0, 0, pageWidth, 32, "F");
     doc.setTextColor(255, 255, 255);
@@ -105,13 +154,11 @@ const TourPage = () => {
 
     y = 42;
 
-    // --- Generated date ---
     doc.setTextColor(120, 120, 120);
     doc.setFontSize(9);
     doc.text(`Generated on ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`, 14, y);
     y += 10;
 
-    // --- Trip route section ---
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -136,7 +183,6 @@ const TourPage = () => {
 
     y = doc.lastAutoTable.finalY + 12;
 
-    // --- Guide bookings ---
     if (activeTour.guideBookings?.length > 0) {
       if (y > 250) { doc.addPage(); y = 20; }
       doc.setFontSize(13);
@@ -164,7 +210,6 @@ const TourPage = () => {
       y = doc.lastAutoTable.finalY + 12;
     }
 
-    // --- Hotel bookings ---
     if (activeTour.hotelBookings?.length > 0) {
       if (y > 250) { doc.addPage(); y = 20; }
       doc.setFontSize(13);
@@ -192,7 +237,6 @@ const TourPage = () => {
       y = doc.lastAutoTable.finalY + 12;
     }
 
-    // --- Transport bookings ---
     if (activeTour.transportBookings?.length > 0) {
       if (y > 250) { doc.addPage(); y = 20; }
       doc.setFontSize(13);
@@ -220,7 +264,6 @@ const TourPage = () => {
       y = doc.lastAutoTable.finalY + 12;
     }
 
-    // --- Budget summary box ---
     if (y > 240) { doc.addPage(); y = 20; }
     doc.setFillColor(...dark);
     doc.roundedRect(14, y, pageWidth - 28, 44, 3, 3, "F");
@@ -247,7 +290,6 @@ const TourPage = () => {
     doc.setTextColor(...accent);
     doc.text(`LKR ${Number(activeTour.totalBudget || 0).toLocaleString()}`, pageWidth - 20, y + 39, { align: "right" });
 
-    // --- Footer ---
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -273,14 +315,11 @@ const TourPage = () => {
       return;
     }
 
-    sessionStorage.setItem("tourStartDistrict", startDistrict.value);
-    sessionStorage.setItem("tourStartDate", startDate);
-    sessionStorage.setItem("tourNumberOfGuests", numberOfGuests.value); // NEW
     navigate("/tours/plan", {
       state: {
         startDistrict: startDistrict.value,
         startDate,
-        numberOfGuests: numberOfGuests.value, // NEW
+        numberOfGuests: numberOfGuests.value,
       },
     });
   };
@@ -289,101 +328,98 @@ const TourPage = () => {
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
       <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 page-title-anim">
           Plan Your Own <span className="text-[#00C896]">Sri Lanka Trip</span>
         </h1>
-        <p className="text-gray-300 text-lg mb-8">
+        <p className="text-gray-300 text-lg mb-8 page-desc-anim">
           Pick the places you want to visit, and we'll auto-generate your trip route,
           show the distance between stops, and connect you with local guides, hotels,
           and transport in those areas.
         </p>
 
-        <div className="max-w-sm mx-auto mb-4 text-left">
-          <label className="block text-sm text-gray-300 mb-2">
-            You're starting your trip from...
-          </label>
-          <Select
-            options={districtOptions}
-            value={startDistrict}
-            onChange={(option) => {
-              setStartDistrict(option);
-              setError("");
-            }}
-            placeholder="Select your district..."
-            styles={selectStyles}
-          />
-        </div>
+        <div className="tour-form-anim">
+          <div className="max-w-sm mx-auto mb-4 text-left">
+            <label className="block text-sm text-gray-300 mb-2">
+              You're starting your trip from...
+            </label>
+            <Select
+              options={districtOptions}
+              value={startDistrict}
+              onChange={(option) => {
+                setStartDistrict(option);
+                setError("");
+              }}
+              placeholder="Select your district..."
+              styles={selectStyles}
+            />
+          </div>
 
-        <div className="max-w-sm mx-auto mb-4 text-left">
-          <label className="block text-sm text-gray-300 mb-2">
-            Trip start date
-          </label>
-          <input
-            type="date"
-            min={getTodayString()}
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
-              setError("");
-            }}
-            className="w-full bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[#00C896]"
-          />
-        </div>
+          <div className="max-w-sm mx-auto mb-4 text-left">
+            <label className="block text-sm text-gray-300 mb-2">
+              Trip start date
+            </label>
+            <input
+              type="date"
+              min={getTodayString()}
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setError("");
+              }}
+              className="w-full bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[#00C896]"
+            />
+          </div>
 
-        {/* NEW: Number of guests select */}
-        <div className="max-w-sm mx-auto mb-4 text-left">
-          <label className="block text-sm text-gray-300 mb-2">
-            Number of guests
-          </label>
-          <Select
-            options={guestOptions}
-            value={numberOfGuests}
-            onChange={(option) => {
-              setNumberOfGuests(option);
-              setError("");
-            }}
-            placeholder="Select number of guests..."
-            styles={selectStyles}
-          />
-          {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
-        </div>
+          <div className="max-w-sm mx-auto mb-4 text-left">
+            <label className="block text-sm text-gray-300 mb-2">
+              Number of guests
+            </label>
+            <Select
+              options={guestOptions}
+              value={numberOfGuests}
+              onChange={(option) => {
+                setNumberOfGuests(option);
+                setError("");
+              }}
+              placeholder="Select number of guests..."
+              styles={selectStyles}
+            />
+            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+          </div>
 
-        <button
-          onClick={handleStart}
-          className="bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:opacity-90 transition"
-        >
-          Start Planning
-        </button>
+          <button
+            onClick={handleStart}
+            className="bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:opacity-90 transition"
+          >
+            Start Planning
+          </button>
+        </div>
       </div>
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#253745] rounded-xl p-6 text-center">
-          <MapPin className="mx-auto text-[#00C896] mb-3" size={32} />
-          <h3 className="font-semibold mb-2">1. Select Destinations</h3>
-          <p className="text-sm text-gray-400">
-            Choose as many places as you like, from beaches to ancient cities to wildlife parks.
-          </p>
-        </div>
-        <div className="bg-[#253745] rounded-xl p-6 text-center">
-          <Route className="mx-auto text-[#00C896] mb-3" size={32} />
-          <h3 className="font-semibold mb-2">2. Get Your Route</h3>
-          <p className="text-sm text-gray-400">
-            We map out the trip order and show the distance between each stop.
-          </p>
-        </div>
-        <div className="bg-[#253745] rounded-xl p-6 text-center">
-          <Users className="mx-auto text-[#00C896] mb-3" size={32} />
-          <h3 className="font-semibold mb-2">3. Book Locally</h3>
-          <p className="text-sm text-gray-400">
-            See guides, hotels, and transport available near each destination.
-          </p>
-        </div>
+        <FeatureCard
+          icon={<MapPin className="mx-auto text-[#00C896] mb-3" size={32} />}
+          title="1. Select Destinations"
+          description="Choose as many places as you like, from beaches to ancient cities to wildlife parks."
+          delay={0}
+        />
+        <FeatureCard
+          icon={<Route className="mx-auto text-[#00C896] mb-3" size={32} />}
+          title="2. Get Your Route"
+          description="We map out the trip order and show the distance between each stop."
+          delay={0.15}
+        />
+        <FeatureCard
+          icon={<Users className="mx-auto text-[#00C896] mb-3" size={32} />}
+          title="3. Book Locally"
+          description="See guides, hotels, and transport available near each destination."
+          delay={0.3}
+        />
       </div>
       <div className="mt-16">
         <Footer />
       </div>
 
-      {/* --- "Your Tour" floating circle button --- */}
       {activeTour && (
         <button
           onClick={() => setShowTourModal(true)}
@@ -395,7 +431,6 @@ const TourPage = () => {
         </button>
       )}
 
-      {/* --- "Your Tour" details modal --- */}
       {showTourModal && activeTour && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] px-4"
@@ -410,7 +445,6 @@ const TourPage = () => {
               <button onClick={() => setShowTourModal(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
             </div>
 
-            {/* Trip route */}
             <div className="mb-5">
               <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Trip Route</h4>
               <div className="flex flex-col gap-1.5 mt-2">
@@ -422,7 +456,6 @@ const TourPage = () => {
               </div>
             </div>
 
-            {/* Guide bookings */}
             {activeTour.guideBookings?.length > 0 && (
               <div className="mb-5">
                 <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Guide Bookings</h4>
@@ -438,7 +471,6 @@ const TourPage = () => {
               </div>
             )}
 
-            {/* Hotel bookings */}
             {activeTour.hotelBookings?.length > 0 && (
               <div className="mb-5">
                 <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Hotel Bookings</h4>
@@ -454,7 +486,6 @@ const TourPage = () => {
               </div>
             )}
 
-            {/* Transport bookings */}
             {activeTour.transportBookings?.length > 0 && (
               <div className="mb-5">
                 <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">Transport Bookings</h4>
@@ -470,7 +501,6 @@ const TourPage = () => {
               </div>
             )}
 
-            {/* Budget summary */}
             <div className="bg-[#11212D] rounded-lg p-4 mt-2">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
                 <span>Guides</span><span>LKR {activeTour.guideBudget?.toLocaleString()}</span>

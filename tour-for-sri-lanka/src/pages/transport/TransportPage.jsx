@@ -115,23 +115,6 @@ export default function TransportPage() {
         onSearch={handleSearch}
       />
 
-      <section ref={vehicleTypeSectionRef} className="px-14 py-8 max-lg:px-5">
-        <h2 className="text-[22px] font-bold">Select your vehicle type</h2>
-        <p className="mt-1 text-[#d5dde2]">
-          All vehicles are with professional drivers
-        </p>
-
-        <div className="mt-3.5 grid grid-cols-4 gap-[62px] max-lg:grid-cols-1 max-lg:gap-6">
-          {vehicleTypes.map((item) => (
-            <VehicleTypeCard
-              key={item.type}
-              item={item}
-              onClick={() => openVehicles(item.type)}
-            />
-          ))}
-        </div>
-      </section>
-
       {travelerId && (
         <section className="px-14 py-8 max-lg:px-5">
           <h2 className="text-[22px] font-bold">Your Bookings</h2>
@@ -197,6 +180,23 @@ export default function TransportPage() {
           </div>
         </section>
       )}
+
+      <section ref={vehicleTypeSectionRef} className="px-14 py-8 max-lg:px-5">
+        <h2 className="text-[22px] font-bold">Select your vehicle type</h2>
+        <p className="mt-1 text-[#d5dde2]">
+          All vehicles are with professional drivers
+        </p>
+
+        <div className="mt-3.5 grid grid-cols-4 gap-[62px] max-lg:grid-cols-1 max-lg:gap-6">
+          {vehicleTypes.map((item) => (
+            <VehicleTypeCard
+              key={item.type}
+              item={item}
+              onClick={() => openVehicles(item.type)}
+            />
+          ))}
+        </div>
+      </section>
 
       <Footer />
     </main>
