@@ -1,51 +1,73 @@
 import { Fragment, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { GrFormPreviousLink } from "react-icons/gr";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
+import { GrFormPreviousLink } from "react-icons/gr";
 
 const SKILL_KEYS = [
-    "CulturalTours", "AdventureTours", "WildLifeTours", "Hiking", "SurfingGuide",
-    "FoodTours", "PhotographyTours", "HistoricalTours", "CityTours", "NatureGuide"
+    "CulturalTours",
+    "AdventureTours",
+    "WildLifeTours",
+    "Hiking",
+    "SurfingGuide",
+    "FoodTours",
+    "PhotographyTours",
+    "HistoricalTours",
+    "CityTours",
+    "NatureGuide",
 ];
-const LANGUAGE_KEYS = ["english", "sinhala", "tamil", "spanish", "japan", "chaina", "korean"];
+
+const LANGUAGE_KEYS = [
+    "english",
+    "sinhala",
+    "tamil",
+    "spanish",
+    "japan",
+    "chaina",
+    "korean",
+];
 
 const STEPS = [
     { label: "Account", done: true, number: "1" },
     { label: "Personal Info", done: true, number: "2" },
     { label: "Professional Info", done: true, number: "3" },
-    { label: "Pricing", number: "4", current: true },
+    { label: "Pricing", current: true, number: "4" },
 ];
 
+const API_URL = "http://localhost:3000/api/guide";
+const STORAGE_KEY = "GuideRegister";
+
 export default function VerifyOtpGuide() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [otp, setOtp] = useState("");
     const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
     const [resendMsg, setResendMsg] = useState("");
 
-    const navigate = useNavigate();
-    const location = useLocation();
-
     const { nicFile, licenseFile, profilePhoto } = location.state || {};
 
-    const stored = sessionStorage.getItem("GuideRegister");
-    const data = stored ? JSON.parse(stored) : null;
+    const storedData = sessionStorage.getItem(STORAGE_KEY);
+    const data = storedData ? JSON.parse(storedData) : null;
     const email = data?.email;
 
-    const buildSkillObject = (selectedKeys = []) => {
-        const skillObj = {};
-        SKILL_KEYS.forEach((key) => {
-            skillObj[key] = selectedKeys.includes(key);
-        });
-        return skillObj;
-    };
+    const buildSkillObject = (selectedKeys = []) =>
+        SKILL_KEYS.reduce(
+            (result, key) => ({
+                ...result,
+                [key]: selectedKeys.includes(key),
+            }),
+            {}
+        );
 
-    const buildLanguageObject = (selectedKeys = []) => {
-        const langObj = {};
-        LANGUAGE_KEYS.forEach((key) => {
-            langObj[key] = selectedKeys.includes(key);
-        });
-        return langObj;
-    };
+    const buildLanguageObject = (selectedKeys = []) =>
+        LANGUAGE_KEYS.reduce(
+            (result, key) => ({
+                ...result,
+                [key]: selectedKeys.includes(key),
+            }),
+            {}
+        );
 
     const handleVerify = async () => {
         if (!data || !email) {
@@ -60,6 +82,7 @@ export default function VerifyOtpGuide() {
 
         setLoading(true);
         setErr("");
+        setResendMsg("");
 
         try {
             const formData = new FormData();
@@ -88,18 +111,33 @@ export default function VerifyOtpGuide() {
             formData.append("maximumGuests", data.maximumGuests ?? "");
             formData.append("currency", data.currency ?? "");
 
-            formData.append("skill", JSON.stringify(buildSkillObject(data.skills)));
-            formData.append("languages", JSON.stringify(buildLanguageObject(data.languages)));
+            formData.append(
+                "skill",
+                JSON.stringify(buildSkillObject(data.skills))
+            );
 
-            nicFile && formData.append("NICfile", nicFile);
-            licenseFile && formData.append("guiedLicense", licenseFile);
-            profilePhoto && formData.append("profilePic", profilePhoto);
+            formData.append(
+                "languages",
+                JSON.stringify(buildLanguageObject(data.languages))
+            );
+
+            if (nicFile) {
+                formData.append("NICfile", nicFile);
+            }
+
+            if (licenseFile) {
+                formData.append("guiedLicense", licenseFile);
+            }
+
+            if (profilePhoto) {
+                formData.append("profilePic", profilePhoto);
+            }
 
             formData.append("otp", otp);
 
-            const response = await fetch("http://localhost:3000/api/guide", {
+            const response = await fetch(API_URL, {
                 method: "POST",
-                body: formData
+                body: formData,
             });
 
             const result = await response.json();
@@ -111,25 +149,31 @@ export default function VerifyOtpGuide() {
             }
 
             localStorage.setItem("token", result.token);
-            sessionStorage.removeItem("GuideRegister");
+            sessionStorage.removeItem(STORAGE_KEY);
+
             navigate("/login");
-        } catch (error) {
+        } catch {
             setErr("Something went wrong. Please try again");
             setLoading(false);
         }
     };
 
     const handleResend = async () => {
-        if (!email) return;
+        if (!email) {
+            setErr("Email not found. Please sign up again.");
+            return;
+        }
 
-        setResendMsg("");
         setErr("");
+        setResendMsg("");
 
         try {
-            const response = await fetch("http://localhost:3000/api/guide/send-otp", {
+            const response = await fetch(`${API_URL}/send-otp`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
             });
 
             const result = await response.json();
@@ -140,7 +184,7 @@ export default function VerifyOtpGuide() {
             }
 
             setResendMsg("A new OTP has been sent to your email");
-        } catch (error) {
+        } catch {
             setErr("Failed to resend OTP");
         }
     };
@@ -151,7 +195,6 @@ export default function VerifyOtpGuide() {
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -178,7 +221,7 @@ export default function VerifyOtpGuide() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -188,7 +231,6 @@ export default function VerifyOtpGuide() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -203,17 +245,30 @@ export default function VerifyOtpGuide() {
                         </h1>
 
                         <p className="text-[12px] text-text/70 mt-[10px] text-center">
-                            We sent a 6-digit code to <span className="font-bold">{email}</span>
+                            We sent a 6-digit code to{" "}
+                            <span className="font-bold">{email}</span>
                         </p>
 
-                        {err && <div className="text-[12px] text-[#9E4444] mt-[10px] text-center">{err}</div>}
-                        {resendMsg && <div className="text-[12px] text-primary-green mt-[10px] text-center">{resendMsg}</div>}
+                        {err && (
+                            <div className="text-[12px] text-[#9E4444] mt-[10px] text-center">
+                                {err}
+                            </div>
+                        )}
+
+                        {resendMsg && (
+                            <div className="text-[12px] text-primary-green mt-[10px] text-center">
+                                {resendMsg}
+                            </div>
+                        )}
 
                         <input
                             type="text"
+                            inputMode="numeric"
                             maxLength={6}
                             value={otp}
-                            onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))}
+                            onChange={(e) =>
+                                setOtp(e.target.value.replace(/[^0-9]/g, ""))
+                            }
                             placeholder="Enter OTP"
                             className="w-full mt-[20px] text-center tracking-[10px] text-[20px] rounded-[10px] bg-border/50 border border-border/50 focus:border-primary-green/80 outline-none p-[10px] text-text"
                         />
@@ -230,7 +285,8 @@ export default function VerifyOtpGuide() {
                         <button
                             type="button"
                             onClick={handleResend}
-                            className="text-[12px] text-text/70 hover:text-primary-green/80 mt-[15px] underline cursor-pointer"
+                            disabled={loading}
+                            className="text-[12px] text-text/70 hover:text-primary-green/80 mt-[15px] underline cursor-pointer disabled:opacity-50"
                         >
                             Resend OTP
                         </button>
@@ -238,9 +294,11 @@ export default function VerifyOtpGuide() {
                         <button
                             type="button"
                             onClick={handlePrevious}
-                            className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-border/50 hover:bg-border/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer"
+                            disabled={loading}
+                            className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-border/50 hover:bg-border/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer disabled:opacity-50"
                         >
-                            <GrFormPreviousLink />Previous
+                            <GrFormPreviousLink />
+                            Previous
                         </button>
                     </div>
                 </div>
