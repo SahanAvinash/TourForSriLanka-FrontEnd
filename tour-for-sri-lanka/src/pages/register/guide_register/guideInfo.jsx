@@ -3,7 +3,13 @@ import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
 import { FaCheck, FaRegCalendarAlt, FaMap, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    useMapEvents,
+    useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -11,6 +17,7 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 delete L.Icon.Default.prototype._getIconUrl;
+
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
@@ -19,10 +26,20 @@ L.Icon.Default.mergeOptions({
 
 const STORAGE_KEY = "GuideRegister";
 
-const DEFAULT_MAP_CENTER = { lat: 6.9271, lng: 79.8612 };
+const DEFAULT_MAP_CENTER = {
+    lat: 6.9271,
+    lng: 79.8612,
+};
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
-const MARITAL_OPTIONS = ["Single", "Married", "Divorced", "Widowed"];
+
+const MARITAL_OPTIONS = [
+    "Single",
+    "Married",
+    "Divorced",
+    "Widowed",
+];
+
 const ETHNICITY_OPTIONS = [
     "Sinhalese",
     "Tamil",
@@ -31,6 +48,7 @@ const ETHNICITY_OPTIONS = [
     "Malay",
     "Other",
 ];
+
 const PROVINCE_OPTIONS = [
     "Western",
     "Central",
@@ -42,11 +60,18 @@ const PROVINCE_OPTIONS = [
     "Uva",
     "Sabaragamuwa",
 ];
+
 const PROVINCE_DISTRICTS = {
     Western: ["Colombo", "Gampaha", "Kalutara"],
     Central: ["Kandy", "Matale", "Nuwara Eliya"],
     Southern: ["Galle", "Matara", "Hambantota"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+    Northern: [
+        "Jaffna",
+        "Kilinochchi",
+        "Mannar",
+        "Vavuniya",
+        "Mullaitivu",
+    ],
     Eastern: ["Batticaloa", "Ampara", "Trincomalee"],
     "North Western": ["Kurunegala", "Puttalam"],
     "North Central": ["Anuradhapura", "Polonnaruwa"],
@@ -55,10 +80,24 @@ const PROVINCE_DISTRICTS = {
 };
 
 const STEPS = [
-    { label: "Account", done: true, number: "1" },
-    { label: "Personal Info", number: "2", current: true },
-    { label: "Language & Skills", number: "3" },
-    { label: "Pricing", number: "4" },
+    {
+        label: "Account",
+        done: true,
+        number: "1",
+    },
+    {
+        label: "Personal Info",
+        number: "2",
+        current: true,
+    },
+    {
+        label: "Language & Skills",
+        number: "3",
+    },
+    {
+        label: "Pricing",
+        number: "4",
+    },
 ];
 
 const selectStyles = {
@@ -90,7 +129,7 @@ const selectStyles = {
             : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
-        fontSize: "12px"
+        fontSize: "12px",
     }),
 
     singleValue: (base) => ({
@@ -131,42 +170,57 @@ const calculateAge = (dob) => {
 
 function LocationClickHandler({ onPick }) {
     useMapEvents({
-        click(e) {
-            onPick(e.latlng);
+        click(event) {
+            onPick(event.latlng);
         },
     });
+
     return null;
 }
 
 function RecenterMap({ position }) {
     const map = useMap();
+
     useEffect(() => {
         map.flyTo(position, map.getZoom());
-    }, [position]);
+    }, [map, position]);
+
     return null;
 }
 
-function MapPickerModal({ initialPosition, onClose, onConfirm }) {
-    const [position, setPosition] = useState(initialPosition || DEFAULT_MAP_CENTER);
+function MapPickerModal({
+    initialPosition,
+    onClose,
+    onConfirm,
+}) {
+    const [position, setPosition] = useState(
+        initialPosition || DEFAULT_MAP_CENTER
+    );
     const [address, setAddress] = useState("");
     const [loadingAddress, setLoadingAddress] = useState(false);
     const [locating, setLocating] = useState(false);
-
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searching, setSearching] = useState(false);
+
     const searchTimeoutRef = useRef(null);
 
     const reverseGeocode = async (lat, lng) => {
         setLoadingAddress(true);
+
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-            const data = await res.json();
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+
+            const data = await response.json();
+
             setAddress(data.display_name || "");
-        } catch (error) {
+        } catch {
             setAddress("");
+        } finally {
+            setLoadingAddress(false);
         }
-        setLoadingAddress(false);
     };
 
     useEffect(() => {
@@ -178,19 +232,36 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
             setSearchResults([]);
             return;
         }
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
         searchTimeoutRef.current = setTimeout(async () => {
             setSearching(true);
+
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&countrycodes=lk`);
-                const data = await res.json();
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                        searchQuery
+                    )}&limit=5&countrycodes=lk`
+                );
+
+                const data = await response.json();
+
                 setSearchResults(data);
-            } catch (error) {
+            } catch {
                 setSearchResults([]);
+            } finally {
+                setSearching(false);
             }
-            setSearching(false);
         }, 500);
-        return () => clearTimeout(searchTimeoutRef.current);
+
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
     }, [searchQuery]);
 
     const handlePick = (latlng) => {
@@ -199,21 +270,35 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     };
 
     const handleUseMyLocation = () => {
-        if (!navigator.geolocation) return;
+        if (!navigator.geolocation) {
+            return;
+        }
+
         setLocating(true);
+
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            (currentPosition) => {
+                const latlng = {
+                    lat: currentPosition.coords.latitude,
+                    lng: currentPosition.coords.longitude,
+                };
+
                 setPosition(latlng);
                 reverseGeocode(latlng.lat, latlng.lng);
                 setLocating(false);
             },
-            () => setLocating(false)
+            () => {
+                setLocating(false);
+            }
         );
     };
 
     const handleSelectResult = (result) => {
-        const latlng = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
+        const latlng = {
+            lat: parseFloat(result.lat),
+            lng: parseFloat(result.lon),
+        };
+
         setPosition(latlng);
         setAddress(result.display_name);
         setSearchQuery("");
@@ -221,75 +306,110 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] px-[20px]">
-            <div className="w-[600px] max-w-full bg-primary-2 text-text rounded-[20px] p-[20px] flex flex-col items-center">
-                <h2 className="text-[18px] font-bold mb-[10px]">Pick your address location</h2>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 px-[20px]">
+            <div className="w-[600px] max-w-full rounded-[20px] bg-primary-2 p-[20px] text-text">
+                <h2 className="mb-[10px] text-center text-[18px] font-bold">
+                    Pick your address location
+                </h2>
 
-                <div className="w-full relative">
+                <div className="relative w-full">
                     <input
                         type="text"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(event) =>
+                            setSearchQuery(event.target.value)
+                        }
                         placeholder="Search for a place (e.g. Galle Fort, Kandy)"
-                        className="w-full h-[45px] text-[12px] bg-border/50 rounded-[15px] pl-[40px] pr-[15px] text-text placeholder:text-text/50"
+                        className="h-[45px] w-full rounded-[15px] bg-border/50 pl-[40px] pr-[15px] text-[12px] text-text placeholder:text-text/50"
                     />
-                    <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-primary-green/70 text-[12px]" />
+
+                    <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[12px] text-primary-green/70" />
 
                     {(searching || searchResults.length > 0) && (
-                        <div className="absolute top-[50px] left-0 w-full bg-border rounded-[15px] overflow-hidden z-[1001] max-h-[200px] overflow-y-auto">
+                        <div className="absolute left-0 top-[50px] z-[1001] max-h-[200px] w-full overflow-y-auto overflow-hidden rounded-[15px] bg-border">
                             {searching && (
-                                <div className="px-[15px] py-[10px] text-[12px] text-text/70">Searching...</div>
-                            )}
-                            {!searching && searchResults.map((result, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => handleSelectResult(result)}
-                                    className="px-[15px] py-[10px] text-[12px] text-text cursor-pointer hover:bg-primary-green/40 border-b border-text/10 last:border-none"
-                                >
-                                    {result.display_name}
+                                <div className="px-[15px] py-[10px] text-[12px] text-text/70">
+                                    Searching...
                                 </div>
-                            ))}
+                            )}
+
+                            {!searching &&
+                                searchResults.map((result, index) => (
+                                    <div
+                                        key={`${result.place_id}-${index}`}
+                                        onClick={() =>
+                                            handleSelectResult(result)
+                                        }
+                                        className="cursor-pointer border-b border-text/10 px-[15px] py-[10px] text-[12px] text-text last:border-none hover:bg-primary-green/40"
+                                    >
+                                        {result.display_name}
+                                    </div>
+                                ))}
                         </div>
                     )}
                 </div>
 
-                <div className="w-full h-[350px] rounded-[15px] overflow-hidden mt-[15px]">
-                    <MapContainer center={position} zoom={13} style={{ height: "100%", width: "100%" }}>
+                <div className="mt-[15px] h-[350px] w-full overflow-hidden rounded-[15px]">
+                    <MapContainer
+                        center={position}
+                        zoom={13}
+                        style={{
+                            height: "100%",
+                            width: "100%",
+                        }}
+                    >
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; OpenStreetMap contributors'
+                            attribution="&copy; OpenStreetMap contributors"
                         />
+
                         <Marker position={position} />
-                        <LocationClickHandler onPick={handlePick} />
+
+                        <LocationClickHandler
+                            onPick={handlePick}
+                        />
+
                         <RecenterMap position={position} />
                     </MapContainer>
                 </div>
 
-                <div className="w-full mt-[15px] text-[12px] bg-border/50 rounded-[15px] p-[10px] min-h-[40px]">
-                    {loadingAddress ? "Finding address..." : (address || "Click on the map to drop a pin")}
+                <div className="mt-[15px] min-h-[40px] w-full rounded-[15px] bg-border/50 p-[10px] text-[12px]">
+                    {loadingAddress
+                        ? "Finding address..."
+                        : address ||
+                          "Click on the map to drop a pin"}
                 </div>
 
                 <button
                     type="button"
                     onClick={handleUseMyLocation}
-                    className="w-full mt-[10px] text-[12px] text-left text-primary-green/80 underline cursor-pointer"
+                    className="mt-[10px] w-full cursor-pointer text-left text-[12px] text-primary-green/80 underline"
                 >
-                    {locating ? "Locating..." : "Use my current location"}
+                    {locating
+                        ? "Locating..."
+                        : "Use my current location"}
                 </button>
 
-                <div className="w-full mt-[15px] flex justify-between gap-3">
+                <div className="mt-[15px] flex w-full gap-3">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-full h-[45px] bg-border/50 font-bold text-[14px] rounded-[20px] hover:bg-border/80 transition-all duration-300 cursor-pointer"
+                        className="h-[45px] w-full cursor-pointer rounded-[20px] bg-border/50 text-[14px] font-bold transition-all duration-300 hover:bg-border/80"
                     >
                         Cancel
                     </button>
+
                     <button
                         type="button"
-                        onClick={() => onConfirm({ address, lat: position.lat, lng: position.lng })}
+                        onClick={() =>
+                            onConfirm({
+                                address,
+                                lat: position.lat,
+                                lng: position.lng,
+                            })
+                        }
                         disabled={!address}
-                        className="w-full h-[45px] bg-primary-green/50 font-bold text-[14px] rounded-[20px] hover:bg-primary-green/80 transition-all duration-300 disabled:opacity-50 cursor-pointer"
+                        className="h-[45px] w-full cursor-pointer rounded-[20px] bg-primary-green/50 text-[14px] font-bold transition-all duration-300 hover:bg-primary-green/80 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Confirm location
                     </button>
@@ -314,42 +434,41 @@ export default function GuideInformation() {
     const [NIC, setNIC] = useState("");
     const [district, setDistrict] = useState(null);
     const [aboutYourSelf, setAboutYourSelf] = useState("");
-
     const [err, setErr] = useState("");
 
-    const genderOptions = GENDER_OPTIONS.map((g) => ({
-        label: g,
-        value: g,
+    const genderOptions = GENDER_OPTIONS.map((item) => ({
+        label: item,
+        value: item,
     }));
 
-    const maritalOptions = MARITAL_OPTIONS.map((m) => ({
-        label: m,
-        value: m,
+    const maritalOptions = MARITAL_OPTIONS.map((item) => ({
+        label: item,
+        value: item,
     }));
 
-    const ethnicityOptions = ETHNICITY_OPTIONS.map((e) => ({
-        label: e,
-        value: e,
+    const ethnicityOptions = ETHNICITY_OPTIONS.map((item) => ({
+        label: item,
+        value: item,
     }));
 
-    const provinceOptions = PROVINCE_OPTIONS.map((p) => ({
-        label: p,
-        value: p,
+    const provinceOptions = PROVINCE_OPTIONS.map((item) => ({
+        label: item,
+        value: item,
     }));
 
     const districtOptions = (
         PROVINCE_DISTRICTS[province?.value] || []
-    ).map((d) => ({ label: d, value: d }));
-
-    const handleProvinceChange = (selected) => {
-        setProvince(selected);
-        setDistrict(null);
-    };
+    ).map((item) => ({
+        label: item,
+        value: item,
+    }));
 
     useEffect(() => {
         const saved = sessionStorage.getItem(STORAGE_KEY);
 
-        if (!saved) return;
+        if (!saved) {
+            return;
+        }
 
         const data = JSON.parse(saved);
 
@@ -358,12 +477,21 @@ export default function GuideInformation() {
         setNIC(data.NIC || "");
         setAboutYourSelf(data.aboutYourSelf || "");
 
-        if (data.latitude && data.longitude) {
-            setCoordinates({ lat: data.latitude, lng: data.longitude });
+        if (
+            data.latitude !== undefined &&
+            data.longitude !== undefined
+        ) {
+            setCoordinates({
+                lat: data.latitude,
+                lng: data.longitude,
+            });
         }
 
         if (data.gender) {
-            setGender({ label: data.gender, value: data.gender });
+            setGender({
+                label: data.gender,
+                value: data.gender,
+            });
         }
 
         if (data.maritalStatus) {
@@ -381,17 +509,25 @@ export default function GuideInformation() {
         }
 
         if (data.province) {
-            setProvince({ label: data.province, value: data.province });
+            setProvince({
+                label: data.province,
+                value: data.province,
+            });
         }
 
         if (data.district) {
-            setDistrict({ label: data.district, value: data.district });
+            setDistrict({
+                label: data.district,
+                value: data.district,
+            });
         }
     }, []);
 
     const buildFormData = () => {
         const oldData =
-            JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
+            JSON.parse(
+                sessionStorage.getItem(STORAGE_KEY)
+            ) || {};
 
         return {
             ...oldData,
@@ -416,16 +552,6 @@ export default function GuideInformation() {
         );
 
         navigate(-1);
-    };
-
-    const handleOpenMap = () => {
-        setShowMapPicker(true);
-    };
-
-    const handleConfirmLocation = (picked) => {
-        setAddress(picked.address);
-        setCoordinates({ lat: picked.lat, lng: picked.lng });
-        setShowMapPicker(false);
     };
 
     const handleNext = () => {
@@ -458,7 +584,8 @@ export default function GuideInformation() {
             return;
         }
 
-        const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
+        const nicRegex =
+            /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
 
         if (!nicRegex.test(NIC)) {
             setErr("Please enter a valid NIC Number");
@@ -475,17 +602,36 @@ export default function GuideInformation() {
         navigate("/guidelanguageskills");
     };
 
-    return (
-        <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
+    const handleOpenMap = () => {
+        setShowMapPicker(true);
+    };
 
-            <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
-                <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
-                    <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
+    const handleConfirmLocation = (picked) => {
+        setAddress(picked.address);
+
+        setCoordinates({
+            lat: picked.lat,
+            lng: picked.lng,
+        });
+
+        setShowMapPicker(false);
+    };
+
+    const handleProvinceChange = (selected) => {
+        setProvince(selected);
+        setDistrict(null);
+    };
+
+    return (
+        <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-r from-primary-1 to-primary-2">
+            <div className="absolute left-0 top-0 z-10 flex w-full justify-center px-4 pt-6 sm:px-6 sm:pt-8 lg:pt-[50px]">
+                <div className="flex w-full max-w-[1200px] justify-center lg:justify-start">
+                    <div className="flex w-[260px] items-start sm:w-[340px] lg:w-[500px] xl:w-[550px]">
                         {STEPS.map((step, index) => (
                             <Fragment key={step.label}>
-                                <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
+                                <div className="flex w-[40px] shrink-0 flex-col items-center sm:w-[58px] lg:w-[80px]">
                                     <div
-                                        className={`w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] lg:w-[30px] lg:h-[30px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full transition-all duration-300 sm:h-[22px] sm:w-[22px] lg:h-[30px] lg:w-[30px] ${
                                             step.done
                                                 ? "bg-primary-green/80"
                                                 : step.current
@@ -493,18 +639,23 @@ export default function GuideInformation() {
                                                 : "bg-border/80"
                                         }`}
                                     >
-                                        <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                        <span className="text-[7px] text-text sm:text-[9px] lg:text-[12px]">
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
-                                    <span className="mt-1 text-text text-[6px] sm:text-[8px] lg:text-[12px] text-center leading-tight whitespace-nowrap">
+                                    <span className="mt-1 whitespace-nowrap text-center text-[6px] leading-tight text-text sm:text-[8px] lg:text-[12px]">
                                         {step.label}
                                     </span>
                                 </div>
 
-                                {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                {index <
+                                    STEPS.length - 1 && (
+                                    <div className="mx-1 mt-[9px] flex-1 border-t-2 border-dashed border-text/50 sm:mt-[11px] lg:mt-[15px]" />
                                 )}
                             </Fragment>
                         ))}
@@ -512,73 +663,85 @@ export default function GuideInformation() {
                 </div>
             </div>
 
-            <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
-                <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
-                    <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
+            <div className="flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6">
+                <div className="flex w-full max-w-[1200px] flex-col items-center justify-center gap-10 lg:flex-row lg:justify-between lg:gap-20">
+                    <div className="flex w-[180px] shrink-0 items-center justify-center sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px]">
                         <img
                             src="/main_logo.png"
                             alt="Tours for Sri Lanka"
-                            className="w-full h-auto object-contain"
+                            className="h-auto w-full object-contain"
                         />
                     </div>
 
-                    <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
-                        <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">
+                    <div className="login-card-anim flex w-full max-w-[500px] flex-col items-center rounded-[20px] bg-primary-2 px-4 py-[20px] text-text sm:px-8 sm:py-[30px]">
+                        <h1 className="text-center text-[20px] font-bold text-text sm:text-[25px]">
                             Sign up as a Guide
                         </h1>
 
                         {err && (
-                            <div className="text-[#9E4444] text-[12px] text-center mt-[5px] px-2">
+                            <div className="mt-[5px] px-2 text-center text-[12px] text-[#9E4444]">
                                 {err}
                             </div>
                         )}
 
-                        <div className="mt-[20px] w-full relative">
+                        <div className="relative mt-[20px] w-full">
                             <input
                                 ref={dobRef}
                                 type="date"
                                 value={dateOfBirth}
-                                max={new Date().toISOString().split("T")[0]}
-                                onChange={(e) => setDateOfBirth(e.target.value)}
+                                max={
+                                    new Date()
+                                        .toISOString()
+                                        .split("T")[0]
+                                }
+                                onChange={(event) =>
+                                    setDateOfBirth(
+                                        event.target.value
+                                    )
+                                }
                                 onClick={() => {
                                     try {
                                         dobRef.current?.showPicker();
-                                    } catch {
-                                        // Some browsers don't support showPicker()
-                                    }
+                                    } catch {}
                                 }}
-                                className={`w-full h-[50px] text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px] [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 ${
-                                    dateOfBirth ? "text-text" : "text-transparent"
+                                className={`h-[50px] w-full rounded-[20px] bg-border/50 pl-[20px] pr-[45px] text-[12px] [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 ${
+                                    dateOfBirth
+                                        ? "text-text"
+                                        : "text-transparent"
                                 }`}
                             />
 
-                            <FaRegCalendarAlt className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 pointer-events-none" />
+                            <FaRegCalendarAlt className="pointer-events-none absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70" />
 
                             {!dateOfBirth && (
-                                <span className="absolute left-[20px] top-1/2 -translate-y-1/2 text-[12px] text-text/50 pointer-events-none">
+                                <span className="pointer-events-none absolute left-[20px] top-1/2 -translate-y-1/2 text-[12px] text-text/50">
                                     Date of Birth
                                 </span>
                             )}
                         </div>
 
-                        <div className="mt-[10px] w-full relative">
+                        <div className="relative mt-[10px] w-full">
                             <input
                                 placeholder="Home Address"
                                 value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
+                                onChange={(event) =>
+                                    setAddress(
+                                        event.target.value
+                                    )
+                                }
+                                className="h-[50px] w-full rounded-[20px] bg-border/50 pl-[20px] pr-[45px] text-[12px] text-text"
                             />
+
                             <button
                                 type="button"
                                 onClick={handleOpenMap}
-                                className="absolute right-[15px] top-1/2 -translate-y-1/2 text-primary-green/80 cursor-pointer"
+                                className="absolute right-[15px] top-1/2 -translate-y-1/2 cursor-pointer text-primary-green/80"
                             >
                                 <FaMap />
                             </button>
                         </div>
 
-                        <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
+                        <div className="mt-[10px] grid w-full grid-cols-1 gap-3 text-[12px] sm:grid-cols-2 sm:gap-4">
                             <Select
                                 options={genderOptions}
                                 value={gender}
@@ -600,7 +763,7 @@ export default function GuideInformation() {
                             />
                         </div>
 
-                        <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
+                        <div className="mt-[10px] grid w-full grid-cols-1 gap-3 text-[12px] sm:grid-cols-2 sm:gap-4">
                             <Select
                                 options={ethnicityOptions}
                                 value={ethnicity}
@@ -622,22 +785,27 @@ export default function GuideInformation() {
                             />
                         </div>
 
-                        <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
+                        <div className="mt-[10px] grid w-full grid-cols-1 gap-3 text-[12px] sm:grid-cols-2 sm:gap-4">
                             <input
                                 placeholder="NIC"
                                 value={NIC}
                                 maxLength={12}
-                                onChange={(e) => {
-                                    const value = e.target.value;
+                                onChange={(event) => {
+                                    const value =
+                                        event.target.value;
 
                                     if (
-                                        /^[0-9]{0,12}$/.test(value) ||
-                                        /^[0-9]{9}[vVxX]$/.test(value)
+                                        /^[0-9]{0,12}$/.test(
+                                            value
+                                        ) ||
+                                        /^[0-9]{9}[vVxX]$/.test(
+                                            value
+                                        )
                                     ) {
                                         setNIC(value);
                                     }
                                 }}
-                                className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
+                                className="h-[50px] w-full rounded-[20px] bg-border/50 pl-[20px] text-[12px] text-text"
                             />
 
                             <Select
@@ -645,7 +813,9 @@ export default function GuideInformation() {
                                 value={district}
                                 onChange={setDistrict}
                                 placeholder={
-                                    province ? "District" : "Select province first"
+                                    province
+                                        ? "District"
+                                        : "Select province first"
                                 }
                                 isDisabled={!province}
                                 menuPosition="fixed"
@@ -654,39 +824,41 @@ export default function GuideInformation() {
                             />
                         </div>
 
-                        <div className="mt-[10px] w-full relative">
+                        <div className="relative mt-[10px] w-full">
                             <textarea
                                 placeholder="About Your Self"
                                 value={aboutYourSelf}
                                 maxLength={100}
-                                onChange={(e) =>
-                                    setAboutYourSelf(e.target.value)
+                                onChange={(event) =>
+                                    setAboutYourSelf(
+                                        event.target.value
+                                    )
                                 }
-                                className="w-full h-[80px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none"
+                                className="h-[80px] w-full resize-none rounded-[20px] bg-border/50 pl-[20px] pr-[20px] pt-[15px] text-[12px] text-text"
                             />
 
-                            <span className="absolute right-[20px] bottom-[10px] text-[10px] text-text/50">
+                            <span className="absolute bottom-[10px] right-[20px] text-[10px] text-text/50">
                                 {aboutYourSelf.length}/100
                             </span>
                         </div>
 
-                        <div className="mt-[20px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="mt-[20px] grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                             <button
                                 type="button"
                                 onClick={handlePrevious}
-                                className="w-full h-[50px] bg-border/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-border/80 transition-all duration-300 hover:scale-95 cursor-pointer"
+                                className="flex h-[50px] w-full cursor-pointer items-center justify-center rounded-[20px] bg-border/50 text-[16px] font-bold transition-all duration-300 hover:scale-95 hover:bg-border/80"
                             >
-                                <GrFormPreviousLink className="font-bold text-[20px]" />
+                                <GrFormPreviousLink className="text-[20px] font-bold" />
                                 Previous
                             </button>
 
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                className="w-full h-[50px] bg-primary-green/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 cursor-pointer"
+                                className="flex h-[50px] w-full cursor-pointer items-center justify-center rounded-[20px] bg-primary-green/50 text-[16px] font-bold transition-all duration-300 hover:scale-105 hover:bg-primary-green/80"
                             >
                                 Next
-                                <GrFormNextLink className="font-bold text-[20px]" />
+                                <GrFormNextLink className="text-[20px] font-bold" />
                             </button>
                         </div>
                     </div>
@@ -696,7 +868,9 @@ export default function GuideInformation() {
             {showMapPicker && (
                 <MapPickerModal
                     initialPosition={coordinates}
-                    onClose={() => setShowMapPicker(false)}
+                    onClose={() =>
+                        setShowMapPicker(false)
+                    }
                     onConfirm={handleConfirmLocation}
                 />
             )}
