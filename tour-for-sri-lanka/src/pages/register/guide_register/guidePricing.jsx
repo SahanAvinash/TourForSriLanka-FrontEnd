@@ -1,11 +1,14 @@
-import { useRef, useState } from "react";
-import { Fragment } from "react";
+import { Fragment, useRef, useState } from "react";
 import { FaCamera, FaCheck } from "react-icons/fa";
 import { GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const GUEST_OPTIONS = [...Array.from({ length: 10 }, (_, i) => `${i + 1}`), "10+"];
+const GUEST_OPTIONS = [
+    ...Array.from({ length: 10 }, (_, i) => `${i + 1}`),
+    "10+",
+];
+
 const CURRENCY_OPTIONS = ["LKR", "USD", "EUR", "GBP"];
 
 const STEPS = [
@@ -21,7 +24,8 @@ const selectStyles = {
         width: "100%",
         minHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "color-mix(in srgb, var(--color-border) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
     }),
@@ -38,7 +42,9 @@ const selectStyles = {
 
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? "var(--color-primary-green)" : "var(--color-border)",
+        backgroundColor: state.isFocused
+            ? "var(--color-primary-green)"
+            : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
         fontSize: "12px",
@@ -48,6 +54,7 @@ const selectStyles = {
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
+        fontSize: "12px",
     }),
 
     placeholder: (base) => ({
@@ -55,6 +62,7 @@ const selectStyles = {
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
+        fontSize: "12px",
     }),
 
     input: (base) => ({
@@ -72,7 +80,9 @@ export default function GuidePricing() {
     const [maximumGuests, setMaximumGuests] = useState(null);
     const [currency, setCurrency] = useState(null);
 
-    const [profilePhoto, setProfilePhoto] = useState(location.state?.profilePhoto || null);
+    const [profilePhoto, setProfilePhoto] = useState(
+        location.state?.profilePhoto || null
+    );
     const [profilePreview, setProfilePreview] = useState(null);
 
     const [err, setErr] = useState("");
@@ -80,32 +90,36 @@ export default function GuidePricing() {
 
     const fileInputRef = useRef(null);
 
-    const guestOptions = GUEST_OPTIONS.map((g) => ({
-        label: `${g} ${g === "1" ? "guest" : "guests"}`,
-        value: g,
+    const guestOptions = GUEST_OPTIONS.map((guest) => ({
+        label: `${guest} ${guest === "1" ? "guest" : "guests"}`,
+        value: guest,
     }));
 
-    const currencyOptions = CURRENCY_OPTIONS.map((c) => ({ label: c, value: c }));
+    const currencyOptions = CURRENCY_OPTIONS.map((currencyValue) => ({
+        label: currencyValue,
+        value: currencyValue,
+    }));
 
     const handleChangePhoto = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
+        fileInputRef.current?.click();
     };
 
     const handleRemovePhoto = () => {
         setProfilePhoto(null);
+
         if (profilePreview) {
             URL.revokeObjectURL(profilePreview);
             setProfilePreview(null);
         }
+
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
 
     const handlePhotoUpload = (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
+
         if (!file) return;
 
         if (!["image/jpeg", "image/png"].includes(file.type)) {
@@ -118,6 +132,10 @@ export default function GuidePricing() {
             setErr("Profile photo must be less than 2MB");
             e.target.value = "";
             return;
+        }
+
+        if (profilePreview) {
+            URL.revokeObjectURL(profilePreview);
         }
 
         setErr("");
@@ -136,7 +154,13 @@ export default function GuidePricing() {
     };
 
     const handleSaveAndContinue = async () => {
-        if (!pricePerHour || !pricePerDay || !maximumGuests || !currency || !profilePhoto) {
+        if (
+            !pricePerHour ||
+            !pricePerDay ||
+            !maximumGuests ||
+            !currency ||
+            !profilePhoto
+        ) {
             setErr("Please fill all required fields");
             return;
         }
@@ -157,23 +181,32 @@ export default function GuidePricing() {
             currency: currency.value,
         };
 
-        sessionStorage.setItem("GuideRegister", JSON.stringify(finalData));
+        sessionStorage.setItem(
+            "GuideRegister",
+            JSON.stringify(finalData)
+        );
 
         setErr("");
         setSendingOtp(true);
 
         try {
-            const res = await fetch("http://localhost:3000/api/guide/send-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: data.email }),
-            });
+            const response = await fetch(
+                "http://localhost:3000/api/guide/send-otp",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: data.email,
+                    }),
+                }
+            );
 
-            const result = await res.json();
+            const result = await response.json();
 
-            if (!res.ok) {
+            if (!response.ok) {
                 setErr(result.error || "Failed to send OTP");
-                setSendingOtp(false);
                 return;
             }
 
@@ -186,14 +219,13 @@ export default function GuidePricing() {
             });
         } catch (error) {
             setErr(error.message || "Failed to send OTP");
+        } finally {
+            setSendingOtp(false);
         }
-
-        setSendingOtp(false);
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -210,7 +242,11 @@ export default function GuidePricing() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -220,7 +256,7 @@ export default function GuidePricing() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -230,7 +266,6 @@ export default function GuidePricing() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -252,16 +287,34 @@ export default function GuidePricing() {
 
                         <div className="mt-[20px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <input
+                                type="text"
+                                inputMode="decimal"
                                 placeholder="Price Per Hour"
                                 value={pricePerHour}
-                                onChange={(e) => setPricePerHour(e.target.value.replace(/[^0-9.]/g, ""))}
+                                onChange={(e) =>
+                                    setPricePerHour(
+                                        e.target.value.replace(
+                                            /[^0-9.]/g,
+                                            ""
+                                        )
+                                    )
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
 
                             <input
+                                type="text"
+                                inputMode="decimal"
                                 placeholder="Price Per Day"
                                 value={pricePerDay}
-                                onChange={(e) => setPricePerDay(e.target.value.replace(/[^0-9.]/g, ""))}
+                                onChange={(e) =>
+                                    setPricePerDay(
+                                        e.target.value.replace(
+                                            /[^0-9.]/g,
+                                            ""
+                                        )
+                                    )
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
@@ -290,12 +343,22 @@ export default function GuidePricing() {
 
                         <div className="mt-[20px] w-full flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-text">
                             <div className="text-[12px] text-center sm:text-left order-2 sm:order-1">
-                                <span className="font-bold mb-[10px]">Profile picture<br /></span>
-                                <span className="text-[10px] opacity-50 mb-[10px]">
-                                    Upload a clear photo<br />of yourself<br />
+                                <span className="font-bold mb-[10px]">
+                                    Profile picture
+                                    <br />
                                 </span>
+
+                                <span className="text-[10px] opacity-50 mb-[10px]">
+                                    Upload a clear photo
+                                    <br />
+                                    of yourself
+                                    <br />
+                                </span>
+
                                 <span className="text-[10px] opacity-50">
-                                    JPG,PNG format<br />Max size 2MB
+                                    JPG, PNG format
+                                    <br />
+                                    Max size 2MB
                                 </span>
                             </div>
 
@@ -307,18 +370,32 @@ export default function GuidePricing() {
                                     onChange={handlePhotoUpload}
                                     className="absolute inset-0 opacity-0 cursor-pointer z-50"
                                 />
+
                                 {profilePhoto ? (
-                                    <img
-                                        src={profilePreview}
-                                        alt="profile"
-                                        className="w-full h-full object-cover"
-                                    />
+                                    profilePreview ? (
+                                        <img
+                                            src={profilePreview}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center px-3">
+                                            <FaCamera className="text-primary-green/80 text-[20px]" />
+                                            <span className="text-[9px] opacity-50 mt-2">
+                                                Photo selected
+                                            </span>
+                                        </div>
+                                    )
                                 ) : (
                                     <>
                                         <FaCamera className="text-primary-green/80 text-[20px]" />
+
                                         <span className="text-[10px] opacity-50">
-                                            Drag & Drop your photo<br />or
+                                            Drag & Drop your photo
+                                            <br />
+                                            or
                                         </span>
+
                                         <span className="text-[10px] text-primary-green/80">
                                             Browse Files
                                         </span>
@@ -327,18 +404,21 @@ export default function GuidePricing() {
                             </div>
 
                             <div className="flex flex-row sm:flex-col gap-2 sm:gap-[10px] order-3">
-                                <div
+                                <button
+                                    type="button"
                                     onClick={handleChangePhoto}
-                                    className="w-[100px] h-[30px] bg-border/50 text-[12px] rounded-[20px] flex items-center justify-center text-text cursor-pointer"
+                                    className="w-[100px] h-[30px] bg-border/50 text-[12px] rounded-[20px] flex items-center justify-center text-text cursor-pointer hover:bg-border/80 transition-all duration-300"
                                 >
-                                    <span>Change Photo</span>
-                                </div>
-                                <div
+                                    Change Photo
+                                </button>
+
+                                <button
+                                    type="button"
                                     onClick={handleRemovePhoto}
-                                    className="w-[100px] h-[30px] bg-border/50 rounded-[20px] text-[12px] flex items-center justify-center text-text cursor-pointer"
+                                    className="w-[100px] h-[30px] bg-border/50 rounded-[20px] text-[12px] flex items-center justify-center text-text cursor-pointer hover:bg-border/80 transition-all duration-300"
                                 >
-                                    <span>Remove Photo</span>
-                                </div>
+                                    Remove Photo
+                                </button>
                             </div>
                         </div>
 
@@ -358,7 +438,9 @@ export default function GuidePricing() {
                                 disabled={sendingOtp}
                                 className="w-full h-[50px] bg-primary-green/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-50"
                             >
-                                {sendingOtp ? "Sending OTP..." : "Save & Continue"}
+                                {sendingOtp
+                                    ? "Sending OTP..."
+                                    : "Save & Continue"}
                             </button>
                         </div>
                     </div>
