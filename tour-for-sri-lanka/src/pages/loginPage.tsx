@@ -77,7 +77,7 @@ export default function LoginPage() {
       storage.setItem("token", token);
       storage.setItem("user", JSON.stringify(user));
 
-      toast.success("Login Success");
+      toast.success("Login successful");
       navigate(ROLE_REDIRECTS[role] || "/");
     } catch (err) {
       const message = axios.isAxiosError(err)
@@ -94,7 +94,6 @@ export default function LoginPage() {
     <form onSubmit={handleOnSubmit}>
       <div className="w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 flex items-center justify-center px-4 sm:px-6 py-10">
         <div className="w-full max-w-[1200px] flex flex-col md:flex-row items-center justify-center md:justify-between gap-10 md:gap-14 lg:gap-20">
-
           <div className="w-[180px] sm:w-[220px] md:w-[380px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
             <img
               src="/main_logo.png"
@@ -104,7 +103,6 @@ export default function LoginPage() {
           </div>
 
           <div className="login-card-anim w-full max-w-[420px] sm:max-w-[450px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-8 px-6 sm:px-10 shadow-lg shadow-black/10 transition-shadow duration-300 hover:shadow-xl">
-
             <h1 className="text-[20px] xs:text-[22px] sm:text-[25px] font-bold text-center">
               Sign in
             </h1>
@@ -262,7 +260,6 @@ export default function LoginPage() {
                 </Link>
               </label>
             </div>
-
           </div>
         </div>
       </div>
