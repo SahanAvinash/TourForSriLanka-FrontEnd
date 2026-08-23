@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaCheck, FaUpload } from "react-icons/fa";
 
 const STORAGE_KEY = "GuideRegister";
@@ -30,12 +30,15 @@ const LANGUAGE_OPTIONS = [
     { label: "Korean", value: "korean" },
 ];
 
-const YEARS_OPTIONS = [...Array.from({ length: 20 }, (_, i) => `${i + 1}`), "20+"];
+const YEARS_OPTIONS = [
+    ...Array.from({ length: 20 }, (_, i) => `${i + 1}`),
+    "20+",
+];
 
 const STEPS = [
     { label: "Account", done: true, number: "1" },
     { label: "Personal Info", done: true, number: "2" },
-    { label: "Language & Skills", number: "3", current: true },
+    { label: "Language & Skills", current: true, number: "3" },
     { label: "Pricing", number: "4" },
 ];
 
@@ -45,7 +48,8 @@ const selectStyles = {
         width: "100%",
         minHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "color-mix(in srgb, var(--color-border) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
     }),
@@ -62,7 +66,9 @@ const selectStyles = {
 
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? "var(--color-primary-green)" : "var(--color-border)",
+        backgroundColor: state.isFocused
+            ? "var(--color-primary-green)"
+            : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
         fontSize: "12px",
@@ -72,7 +78,7 @@ const selectStyles = {
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
-        fontSize: "12px"
+        fontSize: "12px",
     }),
 
     placeholder: (base) => ({
@@ -80,7 +86,7 @@ const selectStyles = {
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
-        fontSize: "12px"
+        fontSize: "12px",
     }),
 
     input: (base) => ({
@@ -91,6 +97,7 @@ const selectStyles = {
 
 const multiSelectStyles = {
     ...selectStyles,
+
     control: (base) => ({
         ...base,
         width: "100%",
@@ -98,7 +105,8 @@ const multiSelectStyles = {
         minHeight: "50px",
         maxHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "color-mix(in srgb, var(--color-border) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
         overflow: "hidden",
@@ -106,7 +114,8 @@ const multiSelectStyles = {
 
     multiValue: (base) => ({
         ...base,
-        backgroundColor: "color-mix(in srgb, var(--color-primary-green) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-primary-green) 50%, transparent)",
         borderRadius: "10px",
         flexShrink: 0,
     }),
@@ -155,18 +164,19 @@ export default function GuideLanguageSkills() {
     const [languages, setLanguages] = useState([]);
     const [additionalFields, setAdditionalFields] = useState("");
 
-    const [nicFile, setNicFile] = useState(location.state?.nicFile || null);
-    const [licenseFile, setLicenseFile] = useState(location.state?.licenseFile || null);
+    const [nicFile, setNicFile] = useState(
+        location.state?.nicFile || null
+    );
+    const [licenseFile, setLicenseFile] = useState(
+        location.state?.licenseFile || null
+    );
 
     const [err, setErr] = useState("");
 
-    const yearsOptions = YEARS_OPTIONS.map((y) => ({
-        label: `${y} ${y === "1" ? "year" : "years"}`,
-        value: y,
+    const yearsOptions = YEARS_OPTIONS.map((year) => ({
+        label: `${year} ${year === "1" ? "year" : "years"}`,
+        value: year,
     }));
-
-    const skillOptions = SKILL_OPTIONS;
-    const languageOptions = LANGUAGE_OPTIONS;
 
     useEffect(() => {
         const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -180,59 +190,93 @@ export default function GuideLanguageSkills() {
 
         if (data.yearsExperience) {
             setYearsExperience({
-                label: `${data.yearsExperience} ${data.yearsExperience === "1" ? "year" : "years"}`,
+                label: `${data.yearsExperience} ${
+                    data.yearsExperience === "1" ? "year" : "years"
+                }`,
                 value: data.yearsExperience,
             });
         }
 
         if (data.skills?.length) {
-            setSkills(SKILL_OPTIONS.filter((opt) => data.skills.includes(opt.value)));
+            setSkills(
+                SKILL_OPTIONS.filter((option) =>
+                    data.skills.includes(option.value)
+                )
+            );
         }
 
         if (data.languages?.length) {
-            setLanguages(LANGUAGE_OPTIONS.filter((opt) => data.languages.includes(opt.value)));
+            setLanguages(
+                LANGUAGE_OPTIONS.filter((option) =>
+                    data.languages.includes(option.value)
+                )
+            );
         }
     }, []);
 
-    const isValidFileType = (file) => file.type === "application/pdf";
+    const isValidFileType = (file) => {
+        return file.type === "application/pdf";
+    };
 
-    const handleFileUpload = (e, type) => {
-        const file = e.target.files[0];
+    const handleFileUpload = (event, type) => {
+        const file = event.target.files?.[0];
+
         if (!file) return;
 
+        const fileName =
+            type === "nic" ? "NIC or Passport" : "Guide License";
+
         if (!isValidFileType(file)) {
-            setErr(`${type === "nic" ? "NIC or Passport" : "Guide License"} must be uploaded as a PDF`);
-            e.target.value = "";
+            setErr(`${fileName} must be uploaded as a PDF`);
+            event.target.value = "";
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            setErr(`${type === "nic" ? "NIC or Passport" : "Guide License"} must be less than 5MB`);
-            e.target.value = "";
+            setErr(`${fileName} must be less than 5MB`);
+            event.target.value = "";
             return;
         }
 
         setErr("");
-        if (type === "nic") setNicFile(file);
-        if (type === "license") setLicenseFile(file);
+
+        if (type === "nic") {
+            setNicFile(file);
+        } else {
+            setLicenseFile(file);
+        }
     };
 
     const buildFormData = () => {
-        const oldData = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
+        const saved =
+            JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
 
         return {
-            ...oldData,
+            ...saved,
             yearsExperience: yearsExperience?.value,
             licenseNumber,
-            skills: skills.map((s) => s.value),
-            languages: languages.map((l) => l.value),
+            skills: skills.map((skill) => skill.value),
+            languages: languages.map((language) => language.value),
             additionalFields,
         };
     };
 
+    const saveFormData = () => {
+        sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(buildFormData())
+        );
+    };
+
     const handlePrevious = () => {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
-        navigate(-1, { state: { nicFile, licenseFile } });
+        saveFormData();
+
+        navigate(-1, {
+            state: {
+                nicFile,
+                licenseFile,
+            },
+        });
     };
 
     const handleNext = () => {
@@ -251,20 +295,25 @@ export default function GuideLanguageSkills() {
         const licenseRegex = /^GL\/\d{4}\/\d{6}$/;
 
         if (!licenseRegex.test(licenseNumber)) {
-            setErr("Guide License Number must be in the form GL/xxxx/xxxxxx");
+            setErr(
+                "Guide License Number must be in the form GL/xxxx/xxxxxx"
+            );
             return;
         }
 
         setErr("");
+        saveFormData();
 
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
-
-        navigate("/guidepricing", { state: { nicFile, licenseFile } });
+        navigate("/guidepricing", {
+            state: {
+                nicFile,
+                licenseFile,
+            },
+        });
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -281,7 +330,11 @@ export default function GuideLanguageSkills() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -291,7 +344,7 @@ export default function GuideLanguageSkills() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -301,7 +354,6 @@ export default function GuideLanguageSkills() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -335,17 +387,22 @@ export default function GuideLanguageSkills() {
 
                         <div className="mt-[10px] w-full">
                             <input
+                                type="text"
                                 placeholder="Guide License Number (eg: GL/xxxx/xxxxxx)"
                                 value={licenseNumber}
                                 maxLength={14}
-                                onChange={(e) => setLicenseNumber(e.target.value.toUpperCase())}
-                                className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
+                                onChange={(e) =>
+                                    setLicenseNumber(
+                                        e.target.value.toUpperCase()
+                                    )
+                                }
+                                className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] outline-none"
                             />
                         </div>
 
                         <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
                             <Select
-                                options={skillOptions}
+                                options={SKILL_OPTIONS}
                                 value={skills}
                                 onChange={setSkills}
                                 placeholder="Skills"
@@ -356,7 +413,7 @@ export default function GuideLanguageSkills() {
                             />
 
                             <Select
-                                options={languageOptions}
+                                options={LANGUAGE_OPTIONS}
                                 value={languages}
                                 onChange={setLanguages}
                                 placeholder="Languages"
@@ -372,8 +429,10 @@ export default function GuideLanguageSkills() {
                                 placeholder="Additional Fields"
                                 value={additionalFields}
                                 maxLength={200}
-                                onChange={(e) => setAdditionalFields(e.target.value)}
-                                className="w-full h-[70px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none"
+                                onChange={(e) =>
+                                    setAdditionalFields(e.target.value)
+                                }
+                                className="w-full h-[70px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pt-[15px] pr-[20px] resize-none outline-none"
                             />
 
                             <span className="absolute right-[20px] bottom-[10px] text-[10px] text-text/50">
@@ -383,20 +442,31 @@ export default function GuideLanguageSkills() {
 
                         <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="w-full h-[135px] bg-border/50 rounded-[20px] text-[12px] p-[10px] text-text">
-                                <span className="font-bold">NIC or Passport<br /></span>
-                                <span className="text-[10px] opacity-50">Upload your certificates</span>
+                                <span className="font-bold">
+                                    NIC or Passport
+                                    <br />
+                                </span>
+
+                                <span className="text-[10px] opacity-50">
+                                    Upload your certificates
+                                </span>
 
                                 <div
                                     className={`relative w-full h-[80px] border-2 border-dotted rounded-[20px] mt-1 flex flex-col justify-center items-center text-[10px] text-center ${
-                                        nicFile ? "border-primary-green" : "border-text/50"
+                                        nicFile
+                                            ? "border-primary-green"
+                                            : "border-text/50"
                                     }`}
                                 >
                                     <input
                                         type="file"
-                                        accept="application/pdf, .pdf"
-                                        onChange={(e) => handleFileUpload(e, "nic")}
+                                        accept="application/pdf,.pdf"
+                                        onChange={(e) =>
+                                            handleFileUpload(e, "nic")
+                                        }
                                         className="absolute inset-0 opacity-0 cursor-pointer z-50"
                                     />
+
                                     {nicFile ? (
                                         <span className="text-primary-green text-[10px] break-all px-2">
                                             {nicFile.name}
@@ -405,8 +475,10 @@ export default function GuideLanguageSkills() {
                                         <>
                                             <FaUpload className="text-primary-green/80" />
                                             <span className="opacity-50">
-                                                Click to Upload<br />
-                                                or Drag and Drop<br />
+                                                Click to Upload
+                                                <br />
+                                                or Drag and Drop
+                                                <br />
                                                 PDF (Max 5MB)
                                             </span>
                                         </>
@@ -415,20 +487,31 @@ export default function GuideLanguageSkills() {
                             </div>
 
                             <div className="w-full h-[135px] bg-border/50 rounded-[20px] text-[12px] p-[10px] text-text">
-                                <span className="font-bold">Guide License<br /></span>
-                                <span className="text-[10px] opacity-50">Upload your certificates</span>
+                                <span className="font-bold">
+                                    Guide License
+                                    <br />
+                                </span>
+
+                                <span className="text-[10px] opacity-50">
+                                    Upload your certificates
+                                </span>
 
                                 <div
                                     className={`relative w-full h-[80px] border-2 border-dotted rounded-[20px] mt-1 flex flex-col justify-center items-center text-[10px] text-center ${
-                                        licenseFile ? "border-primary-green" : "border-text/50"
+                                        licenseFile
+                                            ? "border-primary-green"
+                                            : "border-text/50"
                                     }`}
                                 >
                                     <input
                                         type="file"
-                                        accept="application/pdf, .pdf"
-                                        onChange={(e) => handleFileUpload(e, "license")}
+                                        accept="application/pdf,.pdf"
+                                        onChange={(e) =>
+                                            handleFileUpload(e, "license")
+                                        }
                                         className="absolute inset-0 opacity-0 cursor-pointer z-50"
                                     />
+
                                     {licenseFile ? (
                                         <span className="text-primary-green text-[10px] break-all px-2">
                                             {licenseFile.name}
@@ -437,8 +520,10 @@ export default function GuideLanguageSkills() {
                                         <>
                                             <FaUpload className="text-primary-green/80" />
                                             <span className="opacity-50">
-                                                Click to Upload<br />
-                                                or Drag and Drop<br />
+                                                Click to Upload
+                                                <br />
+                                                or Drag and Drop
+                                                <br />
                                                 PDF (Max 5MB)
                                             </span>
                                         </>
