@@ -1,5 +1,5 @@
-import { Fragment, useState, useRef } from "react";
-import { FaCheck, FaUpload, FaCamera } from "react-icons/fa";
+import { Fragment, useRef, useState } from "react";
+import { FaCamera, FaCheck, FaUpload } from "react-icons/fa";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
 
@@ -7,7 +7,7 @@ const documentConfigs = [
     {
         key: "drivingLicense",
         label: "Driving License",
-        note: "Upload both sides in single File",
+        note: "Upload both sides in single file",
         maxSizeMB: 2,
     },
     {
@@ -34,7 +34,7 @@ const STEPS = [
     { label: "Account", done: true, number: "1" },
     { label: "Vehicle Information", done: true, number: "2" },
     { label: "Facilities", done: true, number: "3" },
-    { label: "Verification", number: "4", current: true },
+    { label: "Verification", current: true, number: "4" },
 ];
 
 function DocumentUploadCard({
@@ -96,6 +96,9 @@ function DocumentUploadCard({
 }
 
 export default function VehicleVerification() {
+    const navigate = useNavigate();
+    const fileInputRef = useRef(null);
+
     const [err, setErr] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -108,9 +111,6 @@ export default function VehicleVerification() {
 
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [profilePreview, setProfilePreview] = useState(null);
-
-    const fileInputRef = useRef(null);
-    const navigate = useNavigate();
 
     const validatePdf = (file, maxSizeMB) => {
         if (file.type !== "application/pdf") {
@@ -125,7 +125,9 @@ export default function VehicleVerification() {
     };
 
     const handleDocumentFile = (file, config) => {
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
         const validationError = validatePdf(
             file,
@@ -133,7 +135,9 @@ export default function VehicleVerification() {
         );
 
         if (validationError) {
-            setErr(`${config.label}: ${validationError}`);
+            setErr(
+                `${config.label}: ${validationError}`
+            );
             return;
         }
 
@@ -146,13 +150,11 @@ export default function VehicleVerification() {
     };
 
     const handleProfilePhotoFile = (file) => {
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
-        if (
-            !["image/jpeg", "image/png"].includes(
-                file.type
-            )
-        ) {
+        if (!["image/jpeg", "image/png"].includes(file.type)) {
             setErr("Profile photo must be JPG or PNG");
             return;
         }
@@ -194,13 +196,21 @@ export default function VehicleVerification() {
     };
 
     const handleSignUp = async () => {
-        const stored = sessionStorage.getItem(
-            "VehicleOwnerRegister"
-        )
-        const data = stored ?JSON.parse(stored) : null
+        let data = null;
+
+        try {
+            const stored = sessionStorage.getItem(
+                "VehicleOwnerRegister"
+            );
+
+            data = stored ? JSON.parse(stored) : null;
+        } catch {
+            setErr("Invalid registration data. Please try again");
+            return;
+        }
 
         if (!data) {
-            setErr("Fill all required data");
+            setErr("Please fill all required data");
             return;
         }
 
@@ -210,23 +220,28 @@ export default function VehicleVerification() {
             );
             return;
         }
-        const missingDoc = documentConfigs.find(
-            (cfg) => !documents[cfg.key]
-        )
-        if(missingDoc){
-            setErr(`Please upload ${missingDoc.label}`)
-            return
-        }
-        if(!profilePhoto){
-            setErr("Please upload a profile photo")
-            return
+
+        const missingDocument = documentConfigs.find(
+            (config) => !documents[config.key]
+        );
+
+        if (missingDocument) {
+            setErr(
+                `Please upload ${missingDocument.label}`
+            );
+            return;
         }
 
-        setErr(null);
+        if (!profilePhoto) {
+            setErr("Please upload a profile photo");
+            return;
+        }
+
+        setErr("");
         setLoading(true);
 
         try {
-            const res = await fetch(
+            const response = await fetch(
                 "http://localhost:3000/api/transport/send-otp",
                 {
                     method: "POST",
@@ -239,12 +254,11 @@ export default function VehicleVerification() {
                 }
             );
 
-            const result = await res.json();
+            const result = await response.json();
 
-            if (!res.ok) {
+            if (!response.ok) {
                 setErr(
-                    result.error ||
-                        "Failed to send OTP"
+                    result.error || "Failed to send OTP"
                 );
                 return;
             }
@@ -267,7 +281,6 @@ export default function VehicleVerification() {
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -284,7 +297,11 @@ export default function VehicleVerification() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -294,7 +311,7 @@ export default function VehicleVerification() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -304,7 +321,6 @@ export default function VehicleVerification() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -314,7 +330,6 @@ export default function VehicleVerification() {
                     </div>
 
                     <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-0">
-
                         <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">
                             Sign up as a Vehicle Owner
                         </h1>
@@ -326,36 +341,35 @@ export default function VehicleVerification() {
                         )}
 
                         <div className="flex flex-wrap justify-center gap-x-[10px] gap-y-[20px] w-full mt-[20px]">
-                            {documentConfigs.map((cfg) => (
+                            {documentConfigs.map((config) => (
                                 <DocumentUploadCard
-                                    key={cfg.key}
-                                    label={cfg.label}
-                                    note={cfg.note}
-                                    maxSizeMB={cfg.maxSizeMB}
-                                    file={documents[cfg.key]}
-                                    onChange={(e) =>
+                                    key={config.key}
+                                    label={config.label}
+                                    note={config.note}
+                                    maxSizeMB={config.maxSizeMB}
+                                    file={documents[config.key]}
+                                    onChange={(event) =>
                                         handleDocumentFile(
-                                            e.target.files[0],
-                                            cfg
+                                            event.target.files[0],
+                                            config
                                         )
                                     }
-                                    onDrop={(e) => {
-                                        e.preventDefault();
+                                    onDrop={(event) => {
+                                        event.preventDefault();
 
                                         handleDocumentFile(
-                                            e.dataTransfer.files[0],
-                                            cfg
+                                            event.dataTransfer.files[0],
+                                            config
                                         );
                                     }}
-                                    onDragOver={(e) =>
-                                        e.preventDefault()
+                                    onDragOver={(event) =>
+                                        event.preventDefault()
                                     }
                                 />
                             ))}
                         </div>
 
                         <div className="w-full flex flex-col sm:flex-row text-[12px] text-text p-[10px] gap-5 sm:gap-3 items-center justify-center">
-
                             <div className="text-center sm:text-left">
                                 <span className="font-bold mb-[10px]">
                                     Profile Picture
@@ -370,22 +384,22 @@ export default function VehicleVerification() {
                                 </span>
 
                                 <span className="text-[10px] opacity-50">
-                                    JPG,PNG format
+                                    JPG, PNG format
                                     <br />
                                     Max size 2MB
                                 </span>
                             </div>
 
                             <div
-                                onDrop={(e) => {
-                                    e.preventDefault();
+                                onDrop={(event) => {
+                                    event.preventDefault();
 
                                     handleProfilePhotoFile(
-                                        e.dataTransfer.files[0]
+                                        event.dataTransfer.files[0]
                                     );
                                 }}
-                                onDragOver={(e) =>
-                                    e.preventDefault()
+                                onDragOver={(event) =>
+                                    event.preventDefault()
                                 }
                                 className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] shrink-0 rounded-full bg-border/50 border-2 border-dotted border-primary-green/50 hover:border-primary-green/80 transition-all duration-300 flex flex-col justify-center items-center text-center text-text overflow-hidden group cursor-pointer"
                             >
@@ -393,9 +407,9 @@ export default function VehicleVerification() {
                                     ref={fileInputRef}
                                     type="file"
                                     accept="image/png,image/jpeg"
-                                    onChange={(e) =>
+                                    onChange={(event) =>
                                         handleProfilePhotoFile(
-                                            e.target.files[0]
+                                            event.target.files[0]
                                         )
                                     }
                                     className="absolute inset-0 opacity-0 cursor-pointer z-50"
@@ -404,7 +418,7 @@ export default function VehicleVerification() {
                                 {profilePhoto ? (
                                     <img
                                         src={profilePreview}
-                                        alt="profile"
+                                        alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -412,8 +426,7 @@ export default function VehicleVerification() {
                                         <FaCamera className="text-primary-green/50 group-hover:text-primary-green/80 text-[20px] transition-all duration-300" />
 
                                         <span className="text-[10px] text-text/50">
-                                            Drag & Drop your
-                                            photo
+                                            Drag & Drop your photo
                                             <br />
                                             or
                                         </span>
@@ -430,24 +443,19 @@ export default function VehicleVerification() {
                                     onClick={handleChangePhoto}
                                     className="w-[100px] h-[30px] bg-border/50 mb-0 sm:mb-[10px] text-[12px] rounded-[20px] flex items-center justify-center text-text cursor-pointer hover:bg-border/80 transition-all duration-300"
                                 >
-                                    <span>
-                                        Change Photo
-                                    </span>
+                                    Change Photo
                                 </div>
 
                                 <div
                                     onClick={handleRemovePhoto}
                                     className="w-[100px] h-[30px] bg-border/50 rounded-[20px] text-[12px] flex items-center justify-center text-text cursor-pointer hover:bg-border/80 transition-all duration-300"
                                 >
-                                    <span>
-                                        Remove Photo
-                                    </span>
+                                    Remove Photo
                                 </div>
                             </div>
                         </div>
 
                         <div className="mb-[10px] sm:mb-[20px] mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 px-0 sm:px-[10px]">
-
                             <button
                                 onClick={handlePrevious}
                                 className="w-full h-[50px] bg-border/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-border/80 transition-all duration-300 hover:scale-95 cursor-pointer"
