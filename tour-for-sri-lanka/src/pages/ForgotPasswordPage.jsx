@@ -140,7 +140,7 @@ export default function ForgotPasswordPage() {
           <img
             src="/main_logo.png"
             alt="Tours for Sri Lanka"
-            className="login-logo-anim w-full h-auto object-contain"
+            className=" w-full h-auto object-contain"
           />
         </div>
 

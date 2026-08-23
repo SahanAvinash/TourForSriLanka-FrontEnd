@@ -36,20 +36,19 @@ const ROLES = [
 export default function RegisterRole() {
   const navigate = useNavigate();
 
-  const handleSelect = (role, path) => {
+  function handleSelect(role, path) {
     sessionStorage.setItem("role", role);
     navigate(path);
-  };
+  }
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 flex items-center justify-center px-4 sm:px-6 py-10">
       <div className="w-full max-w-[1200px] flex flex-col md:flex-row items-center justify-center md:justify-between gap-10 md:gap-14 lg:gap-20">
-
         <div className="w-[180px] sm:w-[220px] md:w-[380px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
           <img
             src="/main_logo.png"
             alt="Tours for Sri Lanka"
-            className="w-full h-auto object-contain"
+            className=" w-full h-auto object-contain"
           />
         </div>
 
@@ -79,7 +78,6 @@ export default function RegisterRole() {
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
