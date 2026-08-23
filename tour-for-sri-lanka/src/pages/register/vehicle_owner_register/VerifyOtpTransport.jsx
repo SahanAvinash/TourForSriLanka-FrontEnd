@@ -1,14 +1,17 @@
 import { Fragment, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { GrFormPreviousLink } from "react-icons/gr";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
+import { GrFormPreviousLink } from "react-icons/gr";
 
 const STEPS = [
     { label: "Account", done: true, number: "1" },
     { label: "Vehicle Information", done: true, number: "2" },
     { label: "Facilities", done: true, number: "3" },
-    { label: "Verification", number: "4", current: true },
+    { label: "Verification", current: true, number: "4" },
 ];
+
+const API_BASE_URL = "http://localhost:3000/api/transport";
+const STORAGE_KEY = "VehicleOwnerRegister";
 
 export default function VerifyOtpTransport() {
     const [otp, setOtp] = useState("");
@@ -27,8 +30,8 @@ export default function VerifyOtpTransport() {
         profilePhoto,
     } = location.state || {};
 
-    const stored = sessionStorage.getItem("VehicleOwnerRegister");
-    const data = stored ? JSON.parse(stored) : null;
+    const storedData = sessionStorage.getItem(STORAGE_KEY);
+    const data = storedData ? JSON.parse(storedData) : null;
     const email = data?.email;
 
     const handleVerify = async () => {
@@ -44,6 +47,7 @@ export default function VerifyOtpTransport() {
 
         setLoading(true);
         setErr("");
+        setResendMsg("");
 
         try {
             const formData = new FormData();
@@ -54,73 +58,120 @@ export default function VerifyOtpTransport() {
                 }
             });
 
-            formData.append("vehicleType", data.vehicleType?.value ?? "");
-            formData.append("vehicleBrand", data.vehicleBrand?.value ?? "");
-            formData.append("vehicleModel", data.vehicleModel?.value ?? "");
-            formData.append("vehicleColor", data.vehicleColor?.value ?? "");
-            formData.append("manufactureYear", data.manufactureYear?.value ?? "");
-            formData.append("passengerCapacity", data.passengerCapacity?.value ?? "");
-            formData.append("luggageCapacity", data.luggageCapacity?.value ?? "");
-            formData.append("fuelType", data.fuelType?.value ?? "");
+            formData.append(
+                "vehicleType",
+                data.vehicleType?.value ?? ""
+            );
+            formData.append(
+                "vehicleBrand",
+                data.vehicleBrand?.value ?? ""
+            );
+            formData.append(
+                "vehicleModel",
+                data.vehicleModel?.value ?? ""
+            );
+            formData.append(
+                "vehicleColor",
+                data.vehicleColor?.value ?? ""
+            );
+            formData.append(
+                "manufactureYear",
+                data.manufactureYear?.value ?? ""
+            );
+            formData.append(
+                "passengerCapacity",
+                data.passengerCapacity?.value ?? ""
+            );
+            formData.append(
+                "luggageCapacity",
+                data.luggageCapacity?.value ?? ""
+            );
+            formData.append(
+                "fuelType",
+                data.fuelType?.value ?? ""
+            );
 
             (data.availableArea || []).forEach((district) => {
-                formData.append("availableArea", district?.value ?? district);
+                formData.append(
+                    "availableArea",
+                    district?.value ?? district
+                );
             });
 
             (data.addVehiclePhotos || []).forEach((url) => {
                 formData.append("addVehiclePhotos", url);
             });
 
-            drivingLicense && formData.append("drivingLicense", drivingLicense);
-            vehicleRegistrationCertificate &&
+            if (drivingLicense) {
+                formData.append("drivingLicense", drivingLicense);
+            }
+
+            if (vehicleRegistrationCertificate) {
                 formData.append(
                     "vehicleRegistrationCertificate",
                     vehicleRegistrationCertificate
                 );
-            insuranceCertificate &&
-                formData.append("insuranceCertificate", insuranceCertificate);
-            revenueLicense && formData.append("revenueLicense", revenueLicense);
-            profilePhoto && formData.append("profilePhoto", profilePhoto);
+            }
+
+            if (insuranceCertificate) {
+                formData.append(
+                    "insuranceCertificate",
+                    insuranceCertificate
+                );
+            }
+
+            if (revenueLicense) {
+                formData.append(
+                    "revenueLicense",
+                    revenueLicense
+                );
+            }
+
+            if (profilePhoto) {
+                formData.append("profilePhoto", profilePhoto);
+            }
 
             formData.append("otp", otp);
 
-            const response = await fetch(
-                "http://localhost:3000/api/transport",
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+            const response = await fetch(API_BASE_URL, {
+                method: "POST",
+                body: formData,
+            });
 
             const result = await response.json();
 
             if (!response.ok) {
                 setErr(result.error || "Verification failed");
-                setLoading(false);
                 return;
             }
 
             localStorage.setItem("token", result.token);
-            sessionStorage.removeItem("VehicleOwnerRegister");
+            sessionStorage.removeItem(STORAGE_KEY);
             navigate("/login");
-        } catch (error) {
+        } catch {
             setErr("Something went wrong. Please try again");
+        } finally {
             setLoading(false);
         }
     };
 
     const handleResend = async () => {
-        if (!email) return;
+        if (!email) {
+            setErr("Email not found. Please sign up again.");
+            return;
+        }
 
-        setResendMsg("");
         setErr("");
+        setResendMsg("");
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/transport/send-otp",
+                `${API_BASE_URL}/send-otp`,
                 {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                     body: JSON.stringify({ email }),
                 }
             );
@@ -128,12 +179,16 @@ export default function VerifyOtpTransport() {
             const result = await response.json();
 
             if (!response.ok) {
-                setErr(result.error || "Failed to resend OTP");
+                setErr(
+                    result.error || "Failed to resend OTP"
+                );
                 return;
             }
 
-            setResendMsg("A new OTP has been sent to your email");
-        } catch (error) {
+            setResendMsg(
+                "A new OTP has been sent to your email"
+            );
+        } catch {
             setErr("Failed to resend OTP");
         }
     };
@@ -144,7 +199,6 @@ export default function VerifyOtpTransport() {
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -161,7 +215,11 @@ export default function VerifyOtpTransport() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -171,7 +229,7 @@ export default function VerifyOtpTransport() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -181,7 +239,6 @@ export default function VerifyOtpTransport() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -197,7 +254,9 @@ export default function VerifyOtpTransport() {
 
                         <p className="text-[12px] text-text/70 mt-[10px] text-center">
                             We sent a 6-digit code to{" "}
-                            <span className="font-bold">{email}</span>
+                            <span className="font-bold">
+                                {email}
+                            </span>
                         </p>
 
                         {err && (
@@ -214,24 +273,34 @@ export default function VerifyOtpTransport() {
 
                         <input
                             type="text"
+                            inputMode="numeric"
                             maxLength={6}
                             value={otp}
-                            onChange={(e) =>
-                                setOtp(e.target.value.replace(/[^0-9]/g, ""))
+                            onChange={(event) =>
+                                setOtp(
+                                    event.target.value.replace(
+                                        /[^0-9]/g,
+                                        ""
+                                    )
+                                )
                             }
                             placeholder="Enter OTP"
                             className="w-full mt-[20px] text-center tracking-[10px] text-[20px] rounded-[10px] bg-border/50 border border-border/50 focus:border-primary-green/80 outline-none p-[10px] text-text"
                         />
 
                         <button
+                            type="button"
                             onClick={handleVerify}
                             disabled={loading}
                             className="text-[18px] font-bold w-full h-[50px] flex justify-center items-center rounded-[20px] bg-primary-green/50 hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 mt-[20px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                         >
-                            {loading ? "Verifying..." : "Verify"}
+                            {loading
+                                ? "Verifying..."
+                                : "Verify"}
                         </button>
 
                         <button
+                            type="button"
                             onClick={handleResend}
                             className="text-[12px] text-text/70 hover:text-primary-green/80 mt-[15px] underline cursor-pointer"
                         >
@@ -239,10 +308,11 @@ export default function VerifyOtpTransport() {
                         </button>
 
                         <button
+                            type="button"
                             onClick={handlePrevious}
                             className="w-full h-[50px] flex justify-center items-center rounded-[20px] bg-border/50 hover:bg-border/80 transition-all duration-300 mt-[15px] hover:scale-95 text-[18px] font-bold cursor-pointer"
                         >
-                            <GrFormPreviousLink />
+                            <GrFormPreviousLink className="text-[20px]" />
                             Previous
                         </button>
                     </div>
