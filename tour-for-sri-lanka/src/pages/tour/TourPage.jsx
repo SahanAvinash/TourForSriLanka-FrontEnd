@@ -4,6 +4,7 @@ import Select from "react-select";
 import { MapPin, Route, Users, Compass, X, Download } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import MapPickerModal from "../../components/MapPickerModal";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -101,6 +102,17 @@ const TourPage = () => {
   });
   const [error, setError] = useState("");
 
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [startLocation, setStartLocation] = useState(() => {
+    const savedAddress = sessionStorage.getItem("tourStartAddress");
+    const savedLat = sessionStorage.getItem("tourStartLat");
+    const savedLng = sessionStorage.getItem("tourStartLng");
+    if (savedAddress && savedLat && savedLng) {
+      return { address: savedAddress, lat: Number(savedLat), lng: Number(savedLng) };
+    }
+    return null;
+  });
+
   useEffect(() => {
     if (startDistrict) sessionStorage.setItem("tourStartDistrict", startDistrict.value);
   }, [startDistrict]);
@@ -112,6 +124,24 @@ const TourPage = () => {
   useEffect(() => {
     if (numberOfGuests) sessionStorage.setItem("tourNumberOfGuests", numberOfGuests.value);
   }, [numberOfGuests]);
+
+  useEffect(() => {
+    if (startLocation) {
+      sessionStorage.setItem("tourStartAddress", startLocation.address);
+      sessionStorage.setItem("tourStartLat", startLocation.lat);
+      sessionStorage.setItem("tourStartLng", startLocation.lng);
+    }
+  }, [startLocation]);
+
+  const handleMapConfirm = (loc) => {
+    setStartLocation(loc);
+    const matchedDistrict = districtOptions.find((d) =>
+      loc.address?.toLowerCase().includes(d.value.toLowerCase())
+    );
+    if (matchedDistrict) setStartDistrict(matchedDistrict);
+    setError("");
+    setShowMapPicker(false);
+  };
 
   const [activeTour, setActiveTour] = useState(null);
   const [showTourModal, setShowTourModal] = useState(false);
@@ -302,8 +332,8 @@ const TourPage = () => {
   };
 
   const handleStart = () => {
-    if (!startDistrict) {
-      setError("Please select your starting district first.");
+    if (!startLocation) {
+      setError("Please pick your starting location on the map.");
       return;
     }
     if (!startDate) {
@@ -317,9 +347,12 @@ const TourPage = () => {
 
     navigate("/tours/plan", {
       state: {
-        startDistrict: startDistrict.value,
+        startDistrict: startDistrict?.value,
         startDate,
         numberOfGuests: numberOfGuests.value,
+        startLat: startLocation?.lat,
+        startLng: startLocation?.lng,
+        startAddress: startLocation?.address,
       },
     });
   };
@@ -342,16 +375,23 @@ const TourPage = () => {
             <label className="block text-sm text-gray-300 mb-2">
               You're starting your trip from...
             </label>
-            <Select
-              options={districtOptions}
-              value={startDistrict}
-              onChange={(option) => {
-                setStartDistrict(option);
-                setError("");
-              }}
-              placeholder="Select your district..."
-              styles={selectStyles}
-            />
+
+            <button
+              type="button"
+              onClick={() => setShowMapPicker(true)}
+              className="w-full flex items-center gap-2 bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white hover:border-[#00C896] focus:outline-none focus:border-[#00C896] transition-colors cursor-pointer"
+            >
+              <MapPin size={16} className="text-[#00C896] flex-shrink-0" />
+              <span className={startLocation ? "text-white text-sm truncate" : "text-gray-400 text-sm truncate"}>
+                {startLocation ? startLocation.address : "Pick your starting location on the map"}
+              </span>
+            </button>
+
+            {startDistrict && (
+              <p className="text-xs text-[#00C896] mt-2">
+                Detected district: {startDistrict.value}
+              </p>
+            )}
           </div>
 
           <div className="max-w-sm mx-auto mb-4 text-left">
@@ -419,6 +459,15 @@ const TourPage = () => {
       <div className="mt-16">
         <Footer />
       </div>
+
+      {showMapPicker && (
+        <MapPickerModal
+          initialPosition={startLocation ? { lat: startLocation.lat, lng: startLocation.lng } : undefined}
+          onClose={() => setShowMapPicker(false)}
+          onConfirm={handleMapConfirm}
+          title="Pick your starting location"
+        />
+      )}
 
       {activeTour && (
         <button

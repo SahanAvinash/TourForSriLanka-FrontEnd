@@ -815,8 +815,7 @@ const TourPreview = () => {
         <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
         <p className="text-gray-400 mb-2">
           Total distance (round trip):{" "}
-          <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>{" "}
-          (straight-line estimate)
+          <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
         </p>
         <div className="flex gap-5 mb-6 text-sm text-gray-400">
           <span className="flex items-center gap-2">

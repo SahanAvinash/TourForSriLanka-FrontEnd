@@ -2,7 +2,7 @@ import { useState } from "react";
 import Select from "react-select";
 import Navbar from "../../components/Navbar";
 import guide_bg from "../../assets/guide/guide_bg.jpg";
-import { FaMapMarkerAlt, FaLanguage, FaSearch } from "react-icons/fa";
+import { FaMapMarkerAlt, FaLanguage, FaSearch, FaHiking } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const DISTRICT_OPTIONS = [
@@ -21,6 +21,20 @@ const LANGUAGE_OPTIONS = [
   { label: "Japanese", value: "japan" },
   { label: "Chinese", value: "chaina" },
   { label: "Korean", value: "korean" },
+];
+
+const SKILL_OPTIONS = [
+  { label: "Cultural Tours", value: "CulturalTours" },
+  { label: "Adventure Tours", value: "AdventureTours" },
+  { label: "Wildlife Tours", value: "WildLifeTours" },
+  { label: "Hiking", value: "Hiking" },
+  { label: "Surfing Guide", value: "SurfingGuide" },
+  { label: "Food Tours", value: "FoodTours" },
+  { label: "Photography Tours", value: "PhotographyTours" },
+  { label: "Historical Tours", value: "HistoricalTours" },
+  { label: "City Tours", value: "CityTours" },
+  { label: "Nature Guide", value: "NatureGuide" },
+  { label: "Other", value: "Other" },
 ];
 
 const selectStyles = {
@@ -47,18 +61,20 @@ const selectStyles = {
 const GuideHeroSection = ({ onFilterChange }) => {
   const [district, setDistrict] = useState(null)
   const [language, setLanguage] = useState(null)
+  const [skill, setSkill] = useState(null)
 
   const districtOptions = DISTRICT_OPTIONS.map((d) => ({ label: d, value: d }));
 
     const handleSearch = () => {
-        if(!district?.value && !language?.value){
+        if(!district?.value && !language?.value && !skill?.value){
             toast.error("Please select at least one filter to search")
             return
         }
         if(onFilterChange){
             onFilterChange({
                 district: district?.value || "",
-                language: language?.value || ""
+                language: language?.value || "",
+                skill: skill?.value || ""
             })
         }
     }
@@ -90,7 +106,7 @@ const GuideHeroSection = ({ onFilterChange }) => {
         </div>
 
         {/* Search Bar */}
-        <div className="animate-box absolute -bottom-12 left-1/2 -translate-x-1/2 w-full max-w-[800px] px-5 z-20">
+        <div className="animate-box absolute -bottom-12 left-1/2 -translate-x-1/2 w-full max-w-[900px] px-5 z-20">
           <div className="bg-[#455766]/80 backdrop-blur-xl rounded-[28px] border border-white/10 shadow-2xl h-[100px] flex items-center px-8">
 
             <div className="flex items-center gap-3 flex-1">
@@ -119,6 +135,23 @@ const GuideHeroSection = ({ onFilterChange }) => {
                   value={language}
                   onChange={setLanguage}
                   placeholder="Any Language"
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                />
+              </div>
+            </div>
+
+            <div className="w-px h-12 bg-white/20 mx-4"></div>
+
+            <div className="flex items-center gap-3 flex-1">
+              <FaHiking className="text-[#00C896] text-2xl" />
+              <div className="w-full">
+                <label className="block text-sm text-gray-300 mb-0.5">Skills</label>
+                <Select
+                  options={SKILL_OPTIONS}
+                  value={skill}
+                  onChange={setSkill}
+                  placeholder="Any Skill"
                   styles={selectStyles}
                   menuPortalTarget={document.body}
                 />
