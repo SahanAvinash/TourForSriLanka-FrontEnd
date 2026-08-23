@@ -7,11 +7,8 @@ import {
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 
-
 const STORAGE_KEY = "VehicleOwnerRegister";
-
 const MAX_PHOTOS = 5;
-
 const API_URL = "http://localhost:3000/api/transport/upload-photo";
 
 const LUGGAGE_OPTIONS = {
@@ -27,9 +24,7 @@ const LUGGAGE_OPTIONS = {
         { value: 3, label: "Medium storage" },
         { value: 4, label: "Large storage" },
     ],
-    jeep: [
-        { value: 1, label: "Small (1–2 bags)" },
-    ],
+    jeep: [{ value: 1, label: "Small (1–2 bags)" }],
 };
 
 const MAX_PASSENGERS = {
@@ -77,7 +72,7 @@ const DISTRICTS = [
 const STEPS = [
     { label: "Account", done: true, number: "1" },
     { label: "Vehicle Information", done: true, number: "2" },
-    { label: "Facilities", number: "3", current: true },
+    { label: "Facilities", current: true, number: "3" },
     { label: "Verification", number: "4" },
 ];
 
@@ -92,19 +87,15 @@ const selectStyles = {
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
         zIndex: 100,
     }),
-
-    
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
     }),
-
     option: (base, state) => ({
         ...base,
         backgroundColor: state.isFocused
@@ -112,40 +103,34 @@ const selectStyles = {
             : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
-        fontSize: "12px"
+        fontSize: "12px",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
     }),
-
     multiValue: (base) => ({
         ...base,
         backgroundColor: "var(--color-primary-green)",
         opacity: 0.8,
         borderRadius: "10px",
     }),
-
     multiValueLabel: (base) => ({
         ...base,
         color: "var(--color-text)",
         fontWeight: 600,
     }),
-
     multiValueRemove: (base) => ({
         ...base,
         color: "var(--color-text)",
@@ -159,30 +144,25 @@ const selectStyles = {
 
 const miniSelectStyles = {
     ...selectStyles,
-
     control: (base) => ({
         ...selectStyles.control(base),
         minHeight: "34px",
         borderRadius: "10px",
     }),
-
     menu: (base) => ({
         ...selectStyles.menu(base),
         fontSize: "12px",
     }),
-
     singleValue: (base) => ({
         ...selectStyles.singleValue(base),
         paddingLeft: "6px",
         fontSize: "12px",
     }),
-
     placeholder: (base) => ({
         ...selectStyles.placeholder(base),
         paddingLeft: "6px",
         fontSize: "12px",
     }),
-
     dropdownIndicator: (base) => ({
         ...base,
         padding: "2px",
@@ -191,7 +171,6 @@ const miniSelectStyles = {
             height: "14px",
         },
     }),
-
     valueContainer: (base) => ({
         ...base,
         padding: "0 2px",
@@ -201,7 +180,6 @@ const miniSelectStyles = {
 export default function VehicleFacilities() {
     const navigate = useNavigate();
 
-    // Facilities form state
     const [passengerCapacity, setPassengerCapacity] = useState(null);
     const [luggageCapacity, setLuggageCapacity] = useState(null);
     const [fuelType, setFuelType] = useState(null);
@@ -273,9 +251,13 @@ export default function VehicleFacilities() {
     };
 
     const handlePhotoChange = async (event) => {
-        const selectedFiles = Array.from(event.target.files || []);
+        const selectedFiles = Array.from(
+            event.target.files || []
+        );
 
-        if (!selectedFiles.length) return;
+        if (!selectedFiles.length) {
+            return;
+        }
 
         const duplicateFile = selectedFiles.some((file) =>
             photos.some((photo) => photo.name === file.name)
@@ -300,9 +282,11 @@ export default function VehicleFacilities() {
 
         for (const file of selectedFiles) {
             if (
-                !["image/jpeg", "image/png", "image/jpg"].includes(
-                    file.type
-                )
+                ![
+                    "image/jpeg",
+                    "image/png",
+                    "image/jpg",
+                ].includes(file.type)
             ) {
                 setError("Only JPG and PNG images are allowed.");
                 continue;
@@ -402,7 +386,6 @@ export default function VehicleFacilities() {
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -419,7 +402,11 @@ export default function VehicleFacilities() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -429,7 +416,7 @@ export default function VehicleFacilities() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -439,8 +426,7 @@ export default function VehicleFacilities() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
-                    <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
+                    <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0 ">
                         <img
                             src="/main_logo.png"
                             alt="Tours for Sri Lanka"
@@ -465,7 +451,9 @@ export default function VehicleFacilities() {
                                 isMulti
                                 value={availableArea}
                                 onChange={(selected) =>
-                                    setAvailableArea(selected || [])
+                                    setAvailableArea(
+                                        selected || []
+                                    )
                                 }
                                 placeholder="Available Districts"
                                 menuPosition="fixed"
@@ -487,11 +475,17 @@ export default function VehicleFacilities() {
                                         <Select
                                             options={passengerOptions}
                                             value={passengerCapacity}
-                                            onChange={setPassengerCapacity}
+                                            onChange={
+                                                setPassengerCapacity
+                                            }
                                             placeholder="0"
                                             menuPosition="fixed"
-                                            menuPortalTarget={document.body}
-                                            styles={miniSelectStyles}
+                                            menuPortalTarget={
+                                                document.body
+                                            }
+                                            styles={
+                                                miniSelectStyles
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -507,11 +501,17 @@ export default function VehicleFacilities() {
                                         <Select
                                             options={luggageOptions}
                                             value={luggageCapacity}
-                                            onChange={setLuggageCapacity}
+                                            onChange={
+                                                setLuggageCapacity
+                                            }
                                             placeholder="Select"
                                             menuPosition="fixed"
-                                            menuPortalTarget={document.body}
-                                            styles={miniSelectStyles}
+                                            menuPortalTarget={
+                                                document.body
+                                            }
+                                            styles={
+                                                miniSelectStyles
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -530,8 +530,12 @@ export default function VehicleFacilities() {
                                             onChange={setFuelType}
                                             placeholder="Select"
                                             menuPosition="fixed"
-                                            menuPortalTarget={document.body}
-                                            styles={miniSelectStyles}
+                                            menuPortalTarget={
+                                                document.body
+                                            }
+                                            styles={
+                                                miniSelectStyles
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -546,7 +550,8 @@ export default function VehicleFacilities() {
                                     </h2>
 
                                     <p className="text-[11px] text-text/80 pt-2">
-                                        Upload clear photos of your vehicle
+                                        Upload clear photos of
+                                        your vehicle
                                     </p>
 
                                     <p className="text-[11px] text-text/80 pt-2">
@@ -565,7 +570,9 @@ export default function VehicleFacilities() {
                                         multiple
                                         accept="image/png,image/jpeg,image/jpg"
                                         className="hidden"
-                                        onChange={handlePhotoChange}
+                                        onChange={
+                                            handlePhotoChange
+                                        }
                                     />
 
                                     <label
@@ -591,50 +598,68 @@ export default function VehicleFacilities() {
                                         ) : (
                                             <div className="flex gap-2 w-full h-full p-2 items-center">
                                                 {photos
-                                                    .slice(0, MAX_PHOTOS)
-                                                    .map((photo, index) => (
-                                                        <div
-                                                            key={`${photo.name}-${index}`}
-                                                            className="relative min-w-[42px] w-[42px] h-full"
-                                                        >
-                                                            {photo.uploading ? (
-                                                                <div className="w-full h-full rounded-lg bg-border flex items-center justify-center">
-                                                                    <span className="text-[8px] text-text/80 text-center">
-                                                                        Uploading...
-                                                                    </span>
-                                                                </div>
-                                                            ) : (
-                                                                <img
-                                                                    src={photo.url}
-                                                                    alt={`Vehicle ${
-                                                                        index + 1
-                                                                    }`}
-                                                                    className="w-full h-full object-cover rounded-lg"
-                                                                />
-                                                            )}
-
-                                                            <button
-                                                                type="button"
-                                                                onClick={(event) => {
-                                                                    event.preventDefault();
-                                                                    event.stopPropagation();
-                                                                    removePhoto(index);
-                                                                }}
-                                                                className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-border hover:bg-[#9E4444] text-text text-[10px] flex items-center justify-center transition-all duration-300"
+                                                    .slice(
+                                                        0,
+                                                        MAX_PHOTOS
+                                                    )
+                                                    .map(
+                                                        (
+                                                            photo,
+                                                            index
+                                                        ) => (
+                                                            <div
+                                                                key={`${photo.name}-${index}`}
+                                                                className="relative min-w-[42px] w-[42px] h-full"
                                                             >
-                                                                ×
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                                {photo.uploading ? (
+                                                                    <div className="w-full h-full rounded-lg bg-border flex items-center justify-center">
+                                                                        <span className="text-[8px] text-text/80 text-center">
+                                                                            Uploading...
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <img
+                                                                        src={
+                                                                            photo.url
+                                                                        }
+                                                                        alt={`Vehicle ${
+                                                                            index +
+                                                                            1
+                                                                        }`}
+                                                                        className="w-full h-full object-cover rounded-lg"
+                                                                    />
+                                                                )}
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(
+                                                                        event
+                                                                    ) => {
+                                                                        event.preventDefault();
+                                                                        event.stopPropagation();
+                                                                        removePhoto(
+                                                                            index
+                                                                        );
+                                                                    }}
+                                                                    className="absolute top-1 right-1 w-[18px] h-[18px] rounded-full bg-border hover:bg-[#9E4444] text-text text-[10px] flex items-center justify-center transition-all duration-300"
+                                                                >
+                                                                    ×
+                                                                </button>
+                                                            </div>
+                                                        )
+                                                    )}
                                             </div>
                                         )}
                                     </label>
 
                                     {photos.length > 0 &&
-                                        photos.length < MAX_PHOTOS && (
+                                        photos.length <
+                                            MAX_PHOTOS && (
                                             <p className="text-[9px] text-primary-green/70 mt-2 text-center">
-                                                Click to add more photos (
-                                                {photos.length}/{MAX_PHOTOS})
+                                                Click to add more
+                                                photos (
+                                                {photos.length}/
+                                                {MAX_PHOTOS})
                                             </p>
                                         )}
                                 </div>

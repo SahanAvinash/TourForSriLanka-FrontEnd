@@ -135,9 +135,7 @@ export default function VehicleVerification() {
         );
 
         if (validationError) {
-            setErr(
-                `${config.label}: ${validationError}`
-            );
+            setErr(`${config.label}: ${validationError}`);
             return;
         }
 
@@ -226,9 +224,7 @@ export default function VehicleVerification() {
         );
 
         if (missingDocument) {
-            setErr(
-                `Please upload ${missingDocument.label}`
-            );
+            setErr(`Please upload ${missingDocument.label}`);
             return;
         }
 
@@ -329,7 +325,7 @@ export default function VehicleVerification() {
                         />
                     </div>
 
-                    <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-0">
+                    <div className="login-card-anim w-full max-w-[500px] bg-primary-2 text-text rounded-[20px] flex flex-col items-center py-[20px] sm:py-[30px] px-4 sm:px-8">
                         <h1 className="text-[20px] sm:text-[25px] font-bold text-text text-center">
                             Sign up as a Vehicle Owner
                         </h1>
