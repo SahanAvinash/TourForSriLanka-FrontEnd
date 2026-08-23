@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
-import COUNTRIES from "../../../data/countryCode";
 import { useNavigate } from "react-router-dom";
 import { IoEye } from "react-icons/io5";
 import { FaCheck, FaEyeSlash } from "react-icons/fa";
 import { validatePhoneNumberLength } from "libphonenumber-js";
+import COUNTRIES from "../../../data/countryCode";
 
 const STORAGE_KEY = "HotelOwnerRegister";
 
@@ -26,42 +26,39 @@ const selectStyles = {
         width: "100%",
         minHeight: "50px",
         borderRadius: "20px",
-        backgroundColor: "color-mix(in srgb, var(--color-border) 50%, transparent)",
+        backgroundColor:
+            "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
     }),
-
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
     }),
-
     option: (base, state) => ({
         ...base,
-        backgroundColor: state.isFocused ? "var(--color-primary-green)" : "var(--color-border)",
+        backgroundColor: state.isFocused
+            ? "var(--color-primary-green)"
+            : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
         fontSize: "12px",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
@@ -72,8 +69,8 @@ export default function HotelOwnerRegister() {
     const navigate = useNavigate();
 
     const role = sessionStorage.getItem("role");
-    const [checkingEmail, setCheckingEmail] = useState(false);
 
+    const [checkingEmail, setCheckingEmail] = useState(false);
     const [country, setCountry] = useState(null);
     const [mobile, setMobile] = useState("");
     const [dialCode, setDialCode] = useState("");
@@ -85,93 +82,14 @@ export default function HotelOwnerRegister() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [NIC, setNIC] = useState("");
 
-    const [err, setErr] = useState("");
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [err, setErr] = useState("");
 
-    const options = COUNTRIES.map((c) => ({
-        label: `${c.flag} ${c.name}`,
-        value: c.code,
+    const countryOptions = COUNTRIES.map((item) => ({
+        label: `${item.flag} ${item.name}`,
+        value: item.code,
     }));
-
-    const handleCountryChange = (selected) => {
-        setCountry(selected);
-
-        const found = COUNTRIES.find((c) => c.code === selected.value);
-
-        if (found) {
-            setDialCode(found.dial);
-            setMobile("");
-        }
-    };
-
-    const buildFormData = () => {
-        const oldData = JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || {};
-
-        return {
-            ...oldData,
-            role,
-            firstName,
-            lastName,
-            email,
-            password,
-            confirmPassword,
-            NIC,
-            country: country?.label,
-            mobile: dialCode ? `${dialCode}${mobile}` : mobile,
-        };
-    };
-
-    const handleNext = async () => {
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !country || !mobile) {
-            setErr("Please fill all required fields");
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            setErr("Password do not matched");
-            return;
-        }
-
-        if (!emailRegex.test(email)) {
-            setErr("Please enter a valid email address");
-            return;
-        }
-
-        if (!nicRegex.test(NIC) && !passportRegex.test(NIC)) {
-            setErr("Please enter a valid NIC or Passport number");
-            return;
-        }
-
-        if (password.length < 8) {
-            setErr("Password must be a least 8 characters");
-            return;
-        }
-
-        setErr("");
-        setCheckingEmail(true);
-
-        try {
-            const res = await fetch(`http://localhost:3000/api/hotel/check-email?email=${encodeURIComponent(email)}`);
-            const result = await res.json();
-
-            if (result.exists) {
-                setErr("This email is already registered");
-                setCheckingEmail(false);
-                return;
-            }
-        } catch (error) {
-            setErr("Could not verify email, please try again");
-            setCheckingEmail(false);
-            return;
-        }
-
-        setCheckingEmail(false);
-
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
-        navigate("/hotelinformation");
-    };
 
     useEffect(() => {
         const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -187,32 +105,170 @@ export default function HotelOwnerRegister() {
         setConfirmPassword(data.confirmPassword || "");
         setNIC(data.NIC || "");
 
-        if (data.country) {
-            const match = options.find((o) => o.label === data.country);
-            setCountry(match || null);
+        if (!data.country) {
+            setMobile(data.mobile || "");
+            return;
+        }
 
-            if (data.mobile) {
-                const foundCountry = COUNTRIES.find((c) => c.code === match?.value);
-                if (foundCountry && data.mobile.startsWith(foundCountry.dial)) {
-                    setDialCode(foundCountry.dial);
-                    setMobile(data.mobile.slice(foundCountry.dial.length));
-                } else {
-                    setMobile(data.mobile);
-                }
-            }
-        } else if (data.mobile) {
+        const selectedCountry = countryOptions.find(
+            (option) => option.label === data.country
+        );
+
+        setCountry(selectedCountry || null);
+
+        if (!data.mobile) return;
+
+        const countryData = COUNTRIES.find(
+            (item) => item.code === selectedCountry?.value
+        );
+
+        if (countryData && data.mobile.startsWith(countryData.dial)) {
+            setDialCode(countryData.dial);
+            setMobile(data.mobile.slice(countryData.dial.length));
+        } else {
             setMobile(data.mobile);
         }
     }, []);
 
+    const handleCountryChange = (selected) => {
+        setCountry(selected);
+
+        const selectedCountry = COUNTRIES.find(
+            (item) => item.code === selected.value
+        );
+
+        if (!selectedCountry) return;
+
+        setDialCode(selectedCountry.dial);
+        setMobile("");
+    };
+
+    const buildFormData = () => {
+        const saved = sessionStorage.getItem(STORAGE_KEY);
+        const oldData = saved ? JSON.parse(saved) : {};
+
+        return {
+            ...oldData,
+            role,
+            firstName,
+            lastName,
+            email,
+            password,
+            confirmPassword,
+            NIC,
+            country: country?.label || "",
+            mobile: dialCode ? `${dialCode}${mobile}` : mobile,
+        };
+    };
+
+    const validateForm = () => {
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !password ||
+            !confirmPassword ||
+            !NIC ||
+            !country ||
+            !mobile
+        ) {
+            return "Please fill all required fields";
+        }
+
+        if (!emailRegex.test(email)) {
+            return "Please enter a valid email address";
+        }
+
+        if (!nicRegex.test(NIC) && !passportRegex.test(NIC)) {
+            return "Please enter a valid NIC or Passport number";
+        }
+
+        if (password.length < 8) {
+            return "Password must be at least 8 characters";
+        }
+
+        if (password !== confirmPassword) {
+            return "Passwords do not match";
+        }
+
+        return "";
+    };
+
+    const handleNext = async () => {
+        const validationError = validateForm();
+
+        if (validationError) {
+            setErr(validationError);
+            return;
+        }
+
+        setErr("");
+        setCheckingEmail(true);
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/hotel/check-email?email=${encodeURIComponent(
+                    email
+                )}`
+            );
+
+            const result = await response.json();
+
+            if (result.exists) {
+                setErr("This email is already registered");
+                return;
+            }
+
+            sessionStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(buildFormData())
+            );
+
+            navigate("/hotelinformation");
+        } catch (error) {
+            setErr("Could not verify email, please try again");
+        } finally {
+            setCheckingEmail(false);
+        }
+    };
+
     const handlePrevious = () => {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildFormData()));
+        sessionStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(buildFormData())
+        );
+
         navigate(-1);
+    };
+
+    const handleNameChange = (setter) => (event) => {
+        setter(event.target.value.replace(/[^a-zA-Z]/g, ""));
+    };
+
+    const handleNICChange = (event) => {
+        setNIC(
+            event.target.value
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .slice(0, 12)
+                .toUpperCase()
+        );
+    };
+
+    const handleMobileChange = (event) => {
+        const value = event.target.value.replace(/\D/g, "");
+
+        if (
+            country &&
+            validatePhoneNumberLength(value, country.value) === "TOO_LONG"
+        ) {
+            return;
+        }
+
+        setMobile(value);
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="step-bar-anim absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -221,15 +277,17 @@ export default function HotelOwnerRegister() {
                                 <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
                                     <div
                                         className={`w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] lg:w-[30px] lg:h-[30px] rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                                            step.done
-                                                ? "bg-primary-green/80"
-                                                : step.current
+                                            step.current
                                                 ? "bg-primary-green/30"
                                                 : "bg-border/80"
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -239,7 +297,7 @@ export default function HotelOwnerRegister() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -249,7 +307,6 @@ export default function HotelOwnerRegister() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -273,13 +330,14 @@ export default function HotelOwnerRegister() {
                             <input
                                 placeholder="First Name"
                                 value={firstName}
-                                onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z]/g, ""))}
+                                onChange={handleNameChange(setFirstName)}
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
+
                             <input
                                 placeholder="Last Name"
                                 value={lastName}
-                                onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z]/g, ""))}
+                                onChange={handleNameChange(setLastName)}
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
@@ -302,6 +360,7 @@ export default function HotelOwnerRegister() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
+
                             {showPassword ? (
                                 <IoEye
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 cursor-pointer"
@@ -317,21 +376,32 @@ export default function HotelOwnerRegister() {
 
                         <div className="mt-[10px] w-full relative">
                             <input
-                                type={showConfirmPassword ? "text" : "password"}
+                                type={
+                                    showConfirmPassword
+                                        ? "text"
+                                        : "password"
+                                }
                                 value={confirmPassword}
                                 placeholder="Confirm Password"
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
+
                             {showConfirmPassword ? (
                                 <IoEye
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 cursor-pointer"
-                                    onClick={() => setShowConfirmPassword(false)}
+                                    onClick={() =>
+                                        setShowConfirmPassword(false)
+                                    }
                                 />
                             ) : (
                                 <FaEyeSlash
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 text-primary-green/70 cursor-pointer"
-                                    onClick={() => setShowConfirmPassword(true)}
+                                    onClick={() =>
+                                        setShowConfirmPassword(true)
+                                    }
                                 />
                             )}
                         </div>
@@ -340,14 +410,14 @@ export default function HotelOwnerRegister() {
                             <input
                                 placeholder="Passport Number/NIC"
                                 value={NIC}
-                                onChange={(e) => setNIC(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 12).toUpperCase())}
+                                onChange={handleNICChange}
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
 
                         <div className="mt-[10px] w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-[12px]">
                             <Select
-                                options={options}
+                                options={countryOptions}
                                 value={country}
                                 onChange={handleCountryChange}
                                 placeholder="Country"
@@ -360,17 +430,12 @@ export default function HotelOwnerRegister() {
                                 <div className="absolute pl-[20px] text-[12px] text-text">
                                     {dialCode || "+"}
                                 </div>
+
                                 <input
                                     type="text"
                                     placeholder="Mobile"
                                     value={mobile}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        if (country && validatePhoneNumberLength(value, country.value) === "TOO_LONG") {
-                                            return;
-                                        }
-                                        setMobile(value);
-                                    }}
+                                    onChange={handleMobileChange}
                                     className="w-full h-[50px] bg-transparent rounded-[20px] text-[12px] pl-[60px] text-text"
                                 />
                             </div>
@@ -392,7 +457,14 @@ export default function HotelOwnerRegister() {
                                 disabled={checkingEmail}
                                 className="w-full h-[50px] bg-primary-green/50 font-bold text-[16px] rounded-[20px] flex items-center justify-center hover:bg-primary-green/80 transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-50"
                             >
-                                {checkingEmail ? "Checking..." : (<>Next <GrFormNextLink className="font-bold text-[20px]" /></>)}
+                                {checkingEmail ? (
+                                    "Checking..."
+                                ) : (
+                                    <>
+                                        Next
+                                        <GrFormNextLink className="font-bold text-[20px]" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
