@@ -5,6 +5,7 @@ import {
     FaCalendarCheck, FaEllipsisV, FaSearch, FaUser,
     FaCheck, FaTimes, FaBan
 } from "react-icons/fa";
+import ScrollFadeIn from "../../components/ScrollFadeIn";
 
 function getAuthHeader() {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -51,7 +52,7 @@ export default function Bookings() {
     }
 
     function handleStatusChange(bookingId, newStatus) {
-        axios.patch(`http://localhost:3000/api/transport/booking/${bookingId}/status`, { status: newStatus }, {
+        axios.patch(`http://localhost:3000/api/transport/bookings/${bookingId}/status`, { status: newStatus }, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success(`Booking marked as ${newStatus}`);
@@ -78,11 +79,11 @@ export default function Bookings() {
 
     return (
         <section id="bookings" className="mt-12">
-            <div className="flex justify-between items-center mb-6">
+            <div className="vehicle-owner-header-anim flex justify-between items-center mb-6">
                 <h1 className="text-[#CCD0CF] text-[24px] font-bold">Bookings</h1>
             </div>
 
-            <div className="bg-[#253745] rounded-[20px] p-6">
+            <div className="vehicle-owner-section-anim bg-[#253745] rounded-[20px] p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-[#CCD0CF] text-[20px] font-bold">All Bookings</h2>
                     <div className="relative w-[280px]">
@@ -116,10 +117,15 @@ export default function Bookings() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredBookings.map((booking) => {
+                                {filteredBookings.map((booking, index) => {
                                     const status = STATUS_META[booking.status] || STATUS_META.pending;
                                     return (
-                                        <tr key={booking._id} className="border-t border-[#4A5C6A]/40">
+                                        <ScrollFadeIn
+                                            key={booking._id}
+                                            as="tr"
+                                            className="vehicle-owner-row-anim border-t border-[#4A5C6A]/40"
+                                            style={{ animationDelay: `${index * 0.05}s` }}
+                                        >
                                             <td className="py-4 pr-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-[45px] h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0">
@@ -208,7 +214,7 @@ export default function Bookings() {
                                                     </>
                                                 )}
                                             </td>
-                                        </tr>
+                                        </ScrollFadeIn>
                                     );
                                 })}
                             </tbody>

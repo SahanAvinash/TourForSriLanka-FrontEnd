@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import {
     FaStar, FaRegStar, FaSearch, FaUser
 } from "react-icons/fa";
+import ScrollFadeIn from "../../components/ScrollFadeIn";
 
 export default function Reviews() {
     const [transportId, setTransportId] = useState(null);
@@ -70,30 +71,30 @@ export default function Reviews() {
 
     return (
         <section id="reviews" className="mt-12">
-            <div className="flex justify-between items-center mb-6">
+            <div className="vehicle-owner-header-anim flex justify-between items-center mb-6">
                 <h1 className="text-[#CCD0CF] text-[24px] font-bold">Reviews</h1>
             </div>
 
             {!loadingReviews && totalReviews > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
-                    <div className="bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
+                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
                         <p className="text-[#CCD0CF]/60 text-[15px] mb-3">Average Rating</p>
                         <p className="text-[#CCD0CF] text-[64px] font-bold leading-none">{averageRating}</p>
                         <div className="flex gap-2 mt-4">{renderStars(averageRating)}</div>
                         <p className="text-[#CCD0CF]/50 text-[13px] mt-3">
                             Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
                         </p>
-                    </div>
+                    </ScrollFadeIn>
 
-                    <div className="bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
+                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
                         <p className="text-[#CCD0CF]/60 text-[15px] mb-3">Total Reviews</p>
                         <p className="text-[#CCD0CF] text-[64px] font-bold leading-none">{totalReviews}</p>
                         <p className="text-[#CCD0CF]/50 text-[13px] mt-4">
                             {ratingCounts[0].count} five-star {ratingCounts[0].count === 1 ? "review" : "reviews"}
                         </p>
-                    </div>
+                    </ScrollFadeIn>
 
-                    <div className="bg-[#253745] rounded-[24px] p-8">
+                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8">
                         <p className="text-[#CCD0CF]/60 text-[15px] mb-4">Rating Breakdown</p>
                         <div className="space-y-2.5">
                             {ratingCounts.map(({ star, count }) => (
@@ -110,11 +111,11 @@ export default function Reviews() {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </ScrollFadeIn>
                 </div>
             )}
 
-            <div className="bg-[#253745] rounded-[20px] p-6">
+            <div className="vehicle-owner-section-anim bg-[#253745] rounded-[20px] p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-[#CCD0CF] text-[20px] font-bold">All Reviews</h2>
                     <div className="relative w-[280px]">
@@ -137,9 +138,10 @@ export default function Reviews() {
                     <div>
                         <div className="space-y-4">
                             {visibleReviews.map((review, index) => (
-                                <div
+                                <ScrollFadeIn
                                     key={review._id}
-                                    className={`pt-4 ${index === 0 ? "" : "border-t border-[#4A5C6A]/40"}`}
+                                    className={`review-item-anim pt-4 ${index === 0 ? "" : "border-t border-[#4A5C6A]/40"}`}
+                                    style={{ animationDelay: `${index * 0.08}s` }}
                                 >
                                     <div className="flex items-start gap-3">
                                         <div className="w-[45px] h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -174,7 +176,7 @@ export default function Reviews() {
                                             )}
                                         </div>
                                     </div>
-                                </div>
+                                </ScrollFadeIn>
                             ))}
                         </div>
 

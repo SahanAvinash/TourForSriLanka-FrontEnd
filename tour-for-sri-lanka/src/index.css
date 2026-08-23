@@ -663,3 +663,347 @@
         opacity: 1;
     }
 }
+@keyframes profileHeaderFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes profileSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes profileAlertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-title-anim {
+    opacity: 0;
+    animation: profileHeaderFadeIn 0.6s ease-out forwards;
+}
+
+.profile-photo-anim {
+    opacity: 0;
+    animation: profileSectionFadeIn 0.7s ease-out 0.15s forwards;
+}
+
+.profile-details-anim {
+    opacity: 0;
+    animation: profileSectionFadeIn 0.7s ease-out 0.3s forwards;
+}
+
+.profile-password-anim {
+    opacity: 0;
+    animation: profileSectionFadeIn 0.7s ease-out 0.45s forwards;
+}
+
+.profile-save-anim {
+    opacity: 0;
+    animation: profileSectionFadeIn 0.7s ease-out 0.6s forwards;
+}
+
+.profile-alert-anim {
+    opacity: 0;
+    animation: profileAlertSlideIn 0.3s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-title-anim,
+    .profile-photo-anim,
+    .profile-details-anim,
+    .profile-password-anim,
+    .profile-save-anim,
+    .profile-alert-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes vehicleOwnerAlertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vehicleOwnerHeaderFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vehicleOwnerCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes vehicleOwnerSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vehicle-owner-alert-anim {
+    opacity: 0;
+    animation: vehicleOwnerAlertSlideIn 0.3s ease-out forwards;
+}
+
+.vehicle-owner-header-anim {
+    opacity: 0;
+    animation: vehicleOwnerHeaderFadeIn 0.6s ease-out forwards;
+}
+
+.vehicle-owner-card-anim {
+    opacity: 0;
+    animation: vehicleOwnerCardFadeIn 0.6s ease-out forwards;
+}
+.vehicle-owner-card-anim:nth-child(1) { animation-delay: 0.1s; }
+.vehicle-owner-card-anim:nth-child(2) { animation-delay: 0.2s; }
+.vehicle-owner-card-anim:nth-child(3) { animation-delay: 0.3s; }
+.vehicle-owner-card-anim:nth-child(4) { animation-delay: 0.4s; }
+.vehicle-owner-card-anim:nth-child(5) { animation-delay: 0.5s; }
+.vehicle-owner-card-anim:nth-child(6) { animation-delay: 0.6s; }
+
+.vehicle-owner-section-anim {
+    opacity: 0;
+    animation: vehicleOwnerSectionFadeIn 0.7s ease-out 0.2s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vehicle-owner-alert-anim,
+    .vehicle-owner-header-anim,
+    .vehicle-owner-card-anim,
+    .vehicle-owner-section-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes vehiclePhotoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vehicleInfoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vehicleInfoCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.vehicle-photo-anim,
+.vehicle-info-anim,
+.vehicle-info-card-anim {
+    opacity: 0;
+}
+
+.vehicle-photo-anim.in-view {
+    animation: vehiclePhotoFadeIn 0.7s ease-out forwards;
+}
+
+.vehicle-info-anim.in-view {
+    animation: vehicleInfoFadeIn 0.7s ease-out 0.15s forwards;
+}
+
+.vehicle-info-card-anim.in-view {
+    animation: vehicleInfoCardFadeIn 0.6s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vehicle-photo-anim,
+    .vehicle-info-anim,
+    .vehicle-info-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes bookingRowFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vehicle-owner-row-anim {
+    opacity: 0;
+}
+
+.vehicle-owner-row-anim.in-view {
+    animation: bookingRowFadeIn 0.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vehicle-owner-row-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes reviewStatCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes reviewItemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.review-stat-card-anim {
+    opacity: 0;
+}
+
+.review-stat-card-anim.in-view {
+    animation: reviewStatCardFadeIn 0.6s ease-out forwards;
+}
+.review-stat-card-anim:nth-child(1).in-view { animation-delay: 0s; }
+.review-stat-card-anim:nth-child(2).in-view { animation-delay: 0.1s; }
+.review-stat-card-anim:nth-child(3).in-view { animation-delay: 0.2s; }
+
+.review-item-anim {
+    opacity: 0;
+}
+
+.review-item-anim.in-view {
+    animation: reviewItemFadeIn 0.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .review-stat-card-anim,
+    .review-item-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+@keyframes ownerProfileTitleFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ownerProfileAlertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ownerProfileCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.owner-profile-title-anim {
+    opacity: 0;
+    animation: ownerProfileTitleFadeIn 0.6s ease-out forwards;
+}
+
+.owner-profile-alert-anim {
+    opacity: 0;
+    animation: ownerProfileAlertSlideIn 0.3s ease-out forwards;
+}
+
+.owner-profile-card-anim {
+    opacity: 0;
+}
+
+.owner-profile-card-anim.in-view {
+    animation: ownerProfileCardFadeIn 0.7s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .owner-profile-title-anim,
+    .owner-profile-alert-anim,
+    .owner-profile-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}

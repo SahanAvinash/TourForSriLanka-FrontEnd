@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaCamera, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
+import ScrollFadeIn from "../../components/ScrollFadeIn";
 
 const API_BASE = "http://localhost:3000";
 
@@ -175,9 +176,9 @@ export default function Profile() {
 
   return (
     <section id="profile" className="pb-16 pt-10">
-      <h2 className="text-2xl font-semibold text-white mb-6">Transport Owner Profile</h2>
+      <h2 className="owner-profile-title-anim text-2xl font-semibold text-white mb-6">Transport Owner Profile</h2>
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <ScrollFadeIn className="owner-profile-card-anim bg-[#11212D] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-4">Owner Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
             <DetailRow label="Owner Name" value={`${transport?.firstName || ""} ${transport?.lastName || ""}`} />
@@ -250,20 +251,20 @@ export default function Profile() {
         <p className="text-gray-500 text-xs mt-4">
           These details can't be edited here. Contact support if any of this information needs to change.
         </p>
-      </div>
+      </ScrollFadeIn>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500 text-red-400 rounded-xl px-4 py-3 mb-5">
+        <div className="owner-profile-alert-anim bg-red-500/10 border border-red-500 text-red-400 rounded-xl px-4 py-3 mb-5">
           {error}
         </div>
       )}
       {message && (
-        <div className="bg-[#00C896]/10 border border-[#00C896] text-[#00C896] rounded-xl px-4 py-3 mb-5">
+        <div className="owner-profile-alert-anim bg-[#00C896]/10 border border-[#00C896] text-[#00C896] rounded-xl px-4 py-3 mb-5">
           {message}
         </div>
       )}
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <ScrollFadeIn className="owner-profile-card-anim bg-[#11212D] rounded-2xl p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-white">Account Status</h3>
           <button
@@ -284,9 +285,9 @@ export default function Profile() {
             ? "Your vehicles are visible to travelers."
             : "Your vehicles are hidden from travelers. Enable it to receive bookings again."}
         </p>
-      </div>
+      </ScrollFadeIn>
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <ScrollFadeIn className="owner-profile-card-anim bg-[#11212D] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-3">Description</h3>
         <textarea
           value={description}
@@ -295,9 +296,9 @@ export default function Profile() {
           className="w-full bg-[#1B2B34] text-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00C896] resize-none"
           placeholder="Tell travelers about your transport service..."
         />
-      </div>
+      </ScrollFadeIn>
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <ScrollFadeIn className="owner-profile-card-anim bg-[#11212D] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-3">
           Change Password
         </h3>
@@ -329,15 +330,17 @@ export default function Profile() {
         <p className="text-gray-500 text-xs mt-2">
           Leave blank if you don't want to change your password.
         </p>
-      </div>
+      </ScrollFadeIn>
 
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="bg-[#00C896] text-white font-medium px-8 py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
-      >
-        {saving ? "Saving..." : "Save Changes"}
-      </button>
+      <ScrollFadeIn className="owner-profile-card-anim">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-[#00C896] text-white font-medium px-8 py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </ScrollFadeIn>
     </section>
   );
 }

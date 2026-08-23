@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { FaCar, FaMoneyBillWave, FaUsers, FaSuitcase, FaGasPump, FaMapMarkerAlt, FaIdCard, FaCalendarAlt, FaPalette, FaPen, FaCheck, FaTimes, FaImage } from "react-icons/fa";
 import { MdVerified, MdPending } from "react-icons/md";
+import ScrollFadeIn from "../../components/ScrollFadeIn";
 
 export default function MyVehicle() {
     const [vehicle, setVehicle] = useState(null);
@@ -170,7 +171,7 @@ export default function MyVehicle() {
 
                     <div className="bg-[#253745] rounded-[20px] p-6">
                         <div className="grid grid-cols-2 gap-6 items-stretch">
-                            <div className="flex flex-col h-full">
+                            <ScrollFadeIn className="vehicle-photo-anim flex flex-col h-full">
                                 <div className="w-full flex-1 min-h-[280px] rounded-[15px] bg-[#1B2B34] overflow-hidden flex items-center justify-center relative">
                                     {photos.length > 0 ? (
                                         <img src={photos[activeImage] || photos[0]} alt={vehicle.vehicleBrand} className="w-full h-full object-cover" />
@@ -251,9 +252,9 @@ export default function MyVehicle() {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                            </ScrollFadeIn>
 
-                            <div>
+                            <ScrollFadeIn className="vehicle-info-anim">
                                 <h2 className="text-[#CCD0CF] text-[20px] font-bold capitalize">
                                     {vehicle.vehicleBrand} {vehicle.vehicleModel}
                                 </h2>
@@ -268,16 +269,16 @@ export default function MyVehicle() {
 
                                 <div className="grid grid-cols-2 gap-3">
                                     {infoItems.map(({ icon: Icon, label, value }) => (
-                                        <div key={label} className="bg-[#4A5C6A]/30 rounded-[12px] p-3">
+                                        <ScrollFadeIn key={label} className="vehicle-info-card-anim bg-[#4A5C6A]/30 rounded-[12px] p-3">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Icon className="text-[#00C896] text-[13px]" />
                                                 <p className="text-[#CCD0CF]/60 text-[11px]">{label}</p>
                                             </div>
                                             <p className="text-[#CCD0CF] text-[14px] font-bold">{value}</p>
-                                        </div>
+                                        </ScrollFadeIn>
                                     ))}
 
-                                    <div className="bg-[#4A5C6A]/30 rounded-[12px] p-3">
+                                    <ScrollFadeIn className="vehicle-info-card-anim bg-[#4A5C6A]/30 rounded-[12px] p-3">
                                         <div className="flex items-center justify-between mb-1">
                                             <div className="flex items-center gap-2">
                                                 <FaMoneyBillWave className="text-[#00C896] text-[13px]" />
@@ -311,9 +312,9 @@ export default function MyVehicle() {
                                                 LKR {Number(vehicle.ratePerKm).toLocaleString()}
                                             </p>
                                         )}
-                                    </div>
+                                    </ScrollFadeIn>
                                 </div>
-                            </div>
+                            </ScrollFadeIn>
                         </div>
                     </div>
                 </>
