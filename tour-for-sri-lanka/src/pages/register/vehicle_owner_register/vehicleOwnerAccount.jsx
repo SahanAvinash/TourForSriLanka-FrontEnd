@@ -20,12 +20,10 @@ const selectStyles = {
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
     }),
-
     option: (base, state) => ({
         ...base,
         backgroundColor: state.isFocused
@@ -34,37 +32,39 @@ const selectStyles = {
         color: "var(--color-text)",
         cursor: "pointer",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
     }),
 };
 
+const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
+const passportRegex = /^[A-Za-z0-9]{6,9}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const steps = [
+    { label: "Account", number: "1", current: true },
+    { label: "Vehicle Information", number: "2" },
+    { label: "Facilities", number: "3" },
+    { label: "Verification", number: "4" },
+];
+
 export default function VehicleOwnerRegister() {
     const navigate = useNavigate();
-
     const role = sessionStorage.getItem("role");
 
     const [checkingEmail, setCheckingEmail] = useState(false);
-
-    const nicRegex = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
-    const passportRegex = /^[A-Za-z0-9]{6,9}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const [country, setCountry] = useState(null);
     const [mobile, setMobile] = useState("");
     const [dialCode, setDialCode] = useState("");
@@ -77,19 +77,26 @@ export default function VehicleOwnerRegister() {
     const [NIC, setNIC] = useState("");
 
     const [err, setErr] = useState("");
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const options = COUNTRIES.map((c) => ({
-        label: `${c.flag} ${c.name}`,
-        value: c.code,
+    const options = COUNTRIES.map((country) => ({
+        label: `${country.flag} ${country.name}`,
+        value: country.code,
     }));
 
     const handleCountryChange = (selected) => {
         setCountry(selected);
 
-        const found = COUNTRIES.find((c) => c.code === selected.value);
+        if (!selected) {
+            setDialCode("");
+            setMobile("");
+            return;
+        }
+
+        const found = COUNTRIES.find(
+            (country) => country.code === selected.value
+        );
 
         if (found) {
             setDialCode(found.dial);
@@ -188,42 +195,43 @@ export default function VehicleOwnerRegister() {
     useEffect(() => {
         const saved = sessionStorage.getItem("VehicleOwnerRegister");
 
-        if (saved) {
-            const data = JSON.parse(saved);
+        if (!saved) return;
 
-            setFirstName(data.firstName || "");
-            setLastName(data.lastName || "");
-            setEmail(data.email || "");
-            setPassword(data.password || "");
-            setConfirmPassword(data.confirmPassword || "");
-            setNIC(data.NIC || "");
+        const data = JSON.parse(saved);
 
-            if (data.country) {
-                const match = options.find((o) => o.label === data.country);
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setEmail(data.email || "");
+        setPassword(data.password || "");
+        setConfirmPassword(data.confirmPassword || "");
+        setNIC(data.NIC || "");
 
-                setCountry(match || null);
+        if (data.country) {
+            const match = options.find(
+                (option) => option.label === data.country
+            );
 
-                if (data.mobile) {
-                    const foundCountry = COUNTRIES.find(
-                        (c) => c.code === match?.value
+            setCountry(match || null);
+
+            if (data.mobile) {
+                const foundCountry = COUNTRIES.find(
+                    (country) => country.code === match?.value
+                );
+
+                if (
+                    foundCountry &&
+                    data.mobile.startsWith(foundCountry.dial)
+                ) {
+                    setDialCode(foundCountry.dial);
+                    setMobile(
+                        data.mobile.slice(foundCountry.dial.length)
                     );
-
-                    if (
-                        foundCountry &&
-                        data.mobile.startsWith(foundCountry.dial)
-                    ) {
-                        setDialCode(foundCountry.dial);
-
-                        setMobile(
-                            data.mobile.slice(foundCountry.dial.length)
-                        );
-                    } else {
-                        setMobile(data.mobile);
-                    }
+                } else {
+                    setMobile(data.mobile);
                 }
-            } else if (data.mobile) {
-                setMobile(data.mobile);
             }
+        } else if (data.mobile) {
+            setMobile(data.mobile);
         }
     }, []);
 
@@ -236,20 +244,12 @@ export default function VehicleOwnerRegister() {
         navigate(-1);
     };
 
-    const steps = [
-        { label: "Account", number: "1", current: true },
-        { label: "Vehicle Information", number: "2" },
-        { label: "Facilities", number: "3" },
-        { label: "Verification", number: "4" },
-    ];
-
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="step-bar-anim absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
-                        {steps.map((step, i) => (
+                        {steps.map((step, index) => (
                             <Fragment key={step.label}>
                                 <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
                                     <div
@@ -262,7 +262,11 @@ export default function VehicleOwnerRegister() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -271,8 +275,8 @@ export default function VehicleOwnerRegister() {
                                     </span>
                                 </div>
 
-                                {i < steps.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                {index < steps.length - 1 && (
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -282,7 +286,6 @@ export default function VehicleOwnerRegister() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -307,7 +310,12 @@ export default function VehicleOwnerRegister() {
                                 placeholder="First Name"
                                 value={firstName}
                                 onChange={(e) =>
-                                    setFirstName(e.target.value.replace(/[^a-zA-Z]/g, ""))
+                                    setFirstName(
+                                        e.target.value.replace(
+                                            /[^a-zA-Z]/g,
+                                            ""
+                                        )
+                                    )
                                 }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
@@ -316,7 +324,12 @@ export default function VehicleOwnerRegister() {
                                 placeholder="Last Name"
                                 value={lastName}
                                 onChange={(e) =>
-                                    setLastName(e.target.value.replace(/[^a-zA-Z]/g, ""))
+                                    setLastName(
+                                        e.target.value.replace(
+                                            /[^a-zA-Z]/g,
+                                            ""
+                                        )
+                                    )
                                 }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
@@ -333,44 +346,62 @@ export default function VehicleOwnerRegister() {
 
                             <div className="flex flex-col relative w-full mt-[10px]">
                                 <input
-                                    type={showPassword ? "text" : "password"}
+                                    type={
+                                        showPassword ? "text" : "password"
+                                    }
                                     value={password}
                                     placeholder="Password"
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
                                     className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                                 />
 
                                 {showPassword ? (
                                     <IoEye
                                         className="absolute right-[18px] top-1/2 -translate-y-1/2 cursor-pointer text-text"
-                                        onClick={() => setShowPassword(false)}
+                                        onClick={() =>
+                                            setShowPassword(false)
+                                        }
                                     />
                                 ) : (
                                     <FaEyeSlash
                                         className="absolute right-[18px] top-1/2 -translate-y-1/2 cursor-pointer text-text"
-                                        onClick={() => setShowPassword(true)}
+                                        onClick={() =>
+                                            setShowPassword(true)
+                                        }
                                     />
                                 )}
                             </div>
 
                             <div className="flex flex-col relative w-full mt-[10px]">
                                 <input
-                                    type={showConfirmPassword ? "text" : "password"}
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
                                     value={confirmPassword}
                                     placeholder="Confirm Password"
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    onChange={(e) =>
+                                        setConfirmPassword(e.target.value)
+                                    }
                                     className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                                 />
 
                                 {showConfirmPassword ? (
                                     <IoEye
                                         className="absolute right-[18px] top-1/2 -translate-y-1/2 cursor-pointer text-text"
-                                        onClick={() => setShowConfirmPassword(false)}
+                                        onClick={() =>
+                                            setShowConfirmPassword(false)
+                                        }
                                     />
                                 ) : (
                                     <FaEyeSlash
                                         className="absolute right-[18px] top-1/2 -translate-y-1/2 cursor-pointer text-text"
-                                        onClick={() => setShowConfirmPassword(true)}
+                                        onClick={() =>
+                                            setShowConfirmPassword(true)
+                                        }
                                     />
                                 )}
                             </div>
@@ -381,7 +412,10 @@ export default function VehicleOwnerRegister() {
                                 onChange={(e) =>
                                     setNIC(
                                         e.target.value
-                                            .replace(/[^a-zA-Z0-9]/g, "")
+                                            .replace(
+                                                /[^a-zA-Z0-9]/g,
+                                                ""
+                                            )
                                             .slice(0, 12)
                                             .toUpperCase()
                                     )
@@ -411,7 +445,11 @@ export default function VehicleOwnerRegister() {
                                         placeholder="Mobile"
                                         value={mobile}
                                         onChange={(e) => {
-                                            const value = e.target.value.replace(/\D/g, "");
+                                            const value =
+                                                e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                );
 
                                             if (
                                                 country &&
