@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useRef, useState } from "react";
 import { FaCamera, FaCheck } from "react-icons/fa";
 import { GrFormPreviousLink } from "react-icons/gr";
@@ -191,7 +192,7 @@ export default function GuidePricing() {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/guide/send-otp",
+                `${API_BASE_URL}/api/guide/send-otp`,
                 {
                     method: "POST",
                     headers: {

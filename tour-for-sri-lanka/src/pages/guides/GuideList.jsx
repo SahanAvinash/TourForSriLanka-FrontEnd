@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useRef, useState } from "react";
 import GuideCard from "./GuideCard";
 
@@ -53,7 +54,7 @@ const params = new URLSearchParams()
 if(filters?.district) params.append("district", filters.district)
 if(filters?.language) params.append("language", filters.language)
 
-const url = `http://localhost:3000/api/guide/?${params.toString()}`
+const url = `${API_BASE_URL}/api/guide/?${params.toString()}`
 
 fetch(url)
             .then((res) => res.json())

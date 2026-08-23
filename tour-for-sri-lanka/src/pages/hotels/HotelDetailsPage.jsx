@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -30,7 +31,7 @@ const roomFacilityLabels = {
   lunch: "Lunch", gym: "Gym"
 }
 
-const API_BASE = "http://localhost:3000/api"
+const API_BASE = `${API_BASE_URL}/api`
 
 // Scroll-triggered reveal hook, reused across facilities & room cards
 function useInView(threshold = 0.15) {

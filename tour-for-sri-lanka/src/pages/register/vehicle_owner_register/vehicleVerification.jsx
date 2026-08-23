@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useRef, useState } from "react";
 import { FaCamera, FaCheck, FaUpload } from "react-icons/fa";
 import { GrFormPreviousLink } from "react-icons/gr";
@@ -238,7 +239,7 @@ export default function VehicleVerification() {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/transport/send-otp",
+                `${API_BASE_URL}/api/transport/send-otp`,
                 {
                     method: "POST",
                     headers: {

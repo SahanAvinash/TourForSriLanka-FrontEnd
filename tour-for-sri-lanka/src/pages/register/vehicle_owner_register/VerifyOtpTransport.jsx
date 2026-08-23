@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -10,7 +11,7 @@ const STEPS = [
     { label: "Verification", current: true, number: "4" },
 ];
 
-const API_BASE_URL = "http://localhost:3000/api/transport";
+const API_URL = `${API_BASE_URL}/api/transport`;
 const STORAGE_KEY = "VehicleOwnerRegister";
 
 export default function VerifyOtpTransport() {

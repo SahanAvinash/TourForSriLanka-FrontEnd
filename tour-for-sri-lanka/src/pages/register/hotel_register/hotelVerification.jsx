@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useState } from "react";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -166,7 +167,7 @@ export default function HotelVerification() {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/hotel/send-otp",
+                `${API_BASE_URL}/api/hotel/send-otp`,
                 {
                     method: "POST",
                     headers: {

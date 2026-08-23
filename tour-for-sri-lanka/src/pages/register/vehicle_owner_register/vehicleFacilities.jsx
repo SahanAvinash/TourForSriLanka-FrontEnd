@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useEffect, useState } from "react";
 import { FaCheck, FaUpload } from "react-icons/fa";
 import {
@@ -9,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const STORAGE_KEY = "VehicleOwnerRegister";
 const MAX_PHOTOS = 5;
-const API_URL = "http://localhost:3000/api/transport/upload-photo";
+const API_URL = `${API_BASE_URL}/api/transport/upload-photo`;
 
 const LUGGAGE_OPTIONS = {
     car: [

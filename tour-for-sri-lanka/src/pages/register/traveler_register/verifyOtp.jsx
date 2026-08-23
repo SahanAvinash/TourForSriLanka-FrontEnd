@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../../../config/api";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GrFormPreviousLink } from "react-icons/gr";
 
-const SEND_OTP_API_URL = "http://localhost:3000/api/traveler/send-otp";
-const REGISTER_API_URL = "http://localhost:3000/api/traveler/register";
+const SEND_OTP_API_URL = `${API_BASE_URL}/api/traveler/send-otp`;
+const REGISTER_API_URL = `${API_BASE_URL}/api/traveler/register`;
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");

@@ -1,12 +1,13 @@
+import { API_BASE_URL } from "../config/api";
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { MdEmail, MdLock } from "react-icons/md";
 
-const SEND_OTP_API_URL = "http://localhost:3000/api/password-reset/send-otp";
-const VERIFY_OTP_API_URL = "http://localhost:3000/api/password-reset/verify-otp";
-const RESET_PASSWORD_API_URL = "http://localhost:3000/api/password-reset/reset-password";
+const SEND_OTP_API_URL = `${API_BASE_URL}/api/password-reset/send-otp`;
+const VERIFY_OTP_API_URL = `${API_BASE_URL}/api/password-reset/verify-otp`;
+const RESET_PASSWORD_API_URL = `${API_BASE_URL}/api/password-reset/reset-password`;
 
 const INPUT_CLASSES = `
   text-text

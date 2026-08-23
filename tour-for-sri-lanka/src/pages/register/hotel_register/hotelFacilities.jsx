@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useEffect, useState } from "react";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
@@ -126,7 +127,7 @@ export default function HotelFacilities() {
         uploadFormData.append("photo", file);
 
         const response = await fetch(
-            "http://localhost:3000/api/hotel/upload-photo",
+            `${API_BASE_URL}/api/hotel/upload-photo`,
             {
                 method: "POST",
                 body: uploadFormData,

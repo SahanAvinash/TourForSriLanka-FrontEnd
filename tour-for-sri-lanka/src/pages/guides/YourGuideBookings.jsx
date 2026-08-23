@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,7 +29,7 @@ export default function YourGuideBookings() {
     const fetchBookings = async () => {
       setLoadingBookings(true);
       try {
-        const res = await fetch("http://localhost:3000/api/guidebooking/my", {
+        const res = await fetch(`${API_BASE_URL}/api/guidebooking/my`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -48,7 +49,7 @@ export default function YourGuideBookings() {
     setCancellingId(bookingId);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/guidebooking/${bookingId}/cancel`,
+        `${API_BASE_URL}/api/guidebooking/${bookingId}/cancel`,
         {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}` },

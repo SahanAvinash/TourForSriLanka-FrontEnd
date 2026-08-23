@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -34,7 +35,7 @@ const dayLabels = {
   friday: "Fri", saturday: "Sat", sunday: "Sun"
 }
 
-const API_BASE = "http://localhost:3000/api"
+const API_BASE = `${API_BASE_URL}/api`
 
 export default function GuideDetailsPage(){
   const { id } = useParams()

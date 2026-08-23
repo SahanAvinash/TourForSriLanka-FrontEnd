@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { FaCalendarCheck, FaStar, FaMoneyBillWave, FaClipboardList, FaCheckCircle } from "react-icons/fa"
 import { MdVerified, MdPending } from "react-icons/md";
@@ -33,14 +34,14 @@ export default function Overview(){
 
         setOwnerName(user.firstName || "")
 
-        axios.get(`http://localhost:3000/api/transport/${transportId}`)
+        axios.get(`${API_BASE_URL}/api/transport/${transportId}`)
             .then((res) => {
                 setIsApproved(res.data.isApproved || false)
             }).catch((error) => {
                 console.log(error)
             })
 
-        axios.get(`http://localhost:3000/api/booking/transport/${transportId}`)
+        axios.get(`${API_BASE_URL}/api/booking/transport/${transportId}`)
             .then((res) => {
                 const bookings = res.data
                 const todayStr = new Date().toDateString()
@@ -60,7 +61,7 @@ export default function Overview(){
                 setLoadingStats(false)
             })
 
-        axios.get(`http://localhost:3000/api/transport-review/vehicle/${transportId}`)
+        axios.get(`${API_BASE_URL}/api/transport-review/vehicle/${transportId}`)
             .then((res) => {
                 const reviews = res.data
                 if (reviews.length > 0) {

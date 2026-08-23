@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useEffect, useState } from "react";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
@@ -215,7 +216,7 @@ export default function GuideRegister() {
 
         try {
             const response = await fetch(
-                `http://localhost:3000/api/guide/check-email?email=${encodeURIComponent(
+                `${API_BASE_URL}/api/guide/check-email?email=${encodeURIComponent(
                     email
                 )}`
             );

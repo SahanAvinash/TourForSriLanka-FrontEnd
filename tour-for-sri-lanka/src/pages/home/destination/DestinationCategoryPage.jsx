@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -11,7 +12,7 @@ const DestinationCategoryPage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/category/${category}`)
+      .get(`${API_BASE_URL}/api/category/${category}`)
       .then((res) => setCategoryData(res.data))
       .catch((err) => console.log("Failed to load category", err));
   }, [category]);

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CategoryCard from "./CategoryCard";
@@ -8,7 +9,7 @@ const CategorySection = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/category")
+      .get(`${API_BASE_URL}/api/category`)
       .then((res) => setCategories(res.data))
       .catch((err) => console.log("Failed to load categories", err))
       .finally(() => setLoading(false));

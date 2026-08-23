@@ -1,13 +1,14 @@
+import { API_BASE_URL } from "../../config/api";
 import AdminApprovalTable from "./AdminApprovalTable";
 
 export default function AdminGuides() {
   return (
     <AdminApprovalTable
       title="Guides"
-      fetchUrl="http://localhost:3000/api/guide"
+      fetchUrl={`${API_BASE_URL}/api/guide`}
       getId={(item) => item._id}
-      getApproveUrl={(item) => `http://localhost:3000/api/guide/approve/${item._id}`}
-      getRemoveUrl={(item) => `http://localhost:3000/api/guide/${item._id}`}
+      getApproveUrl={(item) => `${API_BASE_URL}/api/guide/approve/${item._id}`}
+      getRemoveUrl={(item) => `${API_BASE_URL}/api/guide/${item._id}`}
       columns={[
         { header: "Name", render: (item) => `${item.firstName || ""} ${item.lastName || ""}` },
         { header: "Email", render: (item) => item.email },

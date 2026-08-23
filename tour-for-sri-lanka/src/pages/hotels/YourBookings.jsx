@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,7 +29,7 @@ export default function YourBookings() {
       setLoadingBookings(true);
       try {
         const res = await fetch(
-          `http://localhost:3000/api/booking/traveler/${travelerId}`
+          `${API_BASE_URL}/api/booking/traveler/${travelerId}`
         );
         const data = await res.json();
         if (res.ok) setBookings(data);
@@ -47,7 +48,7 @@ export default function YourBookings() {
     setCancellingId(bookingId);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/booking/${bookingId}/status`,
+        `${API_BASE_URL}/api/booking/${bookingId}/status`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

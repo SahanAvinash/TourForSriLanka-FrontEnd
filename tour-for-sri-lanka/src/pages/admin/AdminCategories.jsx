@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -20,7 +21,7 @@ export default function AdminCategories() {
   function loadCategories() {
     setLoading(true);
     axios
-      .get("http://localhost:3000/api/category", {
+      .get(`${API_BASE_URL}/api/category`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then((res) => setCategories(res.data))
@@ -81,10 +82,10 @@ export default function AdminCategories() {
     if (image) formData.append("image", image);
 
     const request = editingId
-      ? axios.put(`http://localhost:3000/api/category/${editingId}`, formData, {
+      ? axios.put(`${API_BASE_URL}/api/category/${editingId}`, formData, {
           headers: { Authorization: "Bearer " + token },
         })
-      : axios.post("http://localhost:3000/api/category", formData, {
+      : axios.post(`${API_BASE_URL}/api/category`, formData, {
           headers: { Authorization: "Bearer " + token },
         });
 
@@ -100,7 +101,7 @@ export default function AdminCategories() {
   function handleDelete(category) {
     if (!window.confirm(`Delete category "${category.name}"? This cannot be undone.`)) return;
     axios
-      .delete(`http://localhost:3000/api/category/${category._id}`, {
+      .delete(`${API_BASE_URL}/api/category/${category._id}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then(() => {

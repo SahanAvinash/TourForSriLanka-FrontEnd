@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -21,7 +22,7 @@ export default function MyVehicle() {
     const [savingImages, setSavingImages] = useState(false);
 
     function fetchVehicle(id) {
-        return axios.get(`http://localhost:3000/api/transport/${id}`)
+        return axios.get(`${API_BASE_URL}/api/transport/${id}`)
             .then((res) => {
                 setVehicle(res.data);
             }).catch((error) => {
@@ -67,7 +68,7 @@ export default function MyVehicle() {
             return;
         }
         setSavingRate(true);
-        axios.put(`http://localhost:3000/api/transport/${transportId}`, { ratePerKm: rateInput })
+        axios.put(`${API_BASE_URL}/api/transport/${transportId}`, { ratePerKm: rateInput })
             .then((res) => {
                 setVehicle(res.data);
                 setEditingRate(false);
@@ -106,7 +107,7 @@ export default function MyVehicle() {
         const uploadPromises = files.map((file) => {
             const formData = new FormData();
             formData.append("photo", file);
-            return axios.post("http://localhost:3000/api/transport/upload-photo", formData, {
+            return axios.post(`${API_BASE_URL}/api/transport/upload-photo`, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
         });
@@ -130,7 +131,7 @@ export default function MyVehicle() {
             return;
         }
         setSavingImages(true);
-        axios.put(`http://localhost:3000/api/transport/${transportId}`, { addVehiclePhotos: photoDraft })
+        axios.put(`${API_BASE_URL}/api/transport/${transportId}`, { addVehiclePhotos: photoDraft })
             .then((res) => {
                 setVehicle(res.data);
                 setActiveImage(0);

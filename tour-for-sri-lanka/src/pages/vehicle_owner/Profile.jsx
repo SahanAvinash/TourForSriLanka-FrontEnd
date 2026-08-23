@@ -1,8 +1,9 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { FaCamera, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
 import ScrollFadeIn from "../../components/ScrollFadeIn";
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = `${API_BASE_URL}`;
 
 function DetailRow({ label, value }) {
   return (

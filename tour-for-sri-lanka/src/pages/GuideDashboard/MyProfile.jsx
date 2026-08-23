@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -24,7 +25,7 @@ export default function MyProfile() {
     const [savingPhoto, setSavingPhoto] = useState(false);
 
     function fetchGuide(id) {
-        return axios.get(`http://localhost:3000/api/guide/${id}`)
+        return axios.get(`${API_BASE_URL}/api/guide/${id}`)
             .then((res) => setGuide(res.data))
             .catch((error) => console.log(error));
     }
@@ -54,7 +55,7 @@ export default function MyProfile() {
             return;
         }
         setSavingPrice(true);
-        axios.put(`http://localhost:3000/api/guide/${guideId}`, {
+        axios.put(`${API_BASE_URL}/api/guide/${guideId}`, {
             pricePerHour: hourInput, pricePerDay: dayInput
         }).then((res) => {
             setGuide(res.data);
@@ -83,7 +84,7 @@ export default function MyProfile() {
         const formData = new FormData();
         formData.append("photo", file);
 
-        axios.post("http://localhost:3000/api/guide/upload-photo", formData, {
+        axios.post(`${API_BASE_URL}/api/guide/upload-photo`, formData, {
             headers: { "Content-Type": "multipart/form-data" }
         }).then((res) => {
             setPhotoDraft(res.data.url);
@@ -98,7 +99,7 @@ export default function MyProfile() {
 
     function savePhoto() {
         setSavingPhoto(true);
-        axios.put(`http://localhost:3000/api/guide/${guideId}`, { profilePic: photoDraft })
+        axios.put(`${API_BASE_URL}/api/guide/${guideId}`, { profilePic: photoDraft })
             .then((res) => {
                 setGuide(res.data);
                 setEditingPhoto(false);

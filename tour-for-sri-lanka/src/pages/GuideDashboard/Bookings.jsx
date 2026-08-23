@@ -1,8 +1,9 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { FaCalendarCheck, FaCheck, FaTimes, FaUser } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-const API_BASE = "http://localhost:3000/api"
+const API_BASE = `${API_BASE_URL}/api`
 
 export default function Bookings({guide, onClose, onSuccess}) {
   const [bookings, setBookings] = useState([])

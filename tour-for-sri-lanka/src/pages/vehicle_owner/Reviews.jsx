@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -26,7 +27,7 @@ export default function Reviews() {
 
     function fetchReviews() {
         setLoadingReviews(true);
-        axios.get(`http://localhost:3000/api/transport-review/vehicle/${transportId}`)
+        axios.get(`${API_BASE_URL}/api/transport-review/vehicle/${transportId}`)
             .then((res) => {
                 setReviews(res.data);
             }).catch((error) => {

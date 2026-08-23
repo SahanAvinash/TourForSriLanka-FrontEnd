@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState } from "react";
 import { FaStar, FaImage, FaTimes, FaPen } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = `${API_BASE_URL}/api`;
 
 function getAuthHeader() {
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");

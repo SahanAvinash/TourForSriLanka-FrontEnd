@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Users, Briefcase, MapPin } from "lucide-react";
@@ -30,7 +31,7 @@ export default function VehicleList() {
         if(bags) params.append("bags", bags)
 
         const res = await fetch(
-          `http://localhost:3000/api/transport/vehicles?${params.toString()}`
+          `${API_BASE_URL}/api/transport/vehicles?${params.toString()}`
         );
         const data = await res.json();
 

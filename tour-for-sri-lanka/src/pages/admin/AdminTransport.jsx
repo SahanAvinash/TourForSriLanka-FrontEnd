@@ -1,14 +1,15 @@
+import { API_BASE_URL } from "../../config/api";
 import AdminApprovalTable from "./AdminApprovalTable";
 
 export default function AdminTransport() {
   return (
     <AdminApprovalTable
       title="Transport"
-      fetchUrl="http://localhost:3000/api/transport/vehicles"
+      fetchUrl={`${API_BASE_URL}/api/transport/vehicles`}
       extractList={(data) => data.vehicles}
       getId={(item) => item._id}
-      getApproveUrl={(item) => `http://localhost:3000/api/transport/approve/${item._id}`}
-      getRemoveUrl={(item) => `http://localhost:3000/api/transport/${item._id}`}
+      getApproveUrl={(item) => `${API_BASE_URL}/api/transport/approve/${item._id}`}
+      getRemoveUrl={(item) => `${API_BASE_URL}/api/transport/${item._id}`}
       columns={[
         { header: "Owner", render: (item) => `${item.firstName || ""} ${item.lastName || ""}` },
         { header: "Email", render: (item) => item.email },

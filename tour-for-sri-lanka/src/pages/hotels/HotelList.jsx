@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import HotelCard from "./HotelCard";
 
@@ -10,12 +11,12 @@ const HotelList = ({ filters }) => {
   useEffect(() => {
     setLoading(true)
 
-    let url = "http://localhost:3000/api/hotel/"
+    let url = `${API_BASE_URL}/api/hotel/`
     if (isSearching) {
       const params = new URLSearchParams()
       if (filters.destination) params.append("district", filters.destination)
       if (filters.guests) params.append("guests", filters.guests)
-      url = `http://localhost:3000/api/hotel/search?${params.toString()}`
+      url = `${API_BASE_URL}/api/hotel/search?${params.toString()}`
     }
 
     fetch(url)

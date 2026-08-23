@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 // pages/Tour/TourPreview.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -169,7 +170,7 @@ const TourPreview = () => {
       }
 
       try {
-        const res = await axios.post("http://localhost:3000/api/tour/generate-trip", {
+        const res = await axios.post(`${API_BASE_URL}/api/tour/generate-trip`, {
           destinationIds,
           startDistrict,
         });
@@ -275,7 +276,7 @@ const TourPreview = () => {
     setCheckingGuideAvailability(true);
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/guidebooking/check-availability/${selectedGuide._id}`,
+        `${API_BASE_URL}/api/guidebooking/check-availability/${selectedGuide._id}`,
         {
           params: { date: bookingForm.date, quantity: bookingForm.quantity },
           headers: { Authorization: `Bearer ${token}` },
@@ -352,7 +353,7 @@ const TourPreview = () => {
     setEstimateLoading(true);
     setEstimateError("");
     try {
-      const res = await axios.post("http://localhost:3000/api/transport/booking-estimate", {
+      const res = await axios.post(`${API_BASE_URL}/api/transport/booking-estimate`, {
         vehicleId,
         distanceKm: route.distanceKm,
         isReturnTrip: true,
@@ -409,7 +410,7 @@ const TourPreview = () => {
   setEstimateLoading(true);
   try {
     const availRes = await axios.get(
-      `http://localhost:3000/api/transport/check-availability/${selectedTransport._id}`,
+      `${API_BASE_URL}/api/transport/check-availability/${selectedTransport._id}`,
       { params: { pickupDate: transportBookingForm.pickupDate, returnDate: transportBookingForm.returnDate, isReturnTrip: true } }
     );
     if (!availRes.data.available) {
@@ -488,7 +489,7 @@ const TourPreview = () => {
     setRoomsLoading(true);
     setRoomsError("");
     try {
-      const res = await axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`);
       setHotelRooms(res.data);
     } catch (err) {
       console.error(err);
@@ -560,7 +561,7 @@ const TourPreview = () => {
     setRoomsLoading(true);
     try {
       const availRes = await axios.get(
-        `http://localhost:3000/api/booking/check-availability/${selectedRoom._id}`,
+        `${API_BASE_URL}/api/booking/check-availability/${selectedRoom._id}`,
         { params: { checkInDate: hotelBookingForm.checkInDate, checkOutDate: hotelBookingForm.checkOutDate } }
       );
       if (!availRes.data.available) {
@@ -641,7 +642,7 @@ const TourPreview = () => {
     let tourId = null;
     try {
       const tourRes = await axios.post(
-        "http://localhost:3000/api/tour",
+        `${API_BASE_URL}/api/tour`,
         {
           destinations: destinations.map((d, i) => ({
             id: d.id || `stop-${i}`,
@@ -675,7 +676,7 @@ const TourPreview = () => {
     for (const item of cart.guides) {
       try {
         await axios.post(
-          "http://localhost:3000/api/guidebooking",
+          `${API_BASE_URL}/api/guidebooking`,
           {
             guideId: item.guideId,
             date: item.date,
@@ -700,7 +701,7 @@ const TourPreview = () => {
     for (const item of cart.transports) {
       try {
         await axios.post(
-          "http://localhost:3000/api/transport/bookings",
+          `${API_BASE_URL}/api/transport/bookings`,
           {
             vehicleId: item.vehicleId,
             travelerId,
@@ -728,7 +729,7 @@ const TourPreview = () => {
 
     for (const item of cart.hotels) {
       try {
-        await axios.post("http://localhost:3000/api/booking/create", {
+        await axios.post(`${API_BASE_URL}/api/booking/create`, {
           hotelId: item.hotelId,
           roomId: item.roomId,
           travelerId,
@@ -752,7 +753,7 @@ const TourPreview = () => {
 
     if (successfulGuides.length > 0 || successfulTransports.length > 0 || successfulHotels.length > 0) {
       try {
-        await axios.post("http://localhost:3000/api/tour/send-summary", {
+        await axios.post(`${API_BASE_URL}/api/tour/send-summary`, {
           travelerId,
           destinations,
           guideBookings: successfulGuides,
@@ -770,7 +771,7 @@ const TourPreview = () => {
     if (tourId && (successfulGuides.length > 0 || successfulTransports.length > 0 || successfulHotels.length > 0)) {
       try {
         await axios.put(
-          `http://localhost:3000/api/tour/${tourId}/confirm`,
+          `${API_BASE_URL}/api/tour/${tourId}/confirm`,
           {
             selectedGuide: successfulGuides[0]?.guideId,
             selectedHotels: successfulHotels.map((h) => h.hotelId),

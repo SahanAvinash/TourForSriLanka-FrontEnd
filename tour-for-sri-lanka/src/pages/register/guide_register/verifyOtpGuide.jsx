@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { Fragment, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -33,7 +34,7 @@ const STEPS = [
     { label: "Pricing", current: true, number: "4" },
 ];
 
-const API_URL = "http://localhost:3000/api/guide";
+const API_URL = `${API_BASE_URL}/api/guide`;
 const STORAGE_KEY = "GuideRegister";
 
 export default function VerifyOtpGuide() {

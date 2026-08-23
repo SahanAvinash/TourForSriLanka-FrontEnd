@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
@@ -45,7 +46,7 @@ export default function TransportPage() {
       setLoadingBookings(true);
       try {
         const res = await fetch(
-          `http://localhost:3000/api/transport/bookings/traveler/${travelerId}`
+          `${API_BASE_URL}/api/transport/bookings/traveler/${travelerId}`
         );
         const data = await res.json();
         if (res.ok) setBookings(data);
@@ -84,7 +85,7 @@ export default function TransportPage() {
     setCancellingId(bookingId);
     try {
       const res = await fetch(
-        `http://localhost:3000/api/transport/bookings/${bookingId}/status`,
+        `${API_BASE_URL}/api/transport/bookings/${bookingId}/status`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

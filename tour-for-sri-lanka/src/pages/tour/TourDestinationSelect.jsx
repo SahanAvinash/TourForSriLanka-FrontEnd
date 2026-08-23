@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -82,7 +83,7 @@ const TourDestinationSelect = () => {
   useEffect(() => {
     setLoadingCategories(true);
     axios
-      .get("http://localhost:3000/api/category")
+      .get(`${API_BASE_URL}/api/category`)
       .then((res) => {
         setCategories(res.data);
         if (res.data.length > 0) {
@@ -98,7 +99,7 @@ const TourDestinationSelect = () => {
 
     setLoadingDestinations(true);
     axios
-      .get(`http://localhost:3000/api/destination/category/${activeCategory}`)
+      .get(`${API_BASE_URL}/api/destination/category/${activeCategory}`)
       .then((res) => setDestinationsList(res.data))
       .catch((err) => console.log("Failed to load destinations", err))
       .finally(() => setLoadingDestinations(false));

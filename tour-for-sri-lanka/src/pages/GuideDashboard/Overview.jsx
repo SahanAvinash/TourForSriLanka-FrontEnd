@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { FaCalendarCheck, FaStar, FaMoneyBillWave, FaClipboardList, FaCheckCircle } from "react-icons/fa"
 import { MdPending } from "react-icons/md";
@@ -26,7 +27,7 @@ export default function Overview(){
 
         setGuideName(user.firstName || "")
 
-        axios.get(`http://localhost:3000/api/booking/guide/${guideId}`)
+        axios.get(`${API_BASE_URL}/api/booking/guide/${guideId}`)
             .then((res) => {
                 const bookings = res.data
                 const todayStr = new Date().toDateString()

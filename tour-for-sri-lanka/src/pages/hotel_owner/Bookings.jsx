@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -39,7 +40,7 @@ export default function Bookings() {
 
     function fetchBookings() {
         setLoadingBookings(true);
-        axios.get(`http://localhost:3000/api/booking/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
             .then((res) => {
                 setBookings(res.data);
             }).catch((error) => {
@@ -51,7 +52,7 @@ export default function Bookings() {
     }
 
     function handleStatusChange(bookingId, newStatus) {
-        axios.patch(`http://localhost:3000/api/booking/${bookingId}/status`, { status: newStatus }, {
+        axios.patch(`${API_BASE_URL}/api/booking/${bookingId}/status`, { status: newStatus }, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success(`Booking marked as ${newStatus}`);

@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../../../config/api";
 import { FaCamera } from "react-icons/fa";
 import { useState, useRef } from "react";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
 
-const SEND_OTP_API_URL = "http://localhost:3000/api/traveler/send-otp";
+const SEND_OTP_API_URL = `${API_BASE_URL}/api/traveler/send-otp`;
 const REQUIRED_FIELDS = ["role", "firstName", "lastName", "email", "password", "NIC", "country", "mobile"];
 
 export default function TravelerProfilePhoto() {

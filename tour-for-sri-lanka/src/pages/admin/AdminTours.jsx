@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -12,7 +13,7 @@ export default function AdminTours() {
   function loadTours() {
     setLoading(true);
     axios
-      .get("http://localhost:3000/api/tour", { headers: { Authorization: "Bearer " + token } })
+      .get(`${API_BASE_URL}/api/tour`, { headers: { Authorization: "Bearer " + token } })
       .then((res) => setTours(res.data))
       .catch(() => toast.error("Failed to load tours"))
       .finally(() => setLoading(false));
@@ -25,7 +26,7 @@ export default function AdminTours() {
   function handleRemove(tour) {
     if (!window.confirm("Remove this tour and all bookings made within it?")) return;
     axios
-      .delete(`http://localhost:3000/api/tour/${tour._id}`, {
+      .delete(`${API_BASE_URL}/api/tour/${tour._id}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then(() => {

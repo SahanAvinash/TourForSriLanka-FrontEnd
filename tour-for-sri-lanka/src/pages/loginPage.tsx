@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { useState } from "react";
 import {
   MdEmail,
@@ -17,7 +18,7 @@ const ROLE_REDIRECTS = {
   admin: "/admin",
 };
 
-const LOGIN_API_URL = "http://localhost:3000/api/login";
+const LOGIN_API_URL = `${API_BASE_URL}/api/login`;
 
 const INPUT_CLASSES = `
   text-text

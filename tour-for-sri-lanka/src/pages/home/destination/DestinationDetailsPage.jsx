@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -12,7 +13,7 @@ const DestinationDetailsPage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/destination/single/${id}`)
+      .get(`${API_BASE_URL}/api/destination/single/${id}`)
       .then((res) => setDestination(res.data))
       .catch((err) => console.log("Failed to load destination", err))
       .finally(() => setLoading(false));

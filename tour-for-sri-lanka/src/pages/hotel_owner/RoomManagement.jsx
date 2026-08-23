@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -131,7 +132,7 @@ export default function RoomManagement() {
 
     useEffect(() => {
         if (!hotelId) return;
-        axios.get(`http://localhost:3000/api/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/hotel/${hotelId}`)
             .then((res) => {
                 setIsApproved(res.data.isApproved === true);
             }).catch((error) => {
@@ -141,7 +142,7 @@ export default function RoomManagement() {
 
     function fetchRooms() {
         setLoadingRooms(true);
-        axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
                 setRooms(res.data);
             }).catch((error) => {
@@ -192,7 +193,7 @@ export default function RoomManagement() {
         const uploadPromises = files.map((file) => {
             const formData = new FormData();
             formData.append("photo", file);
-            return axios.post("http://localhost:3000/api/hotel/upload-photo", formData, {
+            return axios.post(`${API_BASE_URL}/api/hotel/upload-photo`, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
         });
@@ -257,8 +258,8 @@ export default function RoomManagement() {
         };
 
         const request = editingOriginalRoomNumber
-            ? axios.put(`http://localhost:3000/api/addRoom/${hotelId}/${editingOriginalRoomNumber}`, payload, { headers: getAuthHeader() })
-            : axios.post("http://localhost:3000/api/addRoom", payload, { headers: getAuthHeader() });
+            ? axios.put(`${API_BASE_URL}/api/addRoom/${hotelId}/${editingOriginalRoomNumber}`, payload, { headers: getAuthHeader() })
+            : axios.post(`${API_BASE_URL}/api/addRoom`, payload, { headers: getAuthHeader() });
 
         request.then(() => {
             toast.success(editingOriginalRoomNumber ? "Room updated successfully" : "Room added successfully");
@@ -273,7 +274,7 @@ export default function RoomManagement() {
     }
 
     function handleDeleteRoom(roomNumberToDelete) {
-        axios.delete(`http://localhost:3000/api/addRoom/${hotelId}/${roomNumberToDelete}`, {
+        axios.delete(`${API_BASE_URL}/api/addRoom/${hotelId}/${roomNumberToDelete}`, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success("Room removed successfully");
@@ -286,7 +287,7 @@ export default function RoomManagement() {
 
     function handleToggleStatus(room) {
         const newStatus = room.status === "maintenance" ? "available" : "maintenance";
-        axios.put(`http://localhost:3000/api/addRoom/${hotelId}/${room.roomNumber}`, { status: newStatus }, {
+        axios.put(`${API_BASE_URL}/api/addRoom/${hotelId}/${room.roomNumber}`, { status: newStatus }, {
             headers: getAuthHeader()
         }).then(() => {
             toast.success(`Room marked as ${newStatus}`);

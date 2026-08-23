@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Users, Briefcase, MapPin, Phone, Mail } from "lucide-react";
@@ -151,7 +152,7 @@ export default function BookingPage() {
           dropoffLng: dropoffCoordinates.lng,
           isReturnTrip: isReturnTrip,
         });
-        const res = await fetch(`http://localhost:3000/api/transport/booking-estimate?${params}`);
+        const res = await fetch(`${API_BASE_URL}/api/transport/booking-estimate?${params}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Could not calculate estimate");
@@ -181,7 +182,7 @@ export default function BookingPage() {
     const fetchReviews = async () => {
       setLoadingReviews(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/transport-review/vehicle/${vehicleId}`);
+        const res = await fetch(`${API_BASE_URL}/api/transport-review/vehicle/${vehicleId}`);
         const data = await res.json();
         setReviews(data);
       } catch (err) {
@@ -217,7 +218,7 @@ export default function BookingPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:3000/api/transport/bookings", {
+      const res = await fetch(`${API_BASE_URL}/api/transport/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

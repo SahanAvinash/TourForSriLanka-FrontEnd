@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import {FaBed, FaCalendarCheck, FaStar } from "react-icons/fa"
 import { GrVmMaintenance } from "react-icons/gr";
@@ -33,16 +34,16 @@ export default function Overview(){
 
         setHotelName(user.hotelName || "")
         
-        axios.get(`http://localhost:3000/api/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/hotel/${hotelId}`)
             .then((res) => {
                 setIsApproved(res.data.isApproved || false)
             }).catch((error) => {
                 console.log(Error)
             })
-        axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
         console.log("isApproved value:", user.isApproved)
 
-        axios.get(`http://localhost:3000/api/addRoom/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
                 const rooms = res.data
                 setRoomCount(rooms.length)
@@ -54,7 +55,7 @@ export default function Overview(){
                 setLoadingStats(false)
             })
 
-        axios.get(`http://localhost:3000/api/booking/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
             .then((res) => {
                 const bookings = res.data
                 const todayStr = new Date().toDateString()

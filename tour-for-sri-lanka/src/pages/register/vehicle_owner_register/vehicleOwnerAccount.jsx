@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { useEffect, useState, Fragment } from "react";
 import Select from "react-select";
@@ -167,7 +168,7 @@ export default function VehicleOwnerRegister() {
 
         try {
             const res = await fetch(
-                `http://localhost:3000/api/transport/check-email?email=${encodeURIComponent(
+                `${API_BASE_URL}/api/transport/check-email?email=${encodeURIComponent(
                     email
                 )}`
             );

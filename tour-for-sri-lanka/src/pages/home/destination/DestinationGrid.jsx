@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../config/api";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -10,7 +11,7 @@ const DestinationGrid = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/destination/category/${category}`)
+      .get(`${API_BASE_URL}/api/destination/category/${category}`)
       .then((res) => {
         console.log("DATA:", res.data)
         setDestinations(res.data)

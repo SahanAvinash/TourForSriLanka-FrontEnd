@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -80,7 +81,7 @@ export default function AdminCategoryDestinations() {
 
   function loadCategory() {
     axios
-      .get(`http://localhost:3000/api/category/${categoryId}`, {
+      .get(`${API_BASE_URL}/api/category/${categoryId}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then((res) => setCategory(res.data))
@@ -90,7 +91,7 @@ export default function AdminCategoryDestinations() {
   function loadDestinations() {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/api/destination/category/${categoryId}`, {
+      .get(`${API_BASE_URL}/api/destination/category/${categoryId}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then((res) => setDestinations(res.data))
@@ -200,10 +201,10 @@ export default function AdminCategoryDestinations() {
     setSaving(true);
 
     const request = editingId
-      ? axios.put(`http://localhost:3000/api/destination/${editingId}`, formData, {
+      ? axios.put(`${API_BASE_URL}/api/destination/${editingId}`, formData, {
           headers: { Authorization: "Bearer " + token, "Content-Type": "multipart/form-data" },
         })
-      : axios.post("http://localhost:3000/api/destination", formData, {
+      : axios.post(`${API_BASE_URL}/api/destination`, formData, {
           headers: { Authorization: "Bearer " + token, "Content-Type": "multipart/form-data" },
         });
 
@@ -220,7 +221,7 @@ export default function AdminCategoryDestinations() {
   function handleDelete(destination) {
     if (!window.confirm(`Delete destination "${destination.name}"? This cannot be undone.`)) return;
     axios
-      .delete(`http://localhost:3000/api/destination/${destination._id}`, {
+      .delete(`${API_BASE_URL}/api/destination/${destination._id}`, {
         headers: { Authorization: "Bearer " + token },
       })
       .then(() => {
