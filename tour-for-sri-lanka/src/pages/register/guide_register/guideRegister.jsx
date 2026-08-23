@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import Select from "react-select";
 import { IoEye } from "react-icons/io5";
-import { FaEyeSlash, FaCheck } from "react-icons/fa";
+import { FaCheck, FaEyeSlash } from "react-icons/fa";
 import {
     isValidPhoneNumber,
     validatePhoneNumberLength,
@@ -10,14 +10,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import COUNTRIES from "../../../data/countryCode";
 
-
 const STORAGE_KEY = "GuideRegister";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STEPS = [
-    { label: "Account", number: "1", current: true},
-    { label: "Personal Info", number: "2"},
+    { label: "Account", number: "1", current: true },
+    { label: "Personal Info", number: "2" },
     { label: "Language & Skills", number: "3" },
     { label: "Pricing", number: "4" },
 ];
@@ -33,17 +31,14 @@ const selectStyles = {
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
     }),
-
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
     }),
-
     option: (base, state) => ({
         ...base,
         backgroundColor: state.isFocused
@@ -52,20 +47,17 @@ const selectStyles = {
         color: "var(--color-text)",
         cursor: "pointer",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
@@ -74,44 +66,27 @@ const selectStyles = {
 
 export default function GuideRegister() {
     const navigate = useNavigate();
-
     const role = sessionStorage.getItem("role");
 
     const [checkingEmail, setCheckingEmail] = useState(false);
     const [err, setErr] = useState("");
-
     const [country, setCountry] = useState(null);
     const [dialCode, setDialCode] = useState("");
     const [mobile, setMobile] = useState("");
-
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [NIC, setNIC] = useState("");
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] =
         useState(false);
 
-    const countryOptions = COUNTRIES.map((c) => ({
-        label: `${c.flag} ${c.name}`,
-        value: c.code,
+    const countryOptions = COUNTRIES.map((item) => ({
+        label: `${item.flag} ${item.name}`,
+        value: item.code,
     }));
-
-    const handleCountryChange = (selected) => {
-        setCountry(selected);
-
-        const found = COUNTRIES.find(
-            (c) => c.code === selected.value
-        );
-
-        if (found) {
-            setDialCode(found.dial);
-            setMobile("");
-        }
-    };
 
     useEffect(() => {
         const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -128,24 +103,24 @@ export default function GuideRegister() {
         setNIC(data.NIC || "");
 
         if (data.country) {
-            const match = countryOptions.find(
+            const matchedCountry = countryOptions.find(
                 (option) => option.label === data.country
             );
 
-            setCountry(match || null);
+            setCountry(matchedCountry || null);
 
             if (data.mobile) {
-                const foundCountry = COUNTRIES.find(
-                    (c) => c.code === match?.value
+                const countryData = COUNTRIES.find(
+                    (item) => item.code === matchedCountry?.value
                 );
 
                 if (
-                    foundCountry &&
-                    data.mobile.startsWith(foundCountry.dial)
+                    countryData &&
+                    data.mobile.startsWith(countryData.dial)
                 ) {
-                    setDialCode(foundCountry.dial);
+                    setDialCode(countryData.dial);
                     setMobile(
-                        data.mobile.slice(foundCountry.dial.length)
+                        data.mobile.slice(countryData.dial.length)
                     );
                 } else {
                     setMobile(data.mobile);
@@ -155,6 +130,19 @@ export default function GuideRegister() {
             setMobile(data.mobile);
         }
     }, []);
+
+    const handleCountryChange = (selected) => {
+        setCountry(selected);
+
+        const countryData = COUNTRIES.find(
+            (item) => item.code === selected.value
+        );
+
+        if (countryData) {
+            setDialCode(countryData.dial);
+            setMobile("");
+        }
+    };
 
     const saveFormData = () => {
         const oldData =
@@ -226,33 +214,30 @@ export default function GuideRegister() {
         setCheckingEmail(true);
 
         try {
-            const res = await fetch(
+            const response = await fetch(
                 `http://localhost:3000/api/guide/check-email?email=${encodeURIComponent(
                     email
                 )}`
             );
 
-            const result = await res.json();
+            const result = await response.json();
 
             if (result.exists) {
                 setErr("This email is already registered");
-                setCheckingEmail(false);
                 return;
             }
+
+            saveFormData();
+            navigate("/guideinformation");
         } catch {
             setErr("Could not verify email, please try again");
+        } finally {
             setCheckingEmail(false);
-            return;
         }
-
-        setCheckingEmail(false);
-        saveFormData();
-        navigate("/guideinformation");
     };
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="step-bar-anim absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
@@ -269,7 +254,11 @@ export default function GuideRegister() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -279,7 +268,7 @@ export default function GuideRegister() {
                                 </div>
 
                                 {index < STEPS.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -289,7 +278,6 @@ export default function GuideRegister() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -313,9 +301,9 @@ export default function GuideRegister() {
                             <input
                                 placeholder="First Name"
                                 value={firstName}
-                                onChange={(e) =>
+                                onChange={(event) =>
                                     setFirstName(
-                                        e.target.value.replace(
+                                        event.target.value.replace(
                                             /[^a-zA-Z]/g,
                                             ""
                                         )
@@ -327,9 +315,9 @@ export default function GuideRegister() {
                             <input
                                 placeholder="Last Name"
                                 value={lastName}
-                                onChange={(e) =>
+                                onChange={(event) =>
                                     setLastName(
-                                        e.target.value.replace(
+                                        event.target.value.replace(
                                             /[^a-zA-Z]/g,
                                             ""
                                         )
@@ -344,7 +332,9 @@ export default function GuideRegister() {
                                 type="email"
                                 placeholder="E-Mail"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px]"
                             />
                         </div>
@@ -353,10 +343,13 @@ export default function GuideRegister() {
                             <input
                                 placeholder="NIC"
                                 value={NIC}
-                                onChange={(e) =>
+                                onChange={(event) =>
                                     setNIC(
-                                        e.target.value
-                                            .replace(/[^0-9vVxX]/g, "")
+                                        event.target.value
+                                            .replace(
+                                                /[^0-9vVxX]/g,
+                                                ""
+                                            )
                                             .slice(0, 12)
                                             .toUpperCase()
                                     )
@@ -367,22 +360,32 @@ export default function GuideRegister() {
 
                         <div className="mt-[10px] w-full relative">
                             <input
-                                type={showPassword ? "text" : "password"}
+                                type={
+                                    showPassword
+                                        ? "text"
+                                        : "password"
+                                }
                                 placeholder="Password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
 
                             {showPassword ? (
                                 <IoEye
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 cursor-pointer text-text/70"
-                                    onClick={() => setShowPassword(false)}
+                                    onClick={() =>
+                                        setShowPassword(false)
+                                    }
                                 />
                             ) : (
                                 <FaEyeSlash
                                     className="absolute right-[20px] top-1/2 -translate-y-1/2 cursor-pointer text-text/70"
-                                    onClick={() => setShowPassword(true)}
+                                    onClick={() =>
+                                        setShowPassword(true)
+                                    }
                                 />
                             )}
                         </div>
@@ -390,12 +393,16 @@ export default function GuideRegister() {
                         <div className="mt-[10px] w-full relative">
                             <input
                                 type={
-                                    showConfirmPassword ? "text" : "password"
+                                    showConfirmPassword
+                                        ? "text"
+                                        : "password"
                                 }
                                 placeholder="Confirm Password"
                                 value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
+                                onChange={(event) =>
+                                    setConfirmPassword(
+                                        event.target.value
+                                    )
                                 }
                                 className="w-full h-[50px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pr-[45px]"
                             />
@@ -437,11 +444,12 @@ export default function GuideRegister() {
                                     type="text"
                                     placeholder="Mobile"
                                     value={mobile}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(
-                                            /\D/g,
-                                            ""
-                                        );
+                                    onChange={(event) => {
+                                        const value =
+                                            event.target.value.replace(
+                                                /\D/g,
+                                                ""
+                                            );
 
                                         if (
                                             country &&
