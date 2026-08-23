@@ -15,17 +15,14 @@ const selectStyles = {
         border: "none",
         boxShadow: "none",
     }),
-
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
     }),
-
     menuPortal: (base) => ({
         ...base,
         zIndex: 9999,
     }),
-
     option: (base, state) => ({
         ...base,
         backgroundColor: state.isFocused
@@ -33,27 +30,151 @@ const selectStyles = {
             : "var(--color-border)",
         color: "var(--color-text)",
         cursor: "pointer",
-        fontSize: "12px"
+        fontSize: "12px",
     }),
-
     singleValue: (base) => ({
         ...base,
         color: "var(--color-text)",
         paddingLeft: "10px",
     }),
-
     placeholder: (base) => ({
         ...base,
         color: "var(--color-text)",
         opacity: 0.5,
         paddingLeft: "10px",
     }),
-
     input: (base) => ({
         ...base,
         color: "var(--color-text)",
     }),
 };
+
+const vehicleTypes = [
+    { value: "car", label: "Car" },
+    { value: "van", label: "Van" },
+    { value: "bus", label: "Bus" },
+    { value: "jeep", label: "Jeep" },
+];
+
+const vehicleColors = [
+    { value: "white", label: "White" },
+    { value: "black", label: "Black" },
+    { value: "silver", label: "Silver" },
+    { value: "gray", label: "Gray" },
+    { value: "blue", label: "Blue" },
+    { value: "red", label: "Red" },
+    { value: "green", label: "Green" },
+    { value: "yellow", label: "Yellow" },
+    { value: "orange", label: "Orange" },
+    { value: "brown", label: "Brown" },
+    { value: "gold", label: "Gold" },
+    { value: "beige", label: "Beige" },
+    { value: "purple", label: "Purple" },
+    { value: "pink", label: "Pink" },
+    { value: "maroon", label: "Maroon" },
+    { value: "other", label: "Other" },
+];
+
+const vehicleBrands = {
+    car: [
+        { value: "toyota", label: "Toyota" },
+        { value: "nissan", label: "Nissan" },
+        { value: "suzuki", label: "Suzuki" },
+        { value: "mitsubishi", label: "Mitsubishi" },
+        { value: "hyundai", label: "Hyundai" },
+        { value: "honda", label: "Honda" },
+        { value: "mazda", label: "Mazda" },
+        { value: "kia", label: "Kia" },
+        { value: "isuzu", label: "Isuzu" },
+        { value: "bmw", label: "BMW" },
+        { value: "mercedes_benz", label: "Mercedes-Benz" },
+        { value: "audi", label: "Audi" },
+    ],
+    van: [
+        { value: "toyota", label: "Toyota" },
+        { value: "nissan", label: "Nissan" },
+        { value: "hyundai", label: "Hyundai" },
+        { value: "mitsubishi", label: "Mitsubishi" },
+        { value: "kia", label: "Kia" },
+        { value: "ford", label: "Ford" },
+    ],
+    bus: [
+        { value: "toyota", label: "Toyota" },
+        { value: "mitsubishi", label: "Mitsubishi" },
+        { value: "isuzu", label: "Isuzu" },
+        { value: "ashok_leyland", label: "Ashok Leyland" },
+        { value: "tata", label: "Tata" },
+        { value: "hino", label: "Hino" },
+        { value: "yutong", label: "Yutong" },
+    ],
+    jeep: [
+        { value: "toyota", label: "Toyota" },
+        { value: "mitsubishi", label: "Mitsubishi" },
+        { value: "jeep", label: "Jeep" },
+        { value: "land_rover", label: "Land Rover" },
+        { value: "ford", label: "Ford" },
+        { value: "mahindra", label: "Mahindra" },
+        { value: "nissan", label: "Nissan" },
+        { value: "suzuki", label: "Suzuki" },
+    ],
+};
+
+const vehicleModels = {
+    car: {
+        toyota: ["Corolla", "Prius", "Axio", "Alilion", "Vitz"],
+        nissan: ["Sunny", "X-Trail", "March", "Note"],
+        suzuki: ["Swift", "Alto", "Wagon R"],
+        mitsubishi: ["Lancer", "Pajero"],
+        hyundai: ["Elantra", "i10"],
+        honda: ["Civic", "Fit"],
+        mazda: ["Axela", "Demio"],
+        kia: ["Picanto", "Sportage"],
+        isuzu: ["D-Max"],
+        bmw: ["X5", "X3"],
+        mercedes_benz: ["C-Class", "E-Class"],
+        audi: ["A4", "Q5"],
+    },
+    van: {
+        toyota: ["Hiace", "KDH", "Regius Ace"],
+        nissan: ["Caravan", "NV350"],
+        hyundai: ["H-1", "Staria"],
+        mitsubishi: ["L300", "Delica"],
+        kia: ["Pregio"],
+        ford: ["Transit"],
+    },
+    bus: {
+        toyota: ["Coaster"],
+        mitsubishi: ["Rosa"],
+        isuzu: ["Elf Bus", "Journey"],
+        ashok_leyland: ["Falcon"],
+        tata: ["LP Bus"],
+        hino: ["Melpha"],
+        yutong: ["ZK6122"],
+    },
+    jeep: {
+        toyota: ["Prado", "Land Cruiser", "Fortuner"],
+        mitsubishi: ["Pajero"],
+        jeep: ["Wrangler"],
+        land_rover: ["Defender", "Discovery"],
+        ford: ["Everest"],
+        mahindra: ["Thar"],
+        nissan: ["Patrol"],
+        suzuki: ["Jimny"],
+    },
+};
+
+const suggestedRates = {
+    car: { min: 80, max: 200 },
+    van: { min: 150, max: 350 },
+    jeep: { min: 150, max: 350 },
+    bus: { min: 300, max: 700 },
+};
+
+const registrationNoRegex =
+    /^([A-Za-z]{1,3}[\s-]?\d{1,4}|\d{1,3}[\s-]\d{4})$/;
+
+const chassisNumberRegex =
+    /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9-]{5,17}$/;
 
 export default function VehicleOwnerInformation() {
     const navigate = useNavigate();
@@ -69,152 +190,25 @@ export default function VehicleOwnerInformation() {
     const [vehicleColor, setVehicleColor] = useState(null);
     const [ratePerKm, setRatePerKm] = useState("");
 
-    const registrationNoRegex =
-        /^([A-Za-z]{1,3}[\s-]?\d{1,4}|\d{1,3}[\s-]\d{4})$/;
+    const years = useMemo(
+        () =>
+            Array.from({ length: 50 }, (_, i) => {
+                const year = new Date().getFullYear() - i;
 
-    const chassisNumberRegex =
-        /^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9-]{5,17}$/;
-
-    const years = Array.from({ length: 50 }, (_, i) => {
-        const year = new Date().getFullYear() - i;
-
-        return {
-            value: year,
-            label: year.toString(),
-        };
-    });
-
-    const vehicleColors = [
-        { value: "white", label: "White" },
-        { value: "black", label: "Black" },
-        { value: "silver", label: "Silver" },
-        { value: "gray", label: "Gray" },
-        { value: "blue", label: "Blue" },
-        { value: "red", label: "Red" },
-        { value: "green", label: "Green" },
-        { value: "yellow", label: "Yellow" },
-        { value: "orange", label: "Orange" },
-        { value: "brown", label: "Brown" },
-        { value: "gold", label: "Gold" },
-        { value: "beige", label: "Beige" },
-        { value: "purple", label: "Purple" },
-        { value: "pink", label: "Pink" },
-        { value: "maroon", label: "Maroon" },
-        { value: "other", label: "Other" },
-    ];
-
-    const vehicleTypes = [
-        { value: "car", label: "Car" },
-        { value: "van", label: "Van" },
-        { value: "bus", label: "Bus" },
-        { value: "jeep", label: "Jeep" },
-    ];
-
-    const vehicleBrands = {
-        car: [
-            { value: "toyota", label: "Toyota" },
-            { value: "nissan", label: "Nissan" },
-            { value: "suzuki", label: "Suzuki" },
-            { value: "mitsubishi", label: "Mitsubishi" },
-            { value: "hyundai", label: "Hyundai" },
-            { value: "honda", label: "Honda" },
-            { value: "mazda", label: "Mazda" },
-            { value: "kia", label: "Kia" },
-            { value: "isuzu", label: "Isuzu" },
-            { value: "bmw", label: "BMW" },
-            { value: "mercedes_benz", label: "Mercedes-Benz" },
-            { value: "audi", label: "Audi" },
-        ],
-
-        van: [
-            { value: "toyota", label: "Toyota" },
-            { value: "nissan", label: "Nissan" },
-            { value: "hyundai", label: "Hyundai" },
-            { value: "mitsubishi", label: "Mitsubishi" },
-            { value: "kia", label: "Kia" },
-            { value: "ford", label: "Ford" },
-        ],
-
-        bus: [
-            { value: "toyota", label: "Toyota" },
-            { value: "mitsubishi", label: "Mitsubishi" },
-            { value: "isuzu", label: "Isuzu" },
-            { value: "ashok_leyland", label: "Ashok Leyland" },
-            { value: "tata", label: "Tata" },
-            { value: "hino", label: "Hino" },
-            { value: "yutong", label: "Yutong" },
-        ],
-
-        jeep: [
-            { value: "toyota", label: "Toyota" },
-            { value: "mitsubishi", label: "Mitsubishi" },
-            { value: "jeep", label: "Jeep" },
-            { value: "land_rover", label: "Land Rover" },
-            { value: "ford", label: "Ford" },
-            { value: "mahindra", label: "Mahindra" },
-            { value: "nissan", label: "Nissan" },
-            { value: "suzuki", label: "Suzuki" },
-        ],
-    };
-
-    const vehicleModels = {
-        car: {
-            toyota: ["Corolla", "Prius", "Axio", "Alilion", "Vitz"],
-            nissan: ["Sunny", "X-Trail", "March", "Note"],
-            suzuki: ["Swift", "Alto", "Wagon R"],
-            mitsubishi: ["Lancer", "Pajero"],
-            hyundai: ["Elantra", "i10"],
-            honda: ["Civic", "Fit"],
-            mazda: ["Axela", "Demio"],
-            kia: ["Picanto", "Sportage"],
-            isuzu: ["D-Max"],
-            bmw: ["X5", "X3"],
-            mercedes_benz: ["C-Class", "E-Class"],
-            audi: ["A4", "Q5"],
-        },
-
-        van: {
-            toyota: ["Hiace", "KDH", "Regius Ace"],
-            nissan: ["Caravan", "NV350"],
-            hyundai: ["H-1", "Staria"],
-            mitsubishi: ["L300", "Delica"],
-            kia: ["Pregio"],
-            ford: ["Transit"],
-        },
-
-        bus: {
-            toyota: ["Coaster"],
-            mitsubishi: ["Rosa"],
-            isuzu: ["Elf Bus", "Journey"],
-            ashok_leyland: ["Falcon"],
-            tata: ["LP Bus"],
-            hino: ["Melpha"],
-            yutong: ["ZK6122"],
-        },
-
-        jeep: {
-            toyota: ["Prado", "Land Cruiser", "Fortuner"],
-            mitsubishi: ["Pajero"],
-            jeep: ["Wrangler"],
-            land_rover: ["Defender", "Discovery"],
-            ford: ["Everest"],
-            mahindra: ["Thar"],
-            nissan: ["Patrol"],
-            suzuki: ["Jimny"],
-        },
-    };
-
-    const suggestedRates = {
-        car: { min: 80, max: 200 },
-        van: { min: 150, max: 350 },
-        jeep: { min: 150, max: 350 },
-        bus: { min: 300, max: 700 },
-    };
+                return {
+                    value: year,
+                    label: year.toString(),
+                };
+            }),
+        []
+    );
 
     const brandOptions = useMemo(() => {
-        return vehicleType
-            ? vehicleBrands[vehicleType.value] || []
-            : [];
+        if (!vehicleType) {
+            return [];
+        }
+
+        return vehicleBrands[vehicleType.value] || [];
     }, [vehicleType]);
 
     const modelOptions = useMemo(() => {
@@ -223,8 +217,7 @@ export default function VehicleOwnerInformation() {
         }
 
         const models =
-            vehicleModels[vehicleType.value]?.[vehicleBrand.value] ||
-            [];
+            vehicleModels[vehicleType.value]?.[vehicleBrand.value] || [];
 
         return models.map((model) => ({
             value: model,
@@ -234,15 +227,13 @@ export default function VehicleOwnerInformation() {
 
     const steps = [
         { label: "Account", done: true, number: "1" },
-        { label: "Vehicle Information", number: "2", current: true },
+        { label: "Vehicle Information", current: true, number: "2" },
         { label: "Facilities", number: "3" },
         { label: "Verification", number: "4" },
     ];
 
     useEffect(() => {
-        const saved = sessionStorage.getItem(
-            "VehicleOwnerRegister"
-        );
+        const saved = sessionStorage.getItem("VehicleOwnerRegister");
 
         if (!saved) {
             return;
@@ -266,10 +257,16 @@ export default function VehicleOwnerInformation() {
     }, []);
 
     const saveFormData = () => {
-        const oldData =
-            JSON.parse(
-                sessionStorage.getItem("VehicleOwnerRegister")
-            ) || {};
+        let oldData = {};
+
+        try {
+            oldData =
+                JSON.parse(
+                    sessionStorage.getItem("VehicleOwnerRegister")
+                ) || {};
+        } catch {
+            oldData = {};
+        }
 
         const formData = {
             ...oldData,
@@ -300,7 +297,7 @@ export default function VehicleOwnerInformation() {
             !vehicleType ||
             !vehicleBrand ||
             !vehicleModel ||
-            !shortDescription ||
+            !shortDescription.trim() ||
             !registrationNo ||
             !manufactureYear ||
             !chassisNumber ||
@@ -312,9 +309,7 @@ export default function VehicleOwnerInformation() {
         }
 
         if (!registrationNoRegex.test(registrationNo)) {
-            setErr(
-                "Please enter a valid vehicle registration number"
-            );
+            setErr("Please enter a valid vehicle registration number");
             return;
         }
 
@@ -335,11 +330,10 @@ export default function VehicleOwnerInformation() {
 
     return (
         <div className="relative w-full min-h-screen bg-gradient-to-r from-primary-1 to-primary-2 overflow-x-hidden">
-
             <div className="absolute top-0 left-0 w-full flex justify-center px-4 sm:px-6 pt-6 sm:pt-8 lg:pt-[50px] z-10">
                 <div className="w-full max-w-[1200px] flex justify-center lg:justify-start">
                     <div className="w-[260px] sm:w-[340px] lg:w-[500px] xl:w-[550px] flex items-start">
-                        {steps.map((step, i) => (
+                        {steps.map((step, index) => (
                             <Fragment key={step.label}>
                                 <div className="flex flex-col items-center w-[40px] sm:w-[58px] lg:w-[80px] shrink-0">
                                     <div
@@ -352,7 +346,11 @@ export default function VehicleOwnerInformation() {
                                         }`}
                                     >
                                         <span className="text-text text-[7px] sm:text-[9px] lg:text-[12px]">
-                                            {step.done ? <FaCheck /> : step.number}
+                                            {step.done ? (
+                                                <FaCheck />
+                                            ) : (
+                                                step.number
+                                            )}
                                         </span>
                                     </div>
 
@@ -361,8 +359,8 @@ export default function VehicleOwnerInformation() {
                                     </span>
                                 </div>
 
-                                {i < steps.length - 1 && (
-                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1"></div>
+                                {index < steps.length - 1 && (
+                                    <div className="flex-1 mt-[9px] sm:mt-[11px] lg:mt-[15px] border-t-2 border-dashed border-text/50 mx-1" />
                                 )}
                             </Fragment>
                         ))}
@@ -372,7 +370,6 @@ export default function VehicleOwnerInformation() {
 
             <div className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-10">
                 <div className="w-full max-w-[1200px] flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-20">
-
                     <div className="w-[180px] sm:w-[220px] md:w-[400px] lg:w-[500px] xl:w-[550px] flex items-center justify-center shrink-0">
                         <img
                             src="/main_logo.png"
@@ -447,9 +444,7 @@ export default function VehicleOwnerInformation() {
                                     value={shortDescription}
                                     maxLength={200}
                                     onChange={(e) =>
-                                        setShortDescription(
-                                            e.target.value
-                                        )
+                                        setShortDescription(e.target.value)
                                     }
                                     className="resize-none overflow-hidden w-full h-[100px] text-text text-[12px] bg-border/50 rounded-[20px] pl-[20px] pt-[10px] pr-[20px]"
                                 />
@@ -471,7 +466,7 @@ export default function VehicleOwnerInformation() {
                                                 /[^a-zA-Z0-9\s-]/g,
                                                 ""
                                             )
-                                            .slice(0,9)
+                                            .slice(0, 9)
                                             .toUpperCase()
                                     )
                                 }
@@ -537,17 +532,9 @@ export default function VehicleOwnerInformation() {
                                     <p className="text-[10px] text-text/60 mt-1 pl-[10px]">
                                         Suggested range for{" "}
                                         {vehicleType.label}: Rs.{" "}
-                                        {
-                                            suggestedRates[
-                                                vehicleType.value
-                                            ].min
-                                        }{" "}
+                                        {suggestedRates[vehicleType.value].min}{" "}
                                         -{" "}
-                                        {
-                                            suggestedRates[
-                                                vehicleType.value
-                                            ].max
-                                        }{" "}
+                                        {suggestedRates[vehicleType.value].max}{" "}
                                         per km
                                     </p>
                                 )}
