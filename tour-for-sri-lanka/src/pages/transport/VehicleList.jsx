@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../../config/api";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Users, Briefcase, MapPin } from "lucide-react";
 import Navbar from "../../components/Navbar";
@@ -23,26 +23,44 @@ export default function VehicleList() {
     const fetchVehicles = async () => {
       setLoading(true);
       setError("");
+
       try {
         const params = new URLSearchParams();
-        if (type && type !== "all") params.append("type", type);
-        if (passengers) params.append("passengers", passengers);
-        if(pickupLocation) params.append("location", pickupLocation)
-        if(bags) params.append("bags", bags)
+
+        if (type && type !== "all") {
+          params.append("type", type);
+        }
+
+        if (passengers) {
+          params.append("passengers", passengers);
+        }
+
+        if (pickupLocation) {
+          params.append("location", pickupLocation);
+        }
+
+        if (bags) {
+          params.append("bags", bags);
+        }
 
         const res = await fetch(
           `${API_BASE_URL}/api/transport/vehicles?${params.toString()}`
         );
+
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || "Failed to fetch vehicles");
+          throw new Error(
+            data.error || "Failed to fetch vehicles"
+          );
         }
 
         setVehicles(data.vehicles || []);
       } catch (err) {
         console.log(err);
-        setError("Could not load vehicles. Please try again.");
+        setError(
+          "Could not load vehicles. Please try again."
+        );
       } finally {
         setLoading(false);
       }
@@ -55,7 +73,7 @@ export default function VehicleList() {
     <main className="min-h-screen bg-[#071923] text-white flex flex-col">
       <Navbar />
 
-      <section className="px-14 pt-28 pb-16 max-lg:px-5 flex-1">
+      <section className="px-4 sm:px-6 lg:px-14 pt-24 sm:pt-28 pb-12 sm:pb-16 flex-1">
         <button
           onClick={() => navigate(-1)}
           className="text-[#00C896] text-sm mb-4 hover:underline"
@@ -63,98 +81,133 @@ export default function VehicleList() {
           &larr; Back
         </button>
 
-        <h2 className="text-[26px] font-bold capitalize">
-          Available {type === "all" ? "All Vehicles" : `${type}s`} 
+        <h2 className="text-xl sm:text-[26px] font-bold capitalize">
+          Available{" "}
+          {type === "all"
+            ? "All Vehicles"
+            : `${type}s`}
         </h2>
 
-        <p className="mt-1 text-[#d5dde2] text-sm">
+        <p className="mt-2 text-[#d5dde2] text-xs sm:text-sm break-words">
           {pickupLocation && `From ${pickupLocation}`}
           {pickupDate && ` • ${pickupDate}`}
-          {passengers && ` • ${passengers} passengers`}
+          {passengers &&
+            ` • ${passengers} passengers`}
           {bags && ` • ${bags}`}
         </p>
 
         {loading && (
-          <p className="mt-10 text-[#d5dde2]">Loading vehicles...</p>
-        )}
-
-        {!loading && error && (
-          <p className="mt-10 text-red-400">{error}</p>
-        )}
-
-        {!loading && !error && vehicles.length === 0 && (
-          <p className="mt-10 text-[#d5dde2]">
-            No vehicles found for this type right now.
+          <p className="mt-8 sm:mt-10 text-[#d5dde2]">
+            Loading vehicles...
           </p>
         )}
 
-        <div className="mt-8 grid grid-cols-2 gap-6 max-lg:grid-cols-1">
-          {vehicles.map((v, i) => (
+        {!loading && error && (
+          <p className="mt-8 sm:mt-10 text-red-400">
+            {error}
+          </p>
+        )}
+
+        {!loading &&
+          !error &&
+          vehicles.length === 0 && (
+            <p className="mt-8 sm:mt-10 text-[#d5dde2]">
+              No vehicles found for this type right now.
+            </p>
+          )}
+
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+          {vehicles.map((vehicle, index) => (
             <div
-              key={v._id}
-              className="vehicle-card-anim flex gap-4 bg-[#1B2B34] rounded-[20px] p-4 border border-white/10"
-              style={{animationDelay: `${i * 0.12}s`}}
+              key={vehicle._id}
+              className="vehicle-card-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-3.5 sm:p-4 border border-white/10"
+              style={{
+                animationDelay: `${index * 0.12}s`,
+              }}
             >
-              <img
-                src={v.addVehiclePhotos?.[0]}
-                alt={`${v.vehicleBrand} ${v.vehicleModel}`}
-                className="w-40 h-32 object-cover rounded-[14px] flex-shrink-0"
-              />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <img
+                  src={vehicle.addVehiclePhotos?.[0]}
+                  alt={`${vehicle.vehicleBrand} ${vehicle.vehicleModel}`}
+                  className="w-full sm:w-40 h-44 sm:h-32 object-cover rounded-[14px] shrink-0"
+                />
 
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold">
-                  {v.vehicleBrand} {v.vehicleModel}
-                </h3>
-                <p className="text-sm text-[#d5dde2] mt-1 line-clamp-2">
-                  {v.shortDescription}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base sm:text-lg font-semibold break-words">
+                    {vehicle.vehicleBrand}{" "}
+                    {vehicle.vehicleModel}
+                  </h3>
 
-                <div className="flex items-center gap-4 mt-3 text-sm text-[#d5dde2]">
-                  <span className="flex items-center gap-1">
-                    <Users size={16} /> {v.passengerCapacity}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Briefcase size={16} /> {v.luggageCapacity}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin size={16} /> {v.availableArea?.[0]}
-                    {v.availableArea?.length > 1 &&
-                      ` +${v.availableArea.length - 1}`}
-                  </span>
-                </div>
+                  <p className="text-xs sm:text-sm text-[#d5dde2] mt-1 line-clamp-2">
+                    {vehicle.shortDescription}
+                  </p>
 
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
-                  <div className="flex items-center gap-2">
-                    {v.profilePhoto && (
-                      <img
-                        src={v.profilePhoto}
-                        alt={v.firstName}
-                        className="w-7 h-7 rounded-full object-cover"
-                      />
-                    )}
-                    <span className="text-sm text-[#d5dde2]">
-                      {v.firstName} {v.lastName}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs sm:text-sm text-[#d5dde2]">
+                    <span className="flex items-center gap-1">
+                      <Users size={15} />
+                      {vehicle.passengerCapacity}
+                    </span>
+
+                    <span className="flex items-center gap-1">
+                      <Briefcase size={15} />
+                      {vehicle.luggageCapacity}
+                    </span>
+
+                    <span className="flex items-center gap-1 min-w-0">
+                      <MapPin size={15} />
+                      <span className="truncate">
+                        {vehicle.availableArea?.[0]}
+                        {vehicle.availableArea?.length > 1 &&
+                          ` +${
+                            vehicle.availableArea.length - 1
+                          }`}
+                      </span>
                     </span>
                   </div>
-
-                    <button 
-                        className="px-4 py-1.5 rounded-full bg-[#00C896] text-white text-sm font-medium hover:bg-[#00b383] transition"
-                        onClick={() =>
-                            navigate(`/transport/book/${v._id}`,{
-                                state: {
-                                    vehicle: v,
-                                    searchContext: {
-                                        pickupDate,
-                                        numberOfPassengers: passengers ? Number(passengers) : "",
-                                        bags: bags ? Number(bags) : "",
-                                    },
-                                },
-                             })
-                            }
-                    >
-                    Book Now
-                  </button>
                 </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-3 border-t border-white/10">
+                <div className="flex items-center gap-2 min-w-0">
+                  {vehicle.profilePhoto && (
+                    <img
+                      src={vehicle.profilePhoto}
+                      alt={vehicle.firstName}
+                      className="w-7 h-7 rounded-full object-cover shrink-0"
+                    />
+                  )}
+
+                  <span className="text-xs sm:text-sm text-[#d5dde2] truncate">
+                    {vehicle.firstName}{" "}
+                    {vehicle.lastName}
+                  </span>
+                </div>
+
+                <button
+                  className="w-full sm:w-auto px-5 py-2 rounded-full bg-[#00C896] text-white text-sm font-medium hover:bg-[#00b383] transition"
+                  onClick={() =>
+                    navigate(
+                      `/transport/book/${vehicle._id}`,
+                      {
+                        state: {
+                          vehicle,
+                          searchContext: {
+                            pickupDate,
+                            numberOfPassengers:
+                              passengers
+                                ? Number(passengers)
+                                : "",
+                            bags: bags
+                              ? Number(bags)
+                              : "",
+                          },
+                        },
+                      }
+                    )
+                  }
+                >
+                  Book Now
+                </button>
               </div>
             </div>
           ))}
