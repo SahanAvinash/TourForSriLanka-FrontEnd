@@ -5,6 +5,7 @@ import axios from "axios";
 import Navbar from "../../../components/Navbar";
 import DestinationGallery from "./DestinationGallery";
 import DestinationInfo from "./DestinationInfo";
+import Footer from "../../../components/Footer";
 
 const DestinationDetailsPage = () => {
   const { id } = useParams();
@@ -40,14 +41,18 @@ const DestinationDetailsPage = () => {
   return (
     <div className="min-h-screen bg-[var(--color-primary-1)]">
       <Navbar />
+
       <div className="pt-20">
         <div className="destination-gallery-anim">
           <DestinationGallery destination={destination} />
         </div>
+
         <div className="destination-info-anim">
           <DestinationInfo destination={destination} />
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };
