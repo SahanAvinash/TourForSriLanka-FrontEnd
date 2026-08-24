@@ -21,22 +21,24 @@ const DestinationDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#11212D] flex items-center justify-center">
-        <h1 className="text-white text-2xl">Loading...</h1>
+      <div className="min-h-screen bg-[var(--color-primary-1)] flex items-center justify-center">
+        <h1 className="text-[var(--color-text)] text-2xl">Loading...</h1>
       </div>
     );
   }
 
   if (!destination) {
     return (
-      <div className="min-h-screen bg-[#11212D] flex items-center justify-center">
-        <h1 className="text-white text-4xl">Destination Not Found</h1>
+      <div className="min-h-screen bg-[var(--color-primary-1)] flex items-center justify-center">
+        <h1 className="text-[var(--color-text)] text-4xl">
+          Destination Not Found
+        </h1>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#11212D]">
+    <div className="min-h-screen bg-[var(--color-primary-1)]">
       <Navbar />
       <div className="pt-20">
         <div className="destination-gallery-anim">

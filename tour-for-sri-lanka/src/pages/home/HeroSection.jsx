@@ -22,11 +22,11 @@ const HeroSection = () => {
 
                         <div className="max-w-lg">
 
-                            <h3 className="hero-title-anim text-[#CCD0CF] uppercase tracking-[5px] text-[48px] font-antonsc">
+                            <h3 className="hero-title-anim text-[var(--color-text)] uppercase tracking-[5px] text-[48px] font-antonsc">
                                 Welcome!
                             </h3>
 
-                            <p className="hero-desc-anim mt-6 text-gray-200 text-lg leading-8">
+                            <p className="hero-desc-anim mt-6 text-[var(--color-text)] text-lg leading-8">
                                 We are a Sri Lankan based tourism organization providing
                                 comprehensive travel information, unforgettable experiences,
                                 and personalized tours across the beautiful island of Sri
@@ -39,7 +39,7 @@ const HeroSection = () => {
                                     hero-btn-anim
                                     inline-block
                                     mt-8
-                                    bg-[#00C896]
+                                    bg-[var(--color-primary-green)]
                                     hover:bg-[#00b383]
                                     transition-all
                                     duration-300

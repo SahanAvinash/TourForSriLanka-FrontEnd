@@ -13,8 +13,7 @@ const DestinationGrid = () => {
     axios
       .get(`${API_BASE_URL}/api/destination/category/${category}`)
       .then((res) => {
-        console.log("DATA:", res.data)
-        setDestinations(res.data)
+        setDestinations(res.data);
       })
       .catch((err) => console.log("Failed to load destinations", err))
       .finally(() => setLoading(false));
@@ -23,7 +22,9 @@ const DestinationGrid = () => {
   return (
     <section className="max-w-7xl mx-auto px-8 py-16">
       {loading ? (
-        <p className="text-center text-gray-400">Loading destinations...</p>
+        <p className="text-center text-[var(--color-text)]">
+          Loading destinations...
+        </p>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {destinations.map((destination) => (
@@ -33,7 +34,7 @@ const DestinationGrid = () => {
             />
           ))}
           {destinations.length === 0 && (
-            <p className="text-gray-400 col-span-full text-center">
+            <p className="text-[var(--color-text)] col-span-full text-center">
               No destinations added in this category yet.
             </p>
           )}

@@ -18,13 +18,13 @@ const DestinationCategoryPage = () => {
   }, [category]);
 
   return (
-    <div className="min-h-screen bg-[#11212D]">
+    <div className="min-h-screen bg-[var(--color-primary-1)]">
       <Navbar />
       <section className="pt-28 text-center">
-        <h1 className="text-white text-5xl font-bold page-title-anim">
+        <h1 className="text-[var(--color-text)] text-5xl font-bold page-title-anim">
           {categoryData ? categoryData.name : ""}
         </h1>
-        <p className="text-gray-400 mt-5 text-lg pl-[50px] pr-[50px] page-desc-anim">
+        <p className="text-[var(--color-text)] mt-5 text-lg pl-[50px] pr-[50px] page-desc-anim">
           {categoryData?.description || "Explore beautiful destinations across Sri Lanka."}
         </p>
       </section>

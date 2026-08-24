@@ -40,7 +40,7 @@ const CategoryCard = ({ category, delay = 0 }) => {
       />
       <div className="absolute inset-0 bg-black/45 group-hover:bg-black/30 transition duration-300"></div>
       <div className="absolute inset-0 flex items-center justify-center p-6">
-        <h3 className="text-white text-3xl font-bold leading-tight text-center group-hover:-translate-y-2 transition duration-300">
+        <h3 className="text-[var(--color-text)] text-3xl font-bold leading-tight text-center group-hover:-translate-y-2 transition duration-300">
           {category.name}
         </h3>
       </div>

@@ -4,7 +4,6 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const DestinationGallery = ({ destination }) => {
   const [activeImage, setActiveImage] = useState(0);
 
-  // support old data (single "image") and new data ("images" array)
   let imagesArray = destination.images?.length > 0
     ? destination.images
     : destination.image
@@ -13,18 +12,16 @@ const DestinationGallery = ({ destination }) => {
 
   if (imagesArray.length === 0) imagesArray = ["/destination_placeholder.jpg"];
 
-  console.log("images for", destination.name, imagesArray);
-
   useEffect(() => {
     if (imagesArray.length <= 1) return;
 
     const interval = setInterval(() => {
       setActiveImage((prev) => (prev === imagesArray.length - 1 ? 0 : prev + 1));
     }, 5000);
+
     return () => clearInterval(interval);
   }, [imagesArray.length]);
 
-  // reset to first slide if the destination changes
   useEffect(() => {
     setActiveImage(0);
   }, [destination._id]);
@@ -48,18 +45,22 @@ const DestinationGallery = ({ destination }) => {
             <>
               <button
                 onClick={() =>
-                  setActiveImage((prev) => (prev === 0 ? imagesArray.length - 1 : prev - 1))
+                  setActiveImage((prev) =>
+                    prev === 0 ? imagesArray.length - 1 : prev - 1
+                  )
                 }
-                className="absolute left-[16px] top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 hover:text-[#00C896]/80 text-white h-[40px] w-[40px] rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                className="absolute left-[16px] top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 hover:text-[var(--color-primary-green)]/80 text-white h-[40px] w-[40px] rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
               >
                 <FaChevronLeft />
               </button>
 
               <button
                 onClick={() =>
-                  setActiveImage((prev) => (prev === imagesArray.length - 1 ? 0 : prev + 1))
+                  setActiveImage((prev) =>
+                    prev === imagesArray.length - 1 ? 0 : prev + 1
+                  )
                 }
-                className="absolute right-[16px] top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 hover:text-[#00C896]/80 text-white w-[40px] h-[40px] rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                className="absolute right-[16px] top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 hover:text-[var(--color-primary-green)]/80 text-white w-[40px] h-[40px] rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
               >
                 <FaChevronRight />
               </button>
