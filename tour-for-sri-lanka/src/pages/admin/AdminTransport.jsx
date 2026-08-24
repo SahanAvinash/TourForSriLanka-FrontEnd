@@ -5,7 +5,7 @@ export default function AdminTransport() {
   return (
     <AdminApprovalTable
       title="Transport"
-      fetchUrl={`${API_BASE_URL}/api/transport/vehicles`}
+      fetchUrl={`${API_BASE_URL}/api/transport/pending`}
       extractList={(data) => data.vehicles}
       getId={(item) => item._id}
       getApproveUrl={(item) => `${API_BASE_URL}/api/transport/approve/${item._id}`}
