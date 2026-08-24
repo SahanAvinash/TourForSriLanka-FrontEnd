@@ -115,11 +115,13 @@ const selectStyles = {
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        borderRadius: "15px",
+        overflow: "hidden",
     }),
 
     menuPortal: (base) => ({
         ...base,
-        zIndex: 9999,
+        zIndex: 99999,
     }),
 
     option: (base, state) => ({
@@ -747,8 +749,8 @@ export default function GuideInformation() {
                                 value={gender}
                                 onChange={setGender}
                                 placeholder="Gender"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
 
@@ -757,8 +759,8 @@ export default function GuideInformation() {
                                 value={maritalStatus}
                                 onChange={setMaritalStatus}
                                 placeholder="Marital Status"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
@@ -769,8 +771,8 @@ export default function GuideInformation() {
                                 value={ethnicity}
                                 onChange={setEthnicity}
                                 placeholder="Ethnicity"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
 
@@ -779,8 +781,8 @@ export default function GuideInformation() {
                                 value={province}
                                 onChange={handleProvinceChange}
                                 placeholder="Province"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
@@ -818,8 +820,8 @@ export default function GuideInformation() {
                                         : "Select province first"
                                 }
                                 isDisabled={!province}
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
