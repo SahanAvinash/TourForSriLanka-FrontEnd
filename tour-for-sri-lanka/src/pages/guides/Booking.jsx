@@ -23,7 +23,7 @@ export default function Booking({ guide, onClose, onSuccess }) {
       ...prev,
       [name]: value,
     }));
-  }
+  } 
 
   const unitPrice =
     formData.durationType === "hourly"
