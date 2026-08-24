@@ -34,11 +34,14 @@ const selectStyles = {
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        borderRadius: "15px",
+        overflow: "hidden",
+        zIndex: 99999,
     }),
 
     menuPortal: (base) => ({
         ...base,
-        zIndex: 9999,
+        zIndex: 99999,
     }),
 
     option: (base, state) => ({
@@ -326,8 +329,8 @@ export default function GuidePricing() {
                                 value={maximumGuests}
                                 onChange={setMaximumGuests}
                                 placeholder="Maximum Guests"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
 
@@ -336,8 +339,8 @@ export default function GuidePricing() {
                                 value={currency}
                                 onChange={setCurrency}
                                 placeholder="Currency"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
