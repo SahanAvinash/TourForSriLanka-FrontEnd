@@ -35,32 +35,30 @@ const luggageByVehicle = {
 const selectStyles = {
   menuPortal: (base) => ({
     ...base,
-    zIndex: 99999,
+    zIndex: 9999,
   }),
 
   container: (base) => ({
     ...base,
     width: "100%",
-    minWidth: 0,
   }),
 
   control: (base) => ({
     ...base,
     minHeight: "42px",
     height: "42px",
-    width: "100%",
     borderRadius: "12px",
     backgroundColor: "#4A5C6A80",
     border: "none",
     boxShadow: "none",
-    cursor: "pointer",
-    overflow: "hidden",
+    width: "100%",
   }),
 
   valueContainer: (base) => ({
     ...base,
-    minWidth: 0,
     padding: "0 12px",
+    minWidth: 0,
+    overflow: "hidden",
   }),
 
   option: (base, state) => ({
@@ -68,21 +66,18 @@ const selectStyles = {
     backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
     color: "#CCD0CF",
     cursor: "pointer",
-    padding: "10px 12px",
   }),
 
   menu: (base) => ({
     ...base,
     backgroundColor: "#4A5C6A",
-    borderRadius: "12px",
+    borderRadius: "10px",
     overflow: "hidden",
-    marginTop: "4px",
   }),
 
   singleValue: (base) => ({
     ...base,
     color: "#CCD0CF",
-    margin: 0,
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -92,34 +87,34 @@ const selectStyles = {
     ...base,
     color: "#CCD0CF",
     opacity: 0.5,
-    margin: 0,
     whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   }),
 
   input: (base) => ({
     ...base,
     color: "#CCD0CF",
-    margin: 0,
-    padding: 0,
-  }),
-
-  indicatorSeparator: () => ({
-    display: "none",
-  }),
-
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "#CCD0CF",
-    padding: "6px",
-    flexShrink: 0,
-    "&:hover": {
-      color: "#00C896",
-    },
   }),
 
   indicatorsContainer: (base) => ({
     ...base,
     flexShrink: 0,
+  }),
+};
+
+const passengerSelectStyles = {
+  ...selectStyles,
+
+  control: (base) => ({
+    ...base,
+    minHeight: "42px",
+    height: "42px",
+    borderRadius: "12px",
+    backgroundColor: "#4A5C6A80",
+    border: "none",
+    boxShadow: "none",
+    width: "100%",
   }),
 };
 
@@ -173,6 +168,7 @@ export default function BookingPage() {
   const handleConfirmLocation = (picked) => {
     if (mapPickerTarget === "pickup") {
       updateForm("pickupLocation", picked.address);
+
       setPickupCoordinates({
         lat: picked.lat,
         lng: picked.lng,
@@ -181,6 +177,7 @@ export default function BookingPage() {
 
     if (mapPickerTarget === "dropoff") {
       updateForm("dropoffLocation", picked.address);
+
       setDropoffCoordinates({
         lat: picked.lat,
         lng: picked.lng,
@@ -264,6 +261,7 @@ export default function BookingPage() {
         );
 
         const data = await res.json();
+
         setReviews(data);
       } catch (err) {
         console.log(err);
@@ -332,6 +330,26 @@ export default function BookingPage() {
       toast.success(
         "Booking request sent to the vehicle owner!"
       );
+
+      // Reset all booking fields
+      setForm({
+        pickupLocation: "",
+        dropoffLocation: "",
+        pickupDate: "",
+        returnDate: "",
+        numberOfPassengers: "",
+        bags: "",
+      });
+
+      // Reset map locations
+      setPickupCoordinates(null);
+      setDropoffCoordinates(null);
+
+      // Reset trip type
+      setIsReturnTrip(false);
+
+      // Clear estimate
+      setEstimate(null);
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -345,14 +363,14 @@ export default function BookingPage() {
         <Navbar />
 
         <section className="px-5 sm:px-8 lg:px-14 pt-28 pb-16 flex-1">
-          <p className="text-[#d5dde2]">
+          <p className="text-[#d5dde2] text-sm sm:text-base">
             Vehicle details not found. Please go back and select a
             vehicle again.
           </p>
 
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 text-[#00C896] hover:underline"
+            className="mt-4 text-[#00C896] hover:underline text-sm"
           >
             &larr; Back
           </button>
@@ -367,7 +385,7 @@ export default function BookingPage() {
     <main className="min-h-screen bg-[#071923] text-white flex flex-col">
       <Navbar />
 
-      <section className="px-4 sm:px-6 lg:px-14 pt-28 pb-12 sm:pb-16 flex-1">
+      <section className="px-4 sm:px-6 lg:px-14 pt-28 pb-16 flex-1">
         <button
           onClick={() => navigate(-1)}
           className="text-[#00C896] text-sm mb-5 hover:underline"
@@ -375,53 +393,54 @@ export default function BookingPage() {
           &larr; Back
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-5 sm:gap-6 lg:gap-8">
 
           {/* LEFT SIDE */}
           <div className="space-y-5 sm:space-y-6">
 
-            <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-3 sm:p-4 border border-white/10">
-
+            {/* Vehicle */}
+            <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[20px] p-3 sm:p-4 border border-white/10">
               <img
                 src={vehicle.addVehiclePhotos?.[0]}
                 alt={`${vehicle.vehicleBrand} ${vehicle.vehicleModel}`}
-                className="w-full h-44 sm:h-52 lg:h-48 object-cover rounded-[12px] sm:rounded-[14px]"
+                className="w-full h-44 sm:h-52 lg:h-48 object-cover rounded-[14px]"
               />
 
               <h2 className="text-lg sm:text-xl font-bold mt-4">
                 {vehicle.vehicleBrand} {vehicle.vehicleModel}
               </h2>
 
-              <p className="text-xs sm:text-sm text-[#d5dde2] mt-1 leading-relaxed">
+              <p className="text-sm text-[#d5dde2] mt-1 leading-relaxed">
                 {vehicle.shortDescription}
               </p>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs sm:text-sm text-[#d5dde2]">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3 sm:gap-4 mt-4 text-xs sm:text-sm text-[#d5dde2]">
                 <span className="flex items-center gap-1">
-                  <Users size={15} />
+                  <Users size={16} />
                   {vehicle.passengerCapacity}
                 </span>
 
                 <span className="flex items-center gap-1">
-                  <Briefcase size={15} />
+                  <Briefcase size={16} />
                   {vehicle.luggageCapacity}
                 </span>
 
-                <span className="flex items-center gap-1 min-w-0">
-                  <MapPin size={15} className="shrink-0" />
-                  <span className="truncate">
+                <span className="flex items-start gap-1 col-span-2 sm:col-span-1">
+                  <MapPin size={16} className="shrink-0 mt-0.5" />
+                  <span className="break-words">
                     {vehicle.availableArea?.join(", ")}
                   </span>
                 </span>
               </div>
             </div>
 
-            <div className="booking-owner-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-4 border border-white/10">
+            {/* Owner */}
+            <div className="booking-owner-anim bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
               <h3 className="text-sm font-semibold text-[#d5dde2] mb-3">
                 Vehicle Owner
               </h3>
 
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-3">
                 {vehicle.profilePhoto && (
                   <img
                     src={vehicle.profilePhoto}
@@ -431,19 +450,19 @@ export default function BookingPage() {
                 )}
 
                 <div className="min-w-0">
-                  <p className="font-medium truncate">
+                  <p className="font-medium text-sm sm:text-base">
                     {vehicle.firstName} {vehicle.lastName}
                   </p>
 
                   {vehicle.mobile && (
-                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 mt-1 truncate">
+                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 mt-1 break-all">
                       <Phone size={12} className="shrink-0" />
                       {vehicle.mobile}
                     </p>
                   )}
 
                   {vehicle.email && (
-                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 truncate">
+                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 break-all">
                       <Mail size={12} className="shrink-0" />
                       {vehicle.email}
                     </p>
@@ -456,8 +475,9 @@ export default function BookingPage() {
           {/* BOOKING FORM */}
           <form
             onSubmit={handleSubmit}
-            className="booking-form-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-4 sm:p-6 border border-white/10 space-y-4 h-fit min-w-0"
+            className="booking-form-anim bg-[#1B2B34] rounded-[20px] p-4 sm:p-5 lg:p-6 border border-white/10 space-y-4 h-fit min-w-0"
           >
+            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-lg font-bold">
                 Book this vehicle
@@ -470,7 +490,7 @@ export default function BookingPage() {
                     setIsReturnTrip(false);
                     updateForm("returnDate", "");
                   }}
-                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
+                  className={`h-9 px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
                     !isReturnTrip
                       ? "bg-[#00C896] text-white"
                       : "bg-[#4A5C6A80] text-[#d5dde2]"
@@ -482,7 +502,7 @@ export default function BookingPage() {
                 <button
                   type="button"
                   onClick={() => setIsReturnTrip(true)}
-                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
+                  className={`h-9 px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
                     isReturnTrip
                       ? "bg-[#00C896] text-white"
                       : "bg-[#4A5C6A80] text-[#d5dde2]"
@@ -493,7 +513,7 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* PICKUP */}
+            {/* Pickup */}
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">
                 Pickup Location
@@ -501,6 +521,7 @@ export default function BookingPage() {
 
               <div className="relative">
                 <input
+                  type="text"
                   readOnly
                   value={form.pickupLocation}
                   onClick={() => setMapPickerTarget("pickup")}
@@ -516,7 +537,7 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* DROP OFF */}
+            {/* Dropoff */}
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">
                 Drop-off Location
@@ -524,6 +545,7 @@ export default function BookingPage() {
 
               <div className="relative">
                 <input
+                  type="text"
                   readOnly
                   value={form.dropoffLocation}
                   onClick={() => setMapPickerTarget("dropoff")}
@@ -539,7 +561,7 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* DATES */}
+            {/* Dates */}
             <div
               className={`grid gap-4 ${
                 isReturnTrip
@@ -547,81 +569,56 @@ export default function BookingPage() {
                   : "grid-cols-1"
               }`}
             >
-              <div className="min-w-0 overflow-hidden">
+              {/* Pickup Date */}
+              <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Pickup Date
                 </label>
 
-                <div className="w-full min-w-0 overflow-hidden rounded-[12px]">
-                  <input
-                    type="date"
-                    value={form.pickupDate}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) =>
-                      updateForm("pickupDate", e.target.value)
-                    }
-                    className="
-                      block
-                      w-full
-                      max-w-full
-                      min-w-0
-                      h-[42px]
-                      bg-[#4A5C6A80]
-                      rounded-[12px]
-                      px-3
-                      sm:px-4
-                      py-2
-                      outline-none
-                      text-sm
-                      text-white
-                      appearance-none
-                    "
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={form.pickupDate}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) =>
+                    updateForm("pickupDate", e.target.value)
+                  }
+                  style={{
+                    colorScheme: "dark",
+                  }}
+                  className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
+                />
               </div>
 
+              {/* Return Date */}
               {isReturnTrip && (
-                <div className="min-w-0 overflow-hidden">
+                <div className="min-w-0">
                   <label className="block text-sm text-[#d5dde2] mb-1">
                     Return Date
                   </label>
 
-                  <div className="w-full min-w-0 overflow-hidden rounded-[12px]">
-                    <input
-                      type="date"
-                      value={form.returnDate}
-                      min={
-                        form.pickupDate ||
-                        new Date().toISOString().split("T")[0]
-                      }
-                      onChange={(e) =>
-                        updateForm("returnDate", e.target.value)
-                      }
-                      className="
-                        block
-                        w-full
-                        max-w-full
-                        min-w-0
-                        h-[42px]
-                        bg-[#4A5C6A80]
-                        rounded-[12px]
-                        px-3
-                        sm:px-4
-                        py-2
-                        outline-none
-                        text-sm
-                        text-white
-                        appearance-none
-                      "
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    value={form.returnDate}
+                    min={
+                      form.pickupDate ||
+                      new Date().toISOString().split("T")[0]
+                    }
+                    onChange={(e) =>
+                      updateForm("returnDate", e.target.value)
+                    }
+                    style={{
+                      colorScheme: "dark",
+                    }}
+                    className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
+                  />
                 </div>
               )}
             </div>
 
-            {/* PASSENGERS + BAGS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+            {/* Passengers + Bags */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
+              {/* Passengers */}
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Passengers
@@ -632,8 +629,7 @@ export default function BookingPage() {
                   value={
                     passengerOptions.find(
                       (o) =>
-                        Number(o.value) ===
-                        Number(form.numberOfPassengers)
+                        o.value === form.numberOfPassengers
                     ) || null
                   }
                   onChange={(selected) =>
@@ -643,13 +639,14 @@ export default function BookingPage() {
                     )
                   }
                   placeholder="Select passengers"
+                  isSearchable={false}
                   menuPosition="fixed"
                   menuPortalTarget={document.body}
-                  styles={selectStyles}
-                  isSearchable={false}
+                  styles={passengerSelectStyles}
                 />
               </div>
 
+              {/* Bags */}
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Bags
@@ -659,8 +656,7 @@ export default function BookingPage() {
                   options={luggageOptions}
                   value={
                     luggageOptions.find(
-                      (o) =>
-                        Number(o.value) === Number(form.bags)
+                      (o) => o.value === form.bags
                     ) || null
                   }
                   onChange={(selected) =>
@@ -670,41 +666,45 @@ export default function BookingPage() {
                     )
                   }
                   placeholder="Select bag capacity"
+                  isSearchable={false}
                   menuPosition="fixed"
                   menuPortalTarget={document.body}
                   styles={selectStyles}
-                  isSearchable={false}
                 />
               </div>
             </div>
 
-            {/* ESTIMATE */}
+            {/* Estimate Loading */}
             {estimating && (
               <p className="text-sm text-[#d5dde2]">
                 Calculating distance & price...
               </p>
             )}
 
+            {/* Estimate */}
             {estimate && !estimating && (
-              <div className="bg-[#4A5C6A80] rounded-[12px] p-4 space-y-1">
-                <div className="flex justify-between text-sm text-[#d5dde2] gap-4">
+              <div className="bg-[#4A5C6A80] rounded-[12px] p-4 space-y-2">
+                <div className="flex justify-between gap-4 text-sm text-[#d5dde2]">
                   <span>Distance</span>
-                  <span>{estimate.distanceKm} km</span>
+                  <span>
+                    {estimate.distanceKm} km
+                  </span>
                 </div>
 
-                <div className="flex justify-between font-semibold text-[#00C896] gap-4">
+                <div className="flex justify-between gap-4 font-semibold text-[#00C896]">
                   <span>Total Price</span>
-                  <span>
+                  <span className="text-right">
                     Rs. {estimate.totalPrice.toLocaleString()}
                   </span>
                 </div>
               </div>
             )}
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={submitting || !estimate}
-              className="w-full h-[48px] rounded-full bg-[#00C896] hover:bg-[#00b383] disabled:opacity-50 text-white font-semibold transition"
+              className="w-full min-h-[48px] rounded-full bg-[#00C896] hover:bg-[#00b383] disabled:opacity-50 text-white font-semibold transition text-sm sm:text-base"
             >
               {submitting
                 ? "Booking..."
@@ -727,7 +727,9 @@ export default function BookingPage() {
                 setReviews((prev) =>
                   isUpdate
                     ? prev.map((r) =>
-                        r._id === review._id ? review : r
+                        r._id === review._id
+                          ? review
+                          : r
                       )
                     : [review, ...prev]
                 );
@@ -744,6 +746,7 @@ export default function BookingPage() {
 
       <Footer />
 
+      {/* MAP */}
       {mapPickerTarget && (
         <MapPickerModal
           initialPosition={
