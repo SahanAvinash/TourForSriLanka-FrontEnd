@@ -57,11 +57,14 @@ const selectStyles = {
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        borderRadius: "15px",
+        overflow: "hidden",
+        zIndex: 99999,
     }),
 
     menuPortal: (base) => ({
         ...base,
-        zIndex: 9999,
+        zIndex: 99999,
     }),
 
     option: (base, state) => ({
@@ -101,7 +104,6 @@ const multiSelectStyles = {
     control: (base) => ({
         ...base,
         width: "100%",
-        height: "50px",
         minHeight: "50px",
         maxHeight: "50px",
         borderRadius: "20px",
@@ -125,6 +127,7 @@ const multiSelectStyles = {
         color: "var(--color-primary-1)",
         fontWeight: "bold",
         whiteSpace: "nowrap",
+        fontSize: "11px",
     }),
 
     multiValueRemove: (base) => ({
@@ -144,8 +147,7 @@ const multiSelectStyles = {
         flexWrap: "nowrap",
         overflowX: "auto",
         height: "50px",
-        scrollbarWidth: "thin",
-        scrollbarColor: "var(--color-primary-green) transparent",
+        WebkitOverflowScrolling: "touch",
     }),
 
     indicatorsContainer: (base) => ({
@@ -379,8 +381,8 @@ export default function GuideLanguageSkills() {
                                 value={yearsExperience}
                                 onChange={setYearsExperience}
                                 placeholder="Years of Experience"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
@@ -407,8 +409,8 @@ export default function GuideLanguageSkills() {
                                 onChange={setSkills}
                                 placeholder="Skills"
                                 isMulti
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={multiSelectStyles}
                             />
 
@@ -418,8 +420,8 @@ export default function GuideLanguageSkills() {
                                 onChange={setLanguages}
                                 placeholder="Languages"
                                 isMulti
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={multiSelectStyles}
                             />
                         </div>
