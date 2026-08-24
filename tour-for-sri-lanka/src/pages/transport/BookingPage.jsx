@@ -35,22 +35,32 @@ const luggageByVehicle = {
 const selectStyles = {
   menuPortal: (base) => ({
     ...base,
-    zIndex: 9999,
+    zIndex: 99999,
   }),
 
   container: (base) => ({
     ...base,
     width: "100%",
+    minWidth: 0,
   }),
 
   control: (base) => ({
     ...base,
     minHeight: "42px",
+    height: "42px",
+    width: "100%",
     borderRadius: "12px",
     backgroundColor: "#4A5C6A80",
     border: "none",
     boxShadow: "none",
-    width: "100%",
+    cursor: "pointer",
+    overflow: "hidden",
+  }),
+
+  valueContainer: (base) => ({
+    ...base,
+    minWidth: 0,
+    padding: "0 12px",
   }),
 
   option: (base, state) => ({
@@ -58,54 +68,58 @@ const selectStyles = {
     backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
     color: "#CCD0CF",
     cursor: "pointer",
+    padding: "10px 12px",
   }),
 
   menu: (base) => ({
     ...base,
     backgroundColor: "#4A5C6A",
+    borderRadius: "12px",
+    overflow: "hidden",
+    marginTop: "4px",
   }),
 
   singleValue: (base) => ({
     ...base,
     color: "#CCD0CF",
+    margin: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   }),
 
   placeholder: (base) => ({
     ...base,
     color: "#CCD0CF",
     opacity: 0.5,
+    margin: 0,
+    whiteSpace: "nowrap",
   }),
 
   input: (base) => ({
     ...base,
     color: "#CCD0CF",
-  }),
-};
-
-const passengerSelectStyles = {
-  ...selectStyles,
-
-  control: (base) => ({
-    ...base,
-    minHeight: "42px",
-    borderRadius: "20px",
-    backgroundColor: "#4A5C6A80",
-    border: "none",
-    boxShadow: "none",
-    width: "100%",
+    margin: 0,
+    padding: 0,
   }),
 
-  singleValue: (base) => ({
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+
+  dropdownIndicator: (base) => ({
     ...base,
     color: "#CCD0CF",
-    paddingLeft: "6px",
+    padding: "6px",
+    flexShrink: 0,
+    "&:hover": {
+      color: "#00C896",
+    },
   }),
 
-  placeholder: (base) => ({
+  indicatorsContainer: (base) => ({
     ...base,
-    color: "#CCD0CF",
-    opacity: 0.5,
-    paddingLeft: "6px",
+    flexShrink: 0,
   }),
 };
 
@@ -279,7 +293,8 @@ export default function BookingPage() {
       !dropoffCoordinates ||
       !form.pickupDate ||
       (isReturnTrip && !form.returnDate) ||
-      !form.numberOfPassengers
+      !form.numberOfPassengers ||
+      !form.bags
     ) {
       toast.error("Please fill all required fields");
       return;
@@ -314,7 +329,9 @@ export default function BookingPage() {
         throw new Error(data.message || "Booking failed");
       }
 
-      toast.success("Booking request sent to the vehicle owner!");
+      toast.success(
+        "Booking request sent to the vehicle owner!"
+      );
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -327,15 +344,15 @@ export default function BookingPage() {
       <main className="min-h-screen bg-[#071923] text-white flex flex-col">
         <Navbar />
 
-        <section className="flex-1 px-4 sm:px-6 lg:px-14 pt-28 pb-16">
-          <p className="text-sm sm:text-base text-[#d5dde2]">
-            Vehicle details not found. Please go back and select a vehicle
-            again.
+        <section className="px-5 sm:px-8 lg:px-14 pt-28 pb-16 flex-1">
+          <p className="text-[#d5dde2]">
+            Vehicle details not found. Please go back and select a
+            vehicle again.
           </p>
 
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 text-[#00C896] hover:underline text-sm"
+            className="mt-4 text-[#00C896] hover:underline"
           >
             &larr; Back
           </button>
@@ -350,201 +367,192 @@ export default function BookingPage() {
     <main className="min-h-screen bg-[#071923] text-white flex flex-col">
       <Navbar />
 
-      <section className="flex-1 px-4 sm:px-6 md:px-8 lg:px-14 pt-24 sm:pt-28 pb-12 sm:pb-16">
-        <div className="max-w-7xl mx-auto">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-[#00C896] text-sm mb-5 hover:underline"
-          >
-            &larr; Back
-          </button>
+      <section className="px-4 sm:px-6 lg:px-14 pt-28 pb-12 sm:pb-16 flex-1">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-[#00C896] text-sm mb-5 hover:underline"
+        >
+          &larr; Back
+        </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-5 sm:gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 lg:gap-8">
 
-            {/* Left Side */}
-            <div className="space-y-5 sm:space-y-6">
+          {/* LEFT SIDE */}
+          <div className="space-y-5 sm:space-y-6">
 
-              {/* Vehicle */}
-              <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-3.5 sm:p-4 border border-white/10">
-                <img
-                  src={vehicle.addVehiclePhotos?.[0]}
-                  alt={`${vehicle.vehicleBrand} ${vehicle.vehicleModel}`}
-                  className="w-full h-44 sm:h-52 md:h-56 lg:h-48 object-cover rounded-[14px]"
-                />
+            <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-3 sm:p-4 border border-white/10">
 
-                <h2 className="text-lg sm:text-xl font-bold mt-4">
-                  {vehicle.vehicleBrand} {vehicle.vehicleModel}
-                </h2>
+              <img
+                src={vehicle.addVehiclePhotos?.[0]}
+                alt={`${vehicle.vehicleBrand} ${vehicle.vehicleModel}`}
+                className="w-full h-44 sm:h-52 lg:h-48 object-cover rounded-[12px] sm:rounded-[14px]"
+              />
 
-                <p className="text-xs sm:text-sm text-[#d5dde2] mt-1 leading-relaxed">
-                  {vehicle.shortDescription}
-                </p>
+              <h2 className="text-lg sm:text-xl font-bold mt-4">
+                {vehicle.vehicleBrand} {vehicle.vehicleModel}
+              </h2>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs sm:text-sm text-[#d5dde2]">
-                  <span className="flex items-center gap-1.5">
-                    <Users size={15} />
-                    {vehicle.passengerCapacity}
+              <p className="text-xs sm:text-sm text-[#d5dde2] mt-1 leading-relaxed">
+                {vehicle.shortDescription}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-xs sm:text-sm text-[#d5dde2]">
+                <span className="flex items-center gap-1">
+                  <Users size={15} />
+                  {vehicle.passengerCapacity}
+                </span>
+
+                <span className="flex items-center gap-1">
+                  <Briefcase size={15} />
+                  {vehicle.luggageCapacity}
+                </span>
+
+                <span className="flex items-center gap-1 min-w-0">
+                  <MapPin size={15} className="shrink-0" />
+                  <span className="truncate">
+                    {vehicle.availableArea?.join(", ")}
                   </span>
-
-                  <span className="flex items-center gap-1.5">
-                    <Briefcase size={15} />
-                    {vehicle.luggageCapacity}
-                  </span>
-
-                  <span className="flex items-center gap-1.5 min-w-0">
-                    <MapPin size={15} className="shrink-0" />
-
-                    <span className="break-words">
-                      {vehicle.availableArea?.join(", ")}
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Owner */}
-              <div className="booking-owner-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-3.5 sm:p-4 border border-white/10">
-                <h3 className="text-sm font-semibold text-[#d5dde2] mb-3">
-                  Vehicle Owner
-                </h3>
-
-                <div className="flex items-center gap-3 min-w-0">
-                  {vehicle.profilePhoto ? (
-                    <img
-                      src={vehicle.profilePhoto}
-                      alt={vehicle.firstName}
-                      className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
-                    />
-                  ) : (
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] font-bold shrink-0">
-                      {(vehicle.firstName || "O")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm sm:text-base">
-                      {vehicle.firstName} {vehicle.lastName}
-                    </p>
-
-                    {vehicle.mobile && (
-                      <p className="text-xs text-[#d5dde2] flex items-center gap-1 mt-1 truncate">
-                        <Phone size={12} className="shrink-0" />
-                        {vehicle.mobile}
-                      </p>
-                    )}
-
-                    {vehicle.email && (
-                      <p className="text-xs text-[#d5dde2] flex items-center gap-1 truncate max-w-full">
-                        <Mail size={12} className="shrink-0" />
-                        <span className="truncate">
-                          {vehicle.email}
-                        </span>
-                      </p>
-                    )}
-                  </div>
-                </div>
+                </span>
               </div>
             </div>
 
-            {/* Booking Form */}
-            <form
-              onSubmit={handleSubmit}
-              className="booking-form-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-4 sm:p-5 md:p-6 border border-white/10 space-y-4 h-fit"
+            <div className="booking-owner-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-4 border border-white/10">
+              <h3 className="text-sm font-semibold text-[#d5dde2] mb-3">
+                Vehicle Owner
+              </h3>
+
+              <div className="flex items-center gap-3 min-w-0">
+                {vehicle.profilePhoto && (
+                  <img
+                    src={vehicle.profilePhoto}
+                    alt={vehicle.firstName}
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
+                  />
+                )}
+
+                <div className="min-w-0">
+                  <p className="font-medium truncate">
+                    {vehicle.firstName} {vehicle.lastName}
+                  </p>
+
+                  {vehicle.mobile && (
+                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 mt-1 truncate">
+                      <Phone size={12} className="shrink-0" />
+                      {vehicle.mobile}
+                    </p>
+                  )}
+
+                  {vehicle.email && (
+                    <p className="text-xs text-[#d5dde2] flex items-center gap-1 truncate">
+                      <Mail size={12} className="shrink-0" />
+                      {vehicle.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BOOKING FORM */}
+          <form
+            onSubmit={handleSubmit}
+            className="booking-form-anim bg-[#1B2B34] rounded-[18px] sm:rounded-[20px] p-4 sm:p-6 border border-white/10 space-y-4 h-fit min-w-0"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className="text-lg font-bold">
+                Book this vehicle
+              </h2>
+
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsReturnTrip(false);
+                    updateForm("returnDate", "");
+                  }}
+                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
+                    !isReturnTrip
+                      ? "bg-[#00C896] text-white"
+                      : "bg-[#4A5C6A80] text-[#d5dde2]"
+                  }`}
+                >
+                  One Way
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsReturnTrip(true)}
+                  className={`h-[32px] px-4 rounded-full font-semibold text-xs transition flex-1 sm:flex-none ${
+                    isReturnTrip
+                      ? "bg-[#00C896] text-white"
+                      : "bg-[#4A5C6A80] text-[#d5dde2]"
+                  }`}
+                >
+                  Round Trip
+                </button>
+              </div>
+            </div>
+
+            {/* PICKUP */}
+            <div>
+              <label className="block text-sm text-[#d5dde2] mb-1">
+                Pickup Location
+              </label>
+
+              <div className="relative">
+                <input
+                  readOnly
+                  value={form.pickupLocation}
+                  onClick={() => setMapPickerTarget("pickup")}
+                  placeholder="Click to pick location on map"
+                  className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-4 pr-10 outline-none cursor-pointer text-sm min-w-0"
+                />
+
+                <MapPin
+                  size={16}
+                  onClick={() => setMapPickerTarget("pickup")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* DROP OFF */}
+            <div>
+              <label className="block text-sm text-[#d5dde2] mb-1">
+                Drop-off Location
+              </label>
+
+              <div className="relative">
+                <input
+                  readOnly
+                  value={form.dropoffLocation}
+                  onClick={() => setMapPickerTarget("dropoff")}
+                  placeholder="Click to pick location on map"
+                  className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-4 pr-10 outline-none cursor-pointer text-sm min-w-0"
+                />
+
+                <MapPin
+                  size={16}
+                  onClick={() => setMapPickerTarget("dropoff")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* DATES */}
+            <div
+              className={`grid gap-4 ${
+                isReturnTrip
+                  ? "grid-cols-1 sm:grid-cols-2"
+                  : "grid-cols-1"
+              }`}
             >
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <h2 className="text-lg font-bold">
-                  Book this vehicle
-                </h2>
-
-                <div className="flex w-full sm:w-auto gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsReturnTrip(false);
-                      updateForm("returnDate", "");
-                    }}
-                    className={`flex-1 sm:flex-none h-[34px] px-3 sm:px-4 rounded-full font-semibold text-[11px] sm:text-xs transition ${
-                      !isReturnTrip
-                        ? "bg-[#00C896] text-white"
-                        : "bg-[#4A5C6A80] text-[#d5dde2]"
-                    }`}
-                  >
-                    One Way
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsReturnTrip(true)}
-                    className={`flex-1 sm:flex-none h-[34px] px-3 sm:px-4 rounded-full font-semibold text-[11px] sm:text-xs transition ${
-                      isReturnTrip
-                        ? "bg-[#00C896] text-white"
-                        : "bg-[#4A5C6A80] text-[#d5dde2]"
-                    }`}
-                  >
-                    Round Trip
-                  </button>
-                </div>
-              </div>
-
-              {/* Pickup */}
-              <div>
-                <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                  Pickup Location
+              <div className="min-w-0 overflow-hidden">
+                <label className="block text-sm text-[#d5dde2] mb-1">
+                  Pickup Date
                 </label>
 
-                <div className="relative">
-                  <input
-                    readOnly
-                    value={form.pickupLocation}
-                    onClick={() => setMapPickerTarget("pickup")}
-                    placeholder="Click to pick location on map"
-                    className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 pr-10 outline-none cursor-pointer text-xs sm:text-sm"
-                  />
-
-                  <MapPin
-                    size={16}
-                    onClick={() => setMapPickerTarget("pickup")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Drop-off */}
-              <div>
-                <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                  Drop-off Location
-                </label>
-
-                <div className="relative">
-                  <input
-                    readOnly
-                    value={form.dropoffLocation}
-                    onClick={() => setMapPickerTarget("dropoff")}
-                    placeholder="Click to pick location on map"
-                    className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 pr-10 outline-none cursor-pointer text-xs sm:text-sm"
-                  />
-
-                  <MapPin
-                    size={16}
-                    onClick={() => setMapPickerTarget("dropoff")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#00C896] cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div
-                className={`grid grid-cols-1 ${
-                  isReturnTrip ? "sm:grid-cols-2" : "grid-cols-1"
-                } gap-4`}
-              >
-                <div>
-                  <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                    Pickup Date
-                  </label>
-
+                <div className="w-full min-w-0 overflow-hidden rounded-[12px]">
                   <input
                     type="date"
                     value={form.pickupDate}
@@ -552,16 +560,33 @@ export default function BookingPage() {
                     onChange={(e) =>
                       updateForm("pickupDate", e.target.value)
                     }
-                    className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-xs sm:text-sm"
+                    className="
+                      block
+                      w-full
+                      max-w-full
+                      min-w-0
+                      h-[42px]
+                      bg-[#4A5C6A80]
+                      rounded-[12px]
+                      px-3
+                      sm:px-4
+                      py-2
+                      outline-none
+                      text-sm
+                      text-white
+                      appearance-none
+                    "
                   />
                 </div>
+              </div>
 
-                {isReturnTrip && (
-                  <div>
-                    <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                      Return Date
-                    </label>
+              {isReturnTrip && (
+                <div className="min-w-0 overflow-hidden">
+                  <label className="block text-sm text-[#d5dde2] mb-1">
+                    Return Date
+                  </label>
 
+                  <div className="w-full min-w-0 overflow-hidden rounded-[12px]">
                     <input
                       type="date"
                       value={form.returnDate}
@@ -572,135 +597,149 @@ export default function BookingPage() {
                       onChange={(e) =>
                         updateForm("returnDate", e.target.value)
                       }
-                      className="w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-xs sm:text-sm"
+                      className="
+                        block
+                        w-full
+                        max-w-full
+                        min-w-0
+                        h-[42px]
+                        bg-[#4A5C6A80]
+                        rounded-[12px]
+                        px-3
+                        sm:px-4
+                        py-2
+                        outline-none
+                        text-sm
+                        text-white
+                        appearance-none
+                      "
                     />
                   </div>
-                )}
-              </div>
-
-              {/* Passengers / Bags */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                    Passengers
-                  </label>
-
-                  <Select
-                    options={passengerOptions}
-                    value={
-                      passengerOptions.find(
-                        (o) =>
-                          o.value === form.numberOfPassengers
-                      ) || null
-                    }
-                    onChange={(selected) =>
-                      updateForm(
-                        "numberOfPassengers",
-                        selected ? selected.value : ""
-                      )
-                    }
-                    placeholder="Select passengers"
-                    menuPosition="fixed"
-                    menuPortalTarget={document.body}
-                    styles={passengerSelectStyles}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm text-[#d5dde2] mb-1">
-                    Bags
-                  </label>
-
-                  <Select
-                    options={luggageOptions}
-                    value={
-                      luggageOptions.find(
-                        (o) => o.value === form.bags
-                      ) || null
-                    }
-                    onChange={(selected) =>
-                      updateForm(
-                        "bags",
-                        selected ? selected.value : ""
-                      )
-                    }
-                    placeholder="Select bag capacity"
-                    menuPosition="fixed"
-                    menuPortalTarget={document.body}
-                    styles={selectStyles}
-                  />
-                </div>
-              </div>
-
-              {/* Estimate */}
-              {estimating && (
-                <p className="text-xs sm:text-sm text-[#d5dde2]">
-                  Calculating distance & price...
-                </p>
-              )}
-
-              {estimate && !estimating && (
-                <div className="bg-[#4A5C6A80] rounded-[12px] p-3.5 sm:p-4 space-y-2">
-                  <div className="flex items-center justify-between gap-4 text-xs sm:text-sm text-[#d5dde2]">
-                    <span>Distance</span>
-
-                    <span className="text-right">
-                      {estimate.distanceKm} km
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-[#00C896]">
-                    <span>Total Price</span>
-
-                    <span className="text-right">
-                      Rs.{" "}
-                      {estimate.totalPrice.toLocaleString()}
-                    </span>
-                  </div>
                 </div>
               )}
+            </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={submitting || !estimate}
-                className="w-full min-h-[46px] sm:h-[48px] rounded-full bg-[#00C896] hover:bg-[#00b383] disabled:opacity-50 text-white text-sm sm:text-base font-semibold transition"
-              >
-                {submitting
-                  ? "Booking..."
-                  : "Request Booking"}
-              </button>
-            </form>
-          </div>
+            {/* PASSENGERS + BAGS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
 
-          {/* Reviews */}
-          <section className="booking-reviews-anim mt-8 sm:mt-10">
-            {loadingReviews ? (
-              <p className="text-xs sm:text-sm text-[#d5dde2]">
-                Loading reviews...
+              <div className="min-w-0">
+                <label className="block text-sm text-[#d5dde2] mb-1">
+                  Passengers
+                </label>
+
+                <Select
+                  options={passengerOptions}
+                  value={
+                    passengerOptions.find(
+                      (o) =>
+                        Number(o.value) ===
+                        Number(form.numberOfPassengers)
+                    ) || null
+                  }
+                  onChange={(selected) =>
+                    updateForm(
+                      "numberOfPassengers",
+                      selected ? selected.value : ""
+                    )
+                  }
+                  placeholder="Select passengers"
+                  menuPosition="fixed"
+                  menuPortalTarget={document.body}
+                  styles={selectStyles}
+                  isSearchable={false}
+                />
+              </div>
+
+              <div className="min-w-0">
+                <label className="block text-sm text-[#d5dde2] mb-1">
+                  Bags
+                </label>
+
+                <Select
+                  options={luggageOptions}
+                  value={
+                    luggageOptions.find(
+                      (o) =>
+                        Number(o.value) === Number(form.bags)
+                    ) || null
+                  }
+                  onChange={(selected) =>
+                    updateForm(
+                      "bags",
+                      selected ? selected.value : ""
+                    )
+                  }
+                  placeholder="Select bag capacity"
+                  menuPosition="fixed"
+                  menuPortalTarget={document.body}
+                  styles={selectStyles}
+                  isSearchable={false}
+                />
+              </div>
+            </div>
+
+            {/* ESTIMATE */}
+            {estimating && (
+              <p className="text-sm text-[#d5dde2]">
+                Calculating distance & price...
               </p>
-            ) : (
-              <TransportReviews
-                vehicleId={vehicleId}
-                reviews={reviews}
-                onReviewAdded={(review, isUpdate) => {
-                  setReviews((prev) =>
-                    isUpdate
-                      ? prev.map((r) =>
-                          r._id === review._id ? review : r
-                        )
-                      : [review, ...prev]
-                  );
-                }}
-                onReviewDeleted={(id) =>
-                  setReviews((prev) =>
-                    prev.filter((r) => r._id !== id)
-                  )
-                }
-              />
             )}
-          </section>
+
+            {estimate && !estimating && (
+              <div className="bg-[#4A5C6A80] rounded-[12px] p-4 space-y-1">
+                <div className="flex justify-between text-sm text-[#d5dde2] gap-4">
+                  <span>Distance</span>
+                  <span>{estimate.distanceKm} km</span>
+                </div>
+
+                <div className="flex justify-between font-semibold text-[#00C896] gap-4">
+                  <span>Total Price</span>
+                  <span>
+                    Rs. {estimate.totalPrice.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting || !estimate}
+              className="w-full h-[48px] rounded-full bg-[#00C896] hover:bg-[#00b383] disabled:opacity-50 text-white font-semibold transition"
+            >
+              {submitting
+                ? "Booking..."
+                : "Request Booking"}
+            </button>
+          </form>
         </div>
+
+        {/* REVIEWS */}
+        <section className="booking-reviews-anim mt-8 sm:mt-10">
+          {loadingReviews ? (
+            <p className="text-sm text-[#d5dde2]">
+              Loading reviews...
+            </p>
+          ) : (
+            <TransportReviews
+              vehicleId={vehicleId}
+              reviews={reviews}
+              onReviewAdded={(review, isUpdate) => {
+                setReviews((prev) =>
+                  isUpdate
+                    ? prev.map((r) =>
+                        r._id === review._id ? review : r
+                      )
+                    : [review, ...prev]
+                );
+              }}
+              onReviewDeleted={(id) =>
+                setReviews((prev) =>
+                  prev.filter((r) => r._id !== id)
+                )
+              }
+            />
+          )}
+        </section>
       </section>
 
       <Footer />
