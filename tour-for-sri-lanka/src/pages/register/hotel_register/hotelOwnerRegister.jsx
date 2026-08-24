@@ -35,10 +35,13 @@ const selectStyles = {
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        borderRadius: "15px",
+        overflow: "hidden",
+        zIndex: 99999,
     }),
     menuPortal: (base) => ({
         ...base,
-        zIndex: 9999,
+        zIndex: 99999,
     }),
     option: (base, state) => ({
         ...base,
@@ -434,8 +437,8 @@ export default function HotelOwnerRegister() {
                                 value={country}
                                 onChange={handleCountryChange}
                                 placeholder="Country"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
 
