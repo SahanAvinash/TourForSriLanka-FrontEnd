@@ -8,7 +8,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { tripCount } = useTrip();
-  const isProfileActive = location.pathname.startsWith("/profile")
+  const isProfileActive = location.pathname.startsWith("/profile");
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -16,8 +16,11 @@ const Navbar = () => {
 
   useEffect(() => {
     const loadUser = () => {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const storedUser =
+        localStorage.getItem("user") || sessionStorage.getItem("user");
+
       if (token && storedUser) {
         try {
           setUser(JSON.parse(storedUser));
@@ -31,6 +34,7 @@ const Navbar = () => {
 
     loadUser();
     window.addEventListener("storage", loadUser);
+
     return () => window.removeEventListener("storage", loadUser);
   }, [location]);
 
@@ -40,7 +44,9 @@ const Navbar = () => {
         setIsProfileOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -56,7 +62,7 @@ const Navbar = () => {
   };
 
   const menuItems = [
-    { name: "Home", path: "/"},
+    { name: "Home", path: "/" },
     { name: "Hotels", path: "/hotels" },
     { name: "Transport", path: "/transport" },
     { name: "Tours", path: "/tours" },
@@ -70,26 +76,30 @@ const Navbar = () => {
       return (
         location.pathname === "/" ||
         location.pathname.startsWith("/destinations")
-      )
+      );
     }
-    if(path === "/hotels"){
+
+    if (path === "/hotels") {
       return (
         location.pathname.startsWith("/hotels") ||
         location.pathname.startsWith("/hotel/")
-      )
+      );
     }
-    if(path === "/guides"){
-      return(
+
+    if (path === "/guides") {
+      return (
         location.pathname.startsWith("/guides") ||
         location.pathname.startsWith("/guide/")
-      )
+      );
     }
-    if(path === "/tours"){
-      return(
+
+    if (path === "/tours") {
+      return (
         location.pathname.startsWith("/tours") ||
         location.pathname.startsWith("/tour/")
-      )
+      );
     }
+
     return location.pathname.startsWith(path);
   };
 
@@ -97,7 +107,6 @@ const Navbar = () => {
     <nav className="navbar-anim fixed top-0 w-full z-50 bg-[#253745]/95 backdrop-blur-md border-b border-white/10 shadow-md">
       <div className="max-w-7xl mx-auto px-10 lg:px-10">
         <div className="flex items-center justify-between h-20">
-
           <Link to="/">
             <img
               src={logo}
@@ -111,14 +120,14 @@ const Navbar = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative text-[15px] transition-all duration-300 pb-1
-                  ${
-                    isActive(item.path)
-                      ? "text-[#00C896] border-b-2 border-[#00C896] font-semibold"
-                      : "text-white hover:text-[#00C896]"
-                  }`}
+                className={`relative text-[15px] transition-all duration-300 pb-1 ${
+                  isActive(item.path)
+                    ? "text-[#00C896] border-b-2 border-[#00C896] font-semibold"
+                    : "text-white hover:text-[#00C896]"
+                }`}
               >
                 {item.name}
+
                 {item.path === "/tours" && tripCount > 0 && (
                   <span className="absolute -top-2 -right-4 bg-[#00C896] text-[#06141B] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                     {tripCount}
@@ -140,9 +149,9 @@ const Navbar = () => {
                       src={user.image}
                       alt="profile"
                       className={`w-9 h-9 rounded-full object-cover border-2 transition duration-300 ${
-                          isProfileActive
-                            ? "border-[#00C896]"
-                            : "border-transparent hover:border-[#00C896]"
+                        isProfileActive
+                          ? "border-[#00C896]"
+                          : "border-transparent hover:border-[#00C896]"
                       }`}
                     />
                   ) : (
@@ -159,6 +168,7 @@ const Navbar = () => {
                     >
                       Profile
                     </Link>
+
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-3 text-[14px] text-white hover:bg-[#00C896]/10 hover:text-[#00C896] transition"
@@ -193,7 +203,6 @@ const Navbar = () => {
           >
             {isOpen ? <HiX /> : <HiMenu />}
           </button>
-
         </div>
       </div>
 
@@ -205,14 +214,14 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`relative py-3 transition flex items-center gap-2
-                  ${
-                    isActive(item.path)
-                      ? "text-[#00C896] font-semibold"
-                      : "text-white hover:text-[#00C896]"
-                  }`}
+                className={`relative py-3 transition flex items-center gap-2 ${
+                  isActive(item.path)
+                    ? "text-[#00C896] font-semibold"
+                    : "text-white hover:text-[#00C896]"
+                }`}
               >
                 {item.name}
+
                 {item.path === "/tours" && tripCount > 0 && (
                   <span className="bg-[#00C896] text-[#06141B] text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                     {tripCount}
@@ -223,17 +232,6 @@ const Navbar = () => {
 
             {user ? (
               <div className="flex flex-col gap-3 mt-5 border-t border-white/10 pt-4">
-                <div className="flex items-center gap-2 text-white">
-                  {user.image ? (
-                    <img
-                      src={user.image}
-                      alt="profile"
-                      className="w-9 h-9 rounded-full object-cover"
-                    />
-                  ) : (
-                    <HiUserCircle className="text-3xl" />
-                  )}
-                </div>
                 <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
@@ -241,6 +239,7 @@ const Navbar = () => {
                 >
                   Profile
                 </Link>
+
                 <button
                   onClick={handleLogout}
                   className="text-center py-2 rounded-full bg-[#00C896] text-white hover:bg-[#00b884] transition"

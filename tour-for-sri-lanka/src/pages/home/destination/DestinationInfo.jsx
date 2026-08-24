@@ -42,7 +42,7 @@ const DestinationInfo = ({ destination }) => {
       <div className="flex items-center gap-4 mt-10">
         <Link
           to="/tours"
-          className="inline-block bg-[var(--color-primary-green)] hover:bg-[#00b383] duration-300 text-white px-8 py-4 rounded-full font-semibold"
+          className="inline-block text-center bg-[var(--color-primary-green)] hover:bg-[#00b383] duration-300 text-white px-8 py-4 rounded-full font-semibold"
         >
           Explore Tours
         </Link>
