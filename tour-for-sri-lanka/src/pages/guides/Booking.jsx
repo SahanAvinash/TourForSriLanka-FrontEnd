@@ -12,7 +12,7 @@ export default function Booking({ guide, onClose, onSuccess }) {
     quantity: 1,
     guests: 1,
     message: "",
-  });
+  }); 
 
   const [submitting, setSubmitting] = useState(false);
 
