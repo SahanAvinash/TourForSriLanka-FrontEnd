@@ -97,10 +97,13 @@ const selectStyles = {
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        borderRadius: "15px",
+        overflow: "hidden",
+        zIndex: 99999,
     }),
     menuPortal: (base) => ({
         ...base,
-        zIndex: 9999,
+        zIndex: 99999,
     }),
     option: (base, state) => ({
         ...base,
@@ -179,9 +182,8 @@ function MapPickerModal({ initialPosition, onClose, onConfirm }) {
             setAddress(data.display_name || "");
         } catch (error) {
             setAddress("");
-        } finally {
-            setLoadingAddress(false);
-        }
+        } opacity: 1,
+        setLoadingAddress(false);
     };
 
     useEffect(() => {
@@ -666,8 +668,8 @@ export default function HotelInformation() {
                                 value={hotelType}
                                 onChange={setHotelType}
                                 placeholder="Hotel Type"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
@@ -758,8 +760,8 @@ export default function HotelInformation() {
                                 value={province}
                                 onChange={handleProvinceChange}
                                 placeholder="Province"
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
 
@@ -773,8 +775,8 @@ export default function HotelInformation() {
                                         : "Select province first"
                                 }
                                 isDisabled={!province}
-                                menuPosition="fixed"
-                                menuPortalTarget={document.body}
+                                menuPlacement="auto"
+                                menuShouldScrollIntoView={false}
                                 styles={selectStyles}
                             />
                         </div>
