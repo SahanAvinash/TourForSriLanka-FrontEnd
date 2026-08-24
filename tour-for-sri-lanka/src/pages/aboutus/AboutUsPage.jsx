@@ -130,7 +130,7 @@ export default function AboutUsPage() {
             backgroundImage: `url(${aboutBg})`,
           }}
         >
-          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-x-0 bottom-0 h-32 sm:h-40 bg-gradient-to-t from-[#0D2434] via-[#0D2434]/70 to-transparent" />
 
           <div className="absolute left-5 right-5 sm:left-8 sm:right-8 top-12 sm:top-16 text-white max-w-2xl">
             <h1 className="hero-title-anim text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
