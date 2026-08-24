@@ -184,7 +184,12 @@ function RecenterMap({ position }) {
     const map = useMap();
 
     useEffect(() => {
-        map.flyTo(position, map.getZoom());
+        if (position) {
+            map.flyTo(position, map.getZoom());
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 200);
+        }
     }, [map, position]);
 
     return null;
@@ -308,89 +313,91 @@ function MapPickerModal({
     };
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 px-[20px]">
-            <div className="w-[600px] max-w-full rounded-[20px] bg-primary-2 p-[20px] text-text">
-                <h2 className="mb-[10px] text-center text-[18px] font-bold">
-                    Pick your address location
-                </h2>
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-4 overflow-y-auto">
+            <div className="w-full max-w-[600px] rounded-[20px] bg-primary-2 p-4 sm:p-[20px] text-text my-auto max-h-[90vh] flex flex-col justify-between">
+                <div>
+                    <h2 className="mb-[10px] text-center text-[16px] sm:text-[18px] font-bold">
+                        Pick your address location
+                    </h2>
 
-                <div className="relative w-full">
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(event) =>
-                            setSearchQuery(event.target.value)
-                        }
-                        placeholder="Search for a place (e.g. Galle Fort, Kandy)"
-                        className="h-[45px] w-full rounded-[15px] bg-border/50 pl-[40px] pr-[15px] text-[12px] text-text placeholder:text-text/50"
-                    />
+                    <div className="relative w-full">
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(event) =>
+                                setSearchQuery(event.target.value)
+                            }
+                            placeholder="Search for a place (e.g. Galle Fort)"
+                            className="h-[45px] w-full rounded-[15px] bg-border/50 pl-[40px] pr-[15px] text-[12px] text-text placeholder:text-text/50 outline-none"
+                        />
 
-                    <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[12px] text-primary-green/70" />
+                        <FaSearch className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[12px] text-primary-green/70" />
 
-                    {(searching || searchResults.length > 0) && (
-                        <div className="absolute left-0 top-[50px] z-[1001] max-h-[200px] w-full overflow-y-auto overflow-hidden rounded-[15px] bg-border">
-                            {searching && (
-                                <div className="px-[15px] py-[10px] text-[12px] text-text/70">
-                                    Searching...
-                                </div>
-                            )}
-
-                            {!searching &&
-                                searchResults.map((result, index) => (
-                                    <div
-                                        key={`${result.place_id}-${index}`}
-                                        onClick={() =>
-                                            handleSelectResult(result)
-                                        }
-                                        className="cursor-pointer border-b border-text/10 px-[15px] py-[10px] text-[12px] text-text last:border-none hover:bg-primary-green/40"
-                                    >
-                                        {result.display_name}
+                        {(searching || searchResults.length > 0) && (
+                            <div className="absolute left-0 top-[50px] z-[100001] max-h-[180px] w-full overflow-y-auto rounded-[15px] bg-border shadow-lg">
+                                {searching && (
+                                    <div className="px-[15px] py-[10px] text-[12px] text-text/70">
+                                        Searching...
                                     </div>
-                                ))}
-                        </div>
-                    )}
-                </div>
+                                )}
 
-                <div className="mt-[15px] h-[350px] w-full overflow-hidden rounded-[15px]">
-                    <MapContainer
-                        center={position}
-                        zoom={13}
-                        style={{
-                            height: "100%",
-                            width: "100%",
-                        }}
+                                {!searching &&
+                                    searchResults.map((result, index) => (
+                                        <div
+                                            key={`${result.place_id}-${index}`}
+                                            onClick={() =>
+                                                handleSelectResult(result)
+                                            }
+                                            className="cursor-pointer border-b border-text/10 px-[15px] py-[10px] text-[12px] text-text last:border-none hover:bg-primary-green/40"
+                                        >
+                                            {result.display_name}
+                                        </div>
+                                    ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-[15px] h-[250px] sm:h-[320px] w-full overflow-hidden rounded-[15px] relative z-0">
+                        <MapContainer
+                            center={position}
+                            zoom={13}
+                            style={{
+                                height: "100%",
+                                width: "100%",
+                            }}
+                        >
+                            <TileLayer
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                attribution="&copy; OpenStreetMap contributors"
+                            />
+
+                            <Marker position={position} />
+
+                            <LocationClickHandler
+                                onPick={handlePick}
+                            />
+
+                            <RecenterMap position={position} />
+                        </MapContainer>
+                    </div>
+
+                    <div className="mt-[10px] min-h-[40px] w-full rounded-[15px] bg-border/50 p-[10px] text-[12px] break-words">
+                        {loadingAddress
+                            ? "Finding address..."
+                            : address ||
+                              "Click on the map to drop a pin"}
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleUseMyLocation}
+                        className="mt-[8px] w-full cursor-pointer text-left text-[12px] text-primary-green/80 underline"
                     >
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution="&copy; OpenStreetMap contributors"
-                        />
-
-                        <Marker position={position} />
-
-                        <LocationClickHandler
-                            onPick={handlePick}
-                        />
-
-                        <RecenterMap position={position} />
-                    </MapContainer>
+                        {locating
+                            ? "Locating..."
+                            : "Use my current location"}
+                    </button>
                 </div>
-
-                <div className="mt-[15px] min-h-[40px] w-full rounded-[15px] bg-border/50 p-[10px] text-[12px]">
-                    {loadingAddress
-                        ? "Finding address..."
-                        : address ||
-                          "Click on the map to drop a pin"}
-                </div>
-
-                <button
-                    type="button"
-                    onClick={handleUseMyLocation}
-                    className="mt-[10px] w-full cursor-pointer text-left text-[12px] text-primary-green/80 underline"
-                >
-                    {locating
-                        ? "Locating..."
-                        : "Use my current location"}
-                </button>
 
                 <div className="mt-[15px] flex w-full gap-3">
                     <button
@@ -433,7 +440,6 @@ export default function GuideInformation() {
     const [maritalStatus, setMaritalStatus] = useState(null);
     const [ethnicity, setEthnicity] = useState(null);
     const [province, setProvince] = useState(null);
-    const [NIC, setNIC] = useState("");
     const [district, setDistrict] = useState(null);
     const [aboutYourSelf, setAboutYourSelf] = useState("");
     const [err, setErr] = useState("");
@@ -476,7 +482,6 @@ export default function GuideInformation() {
 
         setDateOfBirth(data.dateOfBirth || "");
         setAddress(data.address || "");
-        setNIC(data.NIC || "");
         setAboutYourSelf(data.aboutYourSelf || "");
 
         if (
@@ -541,7 +546,6 @@ export default function GuideInformation() {
             maritalStatus: maritalStatus?.value,
             ethnicity: ethnicity?.value,
             province: province?.value,
-            NIC,
             district: district?.value,
             aboutYourSelf,
         };
@@ -564,7 +568,6 @@ export default function GuideInformation() {
             !maritalStatus ||
             !ethnicity ||
             !province ||
-            !NIC ||
             !district
         ) {
             setErr("Please fill all required fields");
@@ -583,14 +586,6 @@ export default function GuideInformation() {
             setErr(
                 "You must be at least 18 years old to register as a guide"
             );
-            return;
-        }
-
-        const nicRegex =
-            /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
-
-        if (!nicRegex.test(NIC)) {
-            setErr("Please enter a valid NIC Number");
             return;
         }
 
@@ -686,7 +681,7 @@ export default function GuideInformation() {
                             </div>
                         )}
 
-                        <div className="relative mt-[20px] w-full">
+                        <div className="relative mt-[20px] w-full min-w-0">
                             <input
                                 ref={dobRef}
                                 type="date"
@@ -706,7 +701,7 @@ export default function GuideInformation() {
                                         dobRef.current?.showPicker();
                                     } catch {}
                                 }}
-                                className={`h-[50px] w-full rounded-[20px] bg-border/50 pl-[20px] pr-[45px] text-[12px] [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 ${
+                                className={`h-[50px] w-full min-w-0 box-border appearance-none rounded-[20px] bg-border/50 pl-[20px] pr-[45px] text-[12px] [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 ${
                                     dateOfBirth
                                         ? "text-text"
                                         : "text-transparent"
@@ -722,7 +717,7 @@ export default function GuideInformation() {
                             )}
                         </div>
 
-                        <div className="relative mt-[10px] w-full">
+                        <div className="relative mt-[10px] w-full min-w-0">
                             <input
                                 placeholder="Home Address"
                                 value={address}
@@ -737,7 +732,7 @@ export default function GuideInformation() {
                             <button
                                 type="button"
                                 onClick={handleOpenMap}
-                                className="absolute right-[15px] top-1/2 -translate-y-1/2 cursor-pointer text-primary-green/80"
+                                className="absolute right-[15px] top-1/2 -translate-y-1/2 cursor-pointer p-2 text-primary-green/80 hover:text-primary-green"
                             >
                                 <FaMap />
                             </button>
@@ -787,29 +782,7 @@ export default function GuideInformation() {
                             />
                         </div>
 
-                        <div className="mt-[10px] grid w-full grid-cols-1 gap-3 text-[12px] sm:grid-cols-2 sm:gap-4">
-                            <input
-                                placeholder="NIC"
-                                value={NIC}
-                                maxLength={12}
-                                onChange={(event) => {
-                                    const value =
-                                        event.target.value;
-
-                                    if (
-                                        /^[0-9]{0,12}$/.test(
-                                            value
-                                        ) ||
-                                        /^[0-9]{9}[vVxX]$/.test(
-                                            value
-                                        )
-                                    ) {
-                                        setNIC(value);
-                                    }
-                                }}
-                                className="h-[50px] w-full rounded-[20px] bg-border/50 pl-[20px] text-[12px] text-text"
-                            />
-
+                        <div className="mt-[10px] w-full text-[12px]">
                             <Select
                                 options={districtOptions}
                                 value={district}
