@@ -20,10 +20,13 @@ const selectStyles = {
             "color-mix(in srgb, var(--color-border) 50%, transparent)",
         border: "none",
         boxShadow: "none",
+        cursor: "pointer",
     }),
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     menu: (base) => ({
         ...base,
         backgroundColor: "var(--color-border)",
+        zIndex: 9999,
     }),
     option: (base, state) => ({
         ...base,
@@ -81,10 +84,12 @@ export default function VehicleOwnerRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const options = COUNTRIES.map((country) => ({
-        label: `${country.flag} ${country.name}`,
-        value: country.code,
-    }));
+    const options =
+        COUNTRIES?.map((country) => ({
+            label: `${country.flag} ${country.name}`,
+            value: country.code,
+            dial: country.dial,
+        })) || [];
 
     const handleCountryChange = (selected) => {
         setCountry(selected);
@@ -95,14 +100,8 @@ export default function VehicleOwnerRegister() {
             return;
         }
 
-        const found = COUNTRIES.find(
-            (country) => country.code === selected.value
-        );
-
-        if (found) {
-            setDialCode(found.dial);
-            setMobile("");
-        }
+        setDialCode(selected.dial || "");
+        setMobile("");
     };
 
     const buildFormData = () => {
@@ -431,8 +430,9 @@ export default function VehicleOwnerRegister() {
                                         value={country}
                                         onChange={handleCountryChange}
                                         placeholder="Country"
-                                        menuPosition="fixed"
                                         styles={selectStyles}
+                                        menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                                        menuPosition="fixed"
                                     />
                                 </div>
 
