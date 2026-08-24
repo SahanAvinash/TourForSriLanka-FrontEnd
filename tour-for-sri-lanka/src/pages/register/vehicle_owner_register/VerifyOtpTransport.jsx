@@ -134,7 +134,8 @@ export default function VerifyOtpTransport() {
 
             formData.append("otp", otp);
 
-            const response = await fetch(API_BASE_URL, {
+            // FIX 1: API_BASE_URL වෙනුවට නිවැරදි Transport Register Endpoint එක `${API_URL}/register` ලෙස ලබා දීම
+            const response = await fetch(`${API_URL}/register`, {
                 method: "POST",
                 body: formData,
             });
@@ -166,8 +167,9 @@ export default function VerifyOtpTransport() {
         setResendMsg("");
 
         try {
+            // FIX 2: Correct transport OTP resend route URL
             const response = await fetch(
-                `${API_BASE_URL}/send-otp`,
+                `${API_URL}/send-otp`,
                 {
                     method: "POST",
                     headers: {
