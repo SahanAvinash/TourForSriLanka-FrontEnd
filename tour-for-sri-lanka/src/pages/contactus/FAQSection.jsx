@@ -37,18 +37,17 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="px-6 mb-16">
-      <div className="bg-[#253745] rounded-3xl p-8">
-
-        <h2 className="text-3xl font-bold text-white mb-2">
+    <section className="px-4 sm:px-6 mb-12 sm:mb-16">
+      <div className="bg-[#253745] rounded-3xl p-5 sm:p-6 md:p-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
           Frequently Asked Questions
         </h2>
 
-        <p className="text-gray-400 mb-8">
+        <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base">
           Find answers to the questions we receive most often.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
@@ -56,28 +55,27 @@ export default function FAQSection() {
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center px-6 py-5 text-left"
+                className="w-full flex justify-between items-center gap-4 px-4 sm:px-6 py-4 sm:py-5 text-left"
               >
-                <span className="text-white font-semibold text-lg">
+                <span className="text-white font-semibold text-sm sm:text-base md:text-lg leading-6">
                   {faq.question}
                 </span>
 
                 {openIndex === index ? (
-                  <FaChevronUp className="text-[#00C896]" />
+                  <FaChevronUp className="text-[#00C896] flex-shrink-0 text-sm sm:text-base" />
                 ) : (
-                  <FaChevronDown className="text-[#00C896]" />
+                  <FaChevronDown className="text-[#00C896] flex-shrink-0 text-sm sm:text-base" />
                 )}
               </button>
 
               {openIndex === index && (
-                <div className="px-6 pb-5 text-gray-300 leading-7">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 text-gray-300 text-sm sm:text-base leading-6 sm:leading-7">
                   {faq.answer}
                 </div>
               )}
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

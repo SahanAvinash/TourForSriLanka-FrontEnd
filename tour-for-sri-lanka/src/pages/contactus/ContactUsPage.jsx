@@ -7,54 +7,72 @@ import FAQSection from "./FAQSection";
 import OfficeLocation from "./OfficeLocation";
 
 function useInView(threshold = 0.15) {
-  const ref = useRef(null)
-  const [inView, setInView] = useState(false)
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const el = ref.current;
+    if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setInView(true)
-          observer.unobserve(el)
+          setInView(true);
+          observer.unobserve(el);
         }
       },
       { threshold }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+    );
 
-  return [ref, inView]
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, inView];
 }
 
 export default function ContactUsPage() {
-  const [infoRef, infoInView] = useInView()
-  const [officeRef, officeInView] = useInView()
-  const [faqRef, faqInView] = useInView()
+  const [infoRef, infoInView] = useInView();
+  const [officeRef, officeInView] = useInView();
+  const [faqRef, faqInView] = useInView();
 
   return (
-    <div className="bg-[#11212D] min-h-screen pt-20">
-        <Navbar/>
+    <div className="bg-[#11212D] min-h-screen pt-20 overflow-x-hidden">
+      <Navbar />
 
-        <div className="contact-hero-anim">
-          <ContactHeroSection />
-        </div>
+      <div className="contact-hero-anim w-full">
+        <ContactHeroSection />
+      </div>
 
-        <div ref={infoRef} className={`contact-info-anim ${infoInView ? "in-view" : ""}`}>
-          <ContactInfo />
-        </div>
+      <div
+        ref={infoRef}
+        className={`contact-info-anim ${
+          infoInView ? "in-view" : ""
+        } w-full`}
+      >
+        <ContactInfo />
+      </div>
 
-        <div ref={officeRef} className={`office-location-anim ${officeInView ? "in-view" : ""}`}>
-          <OfficeLocation />
-        </div>
+      <div
+        ref={officeRef}
+        className={`office-location-anim ${
+          officeInView ? "in-view" : ""
+        } w-full`}
+      >
+        <OfficeLocation />
+      </div>
 
-        <div ref={faqRef} className={`faq-section-anim ${faqInView ? "in-view" : ""}`}>
-          <FAQSection />
-        </div>
+      <div
+        ref={faqRef}
+        className={`faq-section-anim ${
+          faqInView ? "in-view" : ""
+        } w-full`}
+      >
+        <FAQSection />
+      </div>
 
-        <Footer/>
+      <Footer />
     </div>
   );
 }
