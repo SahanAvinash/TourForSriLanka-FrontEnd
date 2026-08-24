@@ -129,23 +129,36 @@ const HotelHeroSection = ({ onFilterChange }) => {
   }));
 
   const handleSearch = () => {
+    const filters = {
+      destination: destination?.value || "",
+      checkIn,
+      checkOut,
+      guests,
+    };
+
     if (onFilterChange) {
-      onFilterChange({
-        destination: destination?.value || "",
-        checkIn,
-        checkOut,
-        guests,
-      });
+      onFilterChange(filters);
     }
+
+    setTimeout(() => {
+      document
+        .getElementById("hotel-search-results")
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+    }, 100);
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
   return (
-    <section className="pt-24 sm:pt-28 pb-28 sm:pb-24 bg-[#11212D]">
+    <section className="pt-24 sm:pt-28 pb-28 sm:pb-24 bg-[var(--color-primary-1)]">
       <Navbar />
 
-      <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0 rounded-[20px] sm:rounded-[30px] overflow-visible">
+      <div className="relative min-h-[650px] sm:min-h-[560px] lg:h-[430px] lg:min-h-0 rounded-[20px] sm:rounded-[30px] overflow-visible">
 
-        {/* Background Image */}
+        {/* Background */}
         <div className="hero-bg-anim absolute inset-y-0 left-2 right-2 sm:left-4 sm:right-4 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
             src={hotel_bg}
@@ -153,36 +166,38 @@ const HotelHeroSection = ({ onFilterChange }) => {
             className="w-full h-full object-cover"
           />
 
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-black/45"></div>
+          <div className="absolute inset-0 bg-black/45" />
 
-          {/* Bottom Fade */}
-          <div className="absolute inset-x-0 bottom-0 h-[300px] sm:h-[230px] bg-gradient-to-b from-transparent via-[#11212D]/55 to-[#11212D]"></div>
+          {/* Mobile fade */}
+          <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-[#11212D] via-[#11212D]/75 to-transparent lg:hidden" />
         </div>
 
         {/* Hero Content */}
-        <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-10 sm:top-16 z-10">
-          <h1 className="hero-title-anim text-white text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
+        <div className="absolute left-6 right-6 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-12 sm:top-16 z-10">
+
+          <h1 className="hero-title-anim text-white text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
             Hotel Stay
           </h1>
 
-          <p className="hero-desc-anim text-gray-300 text-sm sm:text-lg mt-3 sm:mt-5 max-w-md">
+          <p className="hero-desc-anim text-gray-300 text-base sm:text-lg mt-4 sm:mt-5 max-w-md">
             Discover and book amazing hotels across Sri Lanka.
           </p>
         </div>
 
         {/* Search Box */}
-        <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
+        <div className="animate-box absolute top-[230px] sm:top-[250px] lg:-bottom-12 lg:top-auto left-4 right-4 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
 
-          <div className="bg-[#455766]/75 sm:bg-[#455766]/80 lg:bg-[#455766]/90 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
+          <div className="bg-[#455766]/75 backdrop-blur-xl rounded-[24px] sm:rounded-[28px] border border-white/10 shadow-2xl p-5 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
 
             {/* Destination */}
-            <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
+            <div className="flex items-center gap-3 w-full lg:flex-1">
+
               <FaMapMarkerAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
               <div className="w-full min-w-0">
+
                 <label className="block text-sm text-gray-300 mb-0.5">
                   Choose your
                 </label>
@@ -197,18 +212,21 @@ const HotelHeroSection = ({ onFilterChange }) => {
                   menuPortalTarget={document.body}
                   className="mt-1"
                 />
+
               </div>
             </div>
 
-            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4"></div>
+            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
 
-            <div className="lg:hidden h-px w-full bg-white/10 my-4"></div>
+            <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             {/* Check In */}
-            <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
+            <div className="flex items-center gap-3 w-full lg:flex-1">
+
               <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
-              <div className="w-full min-w-0">
+              <div className="w-full">
+
                 <label className="text-sm text-gray-300">
                   Check In
                 </label>
@@ -216,30 +234,33 @@ const HotelHeroSection = ({ onFilterChange }) => {
                 <input
                   type="date"
                   value={checkIn}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={today}
                   onChange={(e) => {
                     const newCheckIn = e.target.value;
 
                     setCheckIn(newCheckIn);
 
-                    if (checkOut && checkOut < newCheckIn) {
+                    if (checkOut && checkOut <= newCheckIn) {
                       setCheckOut("");
                     }
                   }}
-                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0"
+                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base"
                 />
+
               </div>
             </div>
 
-            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4"></div>
+            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
 
-            <div className="lg:hidden h-px w-full bg-white/10 my-4"></div>
+            <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             {/* Check Out */}
-            <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
+            <div className="flex items-center gap-3 w-full lg:flex-1">
+
               <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
-              <div className="w-full min-w-0">
+              <div className="w-full">
+
                 <label className="text-sm text-gray-300">
                   Check Out
                 </label>
@@ -247,27 +268,32 @@ const HotelHeroSection = ({ onFilterChange }) => {
                 <input
                   type="date"
                   value={checkOut}
-                  min={checkIn || undefined}
+                  min={checkIn || today}
+                  disabled={!checkIn}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0"
+                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base disabled:opacity-50"
                 />
+
               </div>
             </div>
 
-            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4"></div>
+            <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
 
-            <div className="lg:hidden h-px w-full bg-white/10 my-4"></div>
+            <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             {/* Guests */}
-            <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
+            <div className="flex items-center gap-3 w-full lg:flex-1">
+
               <FaUsers className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
-              <div className="w-full min-w-0">
+              <div className="w-full">
+
                 <label className="block text-sm text-gray-300 mb-0.5">
                   Guests
                 </label>
 
                 <div className="flex items-center justify-between">
+
                   <input
                     type="number"
                     min="1"
@@ -276,20 +302,24 @@ const HotelHeroSection = ({ onFilterChange }) => {
                     onChange={(e) => {
                       const value = Number(e.target.value);
 
-                      if (value >= 1 && value <= 20) {
-                        setGuests(value);
+                      if (!value) {
+                        setGuests(1);
+                        return;
                       }
+
+                      setGuests(Math.min(20, Math.max(1, value)));
                     }}
                     className="w-full bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
 
-                  <div className="flex flex-col ml-2 shrink-0">
+                  <div className="flex flex-col ml-2">
+
                     <button
                       type="button"
                       onClick={() =>
                         setGuests((g) => Math.min(20, Number(g) + 1))
                       }
-                      className="text-[#CCD0CF] hover:text-[#00C896] hover:opacity-80 leading-none transition-all duration-300"
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none transition-all duration-300"
                     >
                       <FaChevronUp size={10} />
                     </button>
@@ -299,23 +329,26 @@ const HotelHeroSection = ({ onFilterChange }) => {
                       onClick={() =>
                         setGuests((g) => Math.max(1, Number(g) - 1))
                       }
-                      className="text-[#CCD0CF] hover:text-[#00C896] hover:opacity-80 leading-none mt-1 transition-all duration-300"
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none mt-1 transition-all duration-300"
                     >
                       <FaChevronDown size={10} />
                     </button>
+
                   </div>
                 </div>
+
               </div>
             </div>
 
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="mt-4 lg:mt-0 lg:ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-6 sm:px-8 py-3.5 rounded-full flex items-center justify-center gap-2 font-semibold w-full lg:w-auto whitespace-nowrap text-sm sm:text-base"
+              className="mt-5 lg:mt-0 lg:ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center justify-center gap-2 font-semibold w-full lg:w-auto whitespace-nowrap"
             >
               <FaSearch />
               Search Hotels
             </button>
+
           </div>
         </div>
       </div>
