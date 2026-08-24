@@ -3,53 +3,68 @@ import { useState } from "react";
 import { FaTimes, FaCalendarAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-const API_BASE = `${API_BASE_URL}/api`
+const API_BASE = `${API_BASE_URL}/api`;
 
 export default function Booking({ guide, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     date: "",
-    durationType: "hourly", // "hourly" | "daily"
+    durationType: "hourly",
     quantity: 1,
     guests: 1,
-    message: ""
-  })
-  const [submitting, setSubmitting] = useState(false)
+    message: "",
+  });
 
-  function handleChange(e){
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const [submitting, setSubmitting] = useState(false);
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
 
-  const unitPrice = formData.durationType === "hourly" ? guide.pricePerHour : guide.pricePerDay
-  const totalPrice = unitPrice * Number(formData.quantity || 0)
+  const unitPrice =
+    formData.durationType === "hourly"
+      ? guide.pricePerHour
+      : guide.pricePerDay;
 
-  async function handleSubmit(e){
-    e.preventDefault()
+  const totalPrice =
+    unitPrice * Number(formData.quantity || 0);
 
-    if(!formData.date){
-      toast.error("Please select a date")
-      return
-    }
-    if(Number(formData.guests) > guide.maximumGuests){
-      toast.error(`This guide allows a maximum of ${guide.maximumGuests} guests`)
-      return
-    }
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token")
-    console.log("LOCAL:",localStorage.getItem("token"))
-    console.log("SESSION:",sessionStorage.getItem("token"))
-    console.log("FINAL TOKEN:",token)
-    if(!token){
-        toast.error("Please login to book a guide")
-        return
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!formData.date) {
+      toast.error("Please select a date");
+      return;
     }
 
-    setSubmitting(true)
-    try{
+    if (Number(formData.guests) > guide.maximumGuests) {
+      toast.error(
+        `This guide allows a maximum of ${guide.maximumGuests} guests`
+      );
+      return;
+    }
+
+    const token =
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Please login to book a guide");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
       const res = await fetch(`${API_BASE}/guidebooking`, {
         method: "POST",
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           guideId: guide._id,
@@ -58,86 +73,118 @@ export default function Booking({ guide, onClose, onSuccess }) {
           quantity: Number(formData.quantity),
           numberOfGuests: Number(formData.guests),
           message: formData.message,
-          totalPrice
-        })
-      })
+          totalPrice,
+        }),
+      });
 
-      if(!res.ok){
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.message || "Booking failed")
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Booking failed");
       }
-      const savedBooking = await res.json()
 
-      toast.success("Booking request sent!")
-      onSuccess?.(savedBooking)
-      onClose()
-    }catch(err){
-      toast.error(err.message || "Something went wrong")
-    }finally{
-      setSubmitting(false)
+      const savedBooking = await res.json();
+
+      toast.success("Booking request sent!");
+
+      onSuccess?.(savedBooking);
+      onClose();
+    } catch (err) {
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setSubmitting(false);
     }
   }
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-3 sm:px-4 py-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-[#253745] rounded-[20px] p-[28px] w-full max-w-[480px] relative"
+        className="bg-[#253745] rounded-[16px] sm:rounded-[20px] p-4 sm:p-6 md:p-7 w-full max-w-[480px] max-h-[95vh] overflow-y-auto relative my-auto"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-[18px] right-[18px] text-gray-400 hover:text-white"
+          className="absolute top-4 right-4 sm:top-[18px] sm:right-[18px] text-gray-400 hover:text-white transition"
         >
           <FaTimes size={18} />
         </button>
 
-        <h2 className="text-white font-bold text-[20px] mb-[4px]">Book This Guide</h2>
-        <p className="text-gray-400 text-[13px] mb-[20px]">
-          {guide.firstName} {guide.lastName} · {guide.district}
-        </p>
+        {/* Header */}
+        <div className="pr-8">
+          <h2 className="text-white font-bold text-[18px] sm:text-[20px]">
+            Book This Guide
+          </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-[16px]">
+          <p className="text-gray-400 text-[11px] sm:text-[13px] mt-1">
+            {guide.firstName} {guide.lastName} · {guide.district}
+          </p>
+        </div>
 
-          <div>
-            <label className="text-gray-300 text-[13px] block mb-[6px]">Date</label>
-            <div className="relative">
-              <FaCalendarAlt className="absolute left-[14px] top-1/2 -translate-y-1/2 text-[#00C896] text-[14px]" />
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 mt-5"
+        >
+          {/* Date */}
+          <div className="min-w-0">
+            <label className="text-gray-300 text-[12px] sm:text-[13px] block mb-1.5">
+              Date
+            </label>
+
+            <div className="relative w-full min-w-0">
+              <FaCalendarAlt className="absolute left-3 sm:left-[14px] top-1/2 -translate-y-1/2 text-[#00C896] text-[13px] sm:text-[14px] pointer-events-none z-10" />
+
               <input
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full bg-[#1a2530] text-white text-[14px] rounded-[10px] pl-[38px] pr-[12px] py-[10px] outline-none"
+                className="block w-full min-w-0 max-w-full appearance-none bg-[#1a2530] text-white text-[13px] sm:text-[14px] rounded-[10px] pl-9 sm:pl-[38px] pr-2 sm:pr-3 py-2.5 outline-none border border-transparent focus:border-[#00C896]/50"
                 required
               />
             </div>
           </div>
 
+          {/* Booking Type */}
           <div>
-            <label className="text-gray-300 text-[13px] block mb-[6px]">Booking Type</label>
-            <div className="flex gap-[10px]">
+            <label className="text-gray-300 text-[12px] sm:text-[13px] block mb-1.5">
+              Booking Type
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setFormData((p) => ({ ...p, durationType: "hourly" }))}
-                className={`flex-1 py-[10px] rounded-[10px] text-[13px] font-medium ${
+                onClick={() =>
+                  setFormData((p) => ({
+                    ...p,
+                    durationType: "hourly",
+                  }))
+                }
+                className={`w-full py-2.5 px-3 rounded-[10px] text-[12px] sm:text-[13px] font-medium transition ${
                   formData.durationType === "hourly"
                     ? "bg-[#00C896] text-white"
-                    : "bg-[#1a2530] text-gray-400"
+                    : "bg-[#1a2530] text-gray-400 hover:text-white"
                 }`}
               >
                 Per Hour ({guide.currency} {guide.pricePerHour})
               </button>
+
               <button
                 type="button"
-                onClick={() => setFormData((p) => ({ ...p, durationType: "daily" }))}
-                className={`flex-1 py-[10px] rounded-[10px] text-[13px] font-medium ${
+                onClick={() =>
+                  setFormData((p) => ({
+                    ...p,
+                    durationType: "daily",
+                  }))
+                }
+                className={`w-full py-2.5 px-3 rounded-[10px] text-[12px] sm:text-[13px] font-medium transition ${
                   formData.durationType === "daily"
                     ? "bg-[#00C896] text-white"
-                    : "bg-[#1a2530] text-gray-400"
+                    : "bg-[#1a2530] text-gray-400 hover:text-white"
                 }`}
               >
                 Per Day ({guide.currency} {guide.pricePerDay})
@@ -145,25 +192,32 @@ export default function Booking({ guide, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="flex gap-[16px]">
-            <div className="flex-1">
-              <label className="text-gray-300 text-[13px] block mb-[6px]">
-                Number of {formData.durationType === "hourly" ? "Hours" : "Days"}
+          {/* Quantity + Guests */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="min-w-0">
+              <label className="text-gray-300 text-[12px] sm:text-[13px] block mb-1.5">
+                Number of{" "}
+                {formData.durationType === "hourly"
+                  ? "Hours"
+                  : "Days"}
               </label>
+
               <input
                 type="number"
                 name="quantity"
                 min="1"
                 value={formData.quantity}
                 onChange={handleChange}
-                className="w-full bg-[#1a2530] text-white text-[14px] rounded-[10px] px-[12px] py-[10px] outline-none"
+                className="block w-full min-w-0 bg-[#1a2530] text-white text-[13px] sm:text-[14px] rounded-[10px] px-3 py-2.5 outline-none border border-transparent focus:border-[#00C896]/50"
                 required
               />
             </div>
-            <div className="flex-1">
-              <label className="text-gray-300 text-[13px] block mb-[6px]">
+
+            <div className="min-w-0">
+              <label className="text-gray-300 text-[12px] sm:text-[13px] block mb-1.5">
                 Guests (max {guide.maximumGuests})
               </label>
+
               <input
                 type="number"
                 name="guests"
@@ -171,40 +225,51 @@ export default function Booking({ guide, onClose, onSuccess }) {
                 max={guide.maximumGuests}
                 value={formData.guests}
                 onChange={handleChange}
-                className="w-full bg-[#1a2530] text-white text-[14px] rounded-[10px] px-[12px] py-[10px] outline-none"
+                className="block w-full min-w-0 bg-[#1a2530] text-white text-[13px] sm:text-[14px] rounded-[10px] px-3 py-2.5 outline-none border border-transparent focus:border-[#00C896]/50"
                 required
               />
             </div>
           </div>
 
+          {/* Message */}
           <div>
-            <label className="text-gray-300 text-[13px] block mb-[6px]">Message (optional)</label>
+            <label className="text-gray-300 text-[12px] sm:text-[13px] block mb-1.5">
+              Message (optional)
+            </label>
+
             <textarea
               name="message"
               value={formData.message}
               onChange={handleChange}
               rows={3}
               placeholder="Anything the guide should know..."
-              className="w-full bg-[#1a2530] text-white text-[14px] rounded-[10px] px-[12px] py-[10px] outline-none resize-none"
+              className="block w-full min-w-0 bg-[#1a2530] text-white text-[13px] sm:text-[14px] rounded-[10px] px-3 py-2.5 outline-none resize-none border border-transparent focus:border-[#00C896]/50"
             />
           </div>
 
-          <div className="flex items-center justify-between bg-[#1a2530] rounded-[10px] px-[16px] py-[12px]">
-            <span className="text-gray-400 text-[13px]">Total</span>
-            <span className="text-[#00C896] font-bold text-[18px]">
+          {/* Total */}
+          <div className="flex items-center justify-between gap-3 bg-[#1a2530] rounded-[10px] px-3 sm:px-4 py-3">
+            <span className="text-gray-400 text-[12px] sm:text-[13px]">
+              Total
+            </span>
+
+            <span className="text-[#00C896] font-bold text-[16px] sm:text-[18px] text-right">
               {guide.currency} {totalPrice || 0}
             </span>
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#00C896] hover:bg-[#00b383] duration-300 text-white py-[12px] rounded-full font-semibold disabled:opacity-60"
+            className="w-full bg-[#00C896] hover:bg-[#00b383] duration-300 text-white py-2.5 sm:py-3 rounded-full font-semibold text-[13px] sm:text-[14px] disabled:opacity-60"
           >
-            {submitting ? "Sending..." : "Confirm Booking Request"}
+            {submitting
+              ? "Sending..."
+              : "Confirm Booking Request"}
           </button>
         </form>
       </div>
     </div>
-  )
+  );
 }

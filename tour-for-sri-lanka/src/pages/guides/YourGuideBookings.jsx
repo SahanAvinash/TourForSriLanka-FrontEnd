@@ -11,10 +11,15 @@ const statusStyles = {
 };
 
 export default function YourGuideBookings() {
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+
   const storedUser = JSON.parse(
-    localStorage.getItem("user") || sessionStorage.getItem("user") || "null"
+    localStorage.getItem("user") ||
+      sessionStorage.getItem("user") ||
+      "null"
   );
+
   const travelerId = storedUser?._id;
 
   const [bookings, setBookings] = useState([]);
@@ -26,20 +31,29 @@ export default function YourGuideBookings() {
       setLoadingBookings(false);
       return;
     }
+
     const fetchBookings = async () => {
       setLoadingBookings(true);
+
       try {
         const res = await fetch(`${API_BASE_URL}/api/guidebooking/my`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+
         const data = await res.json();
-        if (res.ok) setBookings(data);
+
+        if (res.ok) {
+          setBookings(data);
+        }
       } catch (err) {
         console.log(err);
       } finally {
         setLoadingBookings(false);
       }
     };
+
     fetchBookings();
   }, [token, travelerId]);
 
@@ -47,19 +61,28 @@ export default function YourGuideBookings() {
     if (!window.confirm("Cancel this booking?")) return;
 
     setCancellingId(bookingId);
+
     try {
       const res = await fetch(
         `${API_BASE_URL}/api/guidebooking/${bookingId}/cancel`,
         {
           method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "Failed to cancel booking");
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to cancel booking");
+      }
 
-      setBookings((prev) => prev.filter((b) => b._id !== bookingId));
+      setBookings((prev) =>
+        prev.filter((booking) => booking._id !== bookingId)
+      );
+
       toast.success("Booking cancelled");
     } catch (err) {
       toast.error(err.message);
@@ -70,74 +93,107 @@ export default function YourGuideBookings() {
 
   if (!token || !travelerId) return null;
 
-  const activeBookings = bookings.filter((b) => b.status !== "cancelled");
+  const activeBookings = bookings.filter(
+    (booking) => booking.status !== "cancelled"
+  );
 
   return (
-    <section className="px-8 py-8 bg-[#11212D]">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-[22px] font-bold text-white">Your Bookings</h2>
+    <section className="bg-[#11212D] px-5 py-8 sm:px-8 lg:px-14">
+      <div className="mx-auto max-w-7xl">
+        <h2 className="text-[20px] font-bold text-white sm:text-[22px]">
+          Your Bookings
+        </h2>
 
         {loadingBookings && (
-          <p className="mt-3 text-[#d5dde2]">Loading your bookings...</p>
+          <p className="mt-3 text-sm text-[#d5dde2]">
+            Loading your bookings...
+          </p>
         )}
 
         {!loadingBookings && activeBookings.length === 0 && (
-          <p className="mt-3 text-[#d5dde2]">
+          <p className="mt-3 text-sm text-[#d5dde2]">
             You haven't booked any guide yet.
           </p>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-6 max-lg:grid-cols-1">
-          {activeBookings.map((b) => (
-            <div
-              key={b._id}
-              className="flex gap-4 bg-[#1B2B34] rounded-[20px] p-4 border border-white/10"
-            >
-              <img
-                src={b.guideId?.profilePic || "/guide_placeholder.jpg"}
-                alt={`${b.guideId?.firstName} ${b.guideId?.lastName}`}
-                className="w-32 h-24 object-cover rounded-[14px] flex-shrink-0"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-white">
-                    {b.guideId?.firstName} {b.guideId?.lastName}
-                  </h3>
-                  <span
-                    className={`text-xs px-2.5 py-1 rounded-full capitalize ${statusStyles[b.status]}`}
-                  >
-                    {b.status}
-                  </span>
-                </div>
-                <p className="text-sm text-[#d5dde2] mt-1">
-                  {b.guideId?.district}
-                  {b.guideId?.province ? `, ${b.guideId.province}` : ""}
-                </p>
-                <p className="text-sm text-[#d5dde2] mt-1">
-                  {new Date(b.date).toLocaleDateString()} · {b.quantity}{" "}
-                  {b.durationType === "hourly"
-                    ? b.quantity === 1 ? "hour" : "hours"
-                    : b.quantity === 1 ? "day" : "days"}{" "}
-                  · {b.numberOfGuests} guest{b.numberOfGuests !== 1 ? "s" : ""}
-                </p>
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-sm font-semibold text-[#00C896]">
-                    {b.guideId?.currency} {b.totalPrice?.toLocaleString()}
-                  </p>
-                  {b.status === "pending" && (
-                    <button
-                      onClick={() => handleCancelBooking(b._id)}
-                      disabled={cancellingId === b._id}
-                      className="text-xs px-3 py-1 rounded-full border border-red-400 text-red-400 hover:bg-red-400/10 disabled:opacity-50 transition"
+        {!loadingBookings && activeBookings.length > 0 && (
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+            {activeBookings.map((booking) => (
+              <div
+                key={booking._id}
+                className="flex flex-col gap-4 rounded-[20px] border border-white/10 bg-[#1B2B34] p-4 sm:flex-row"
+              >
+                <img
+                  src={
+                    booking.guideId?.profilePic ||
+                    "/guide_placeholder.jpg"
+                  }
+                  alt={`${booking.guideId?.firstName || ""} ${
+                    booking.guideId?.lastName || ""
+                  }`}
+                  className="h-44 w-full flex-shrink-0 rounded-[14px] object-cover sm:h-28 sm:w-32"
+                />
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="min-w-0 break-words text-base font-semibold text-white sm:text-lg">
+                      {booking.guideId?.firstName}{" "}
+                      {booking.guideId?.lastName}
+                    </h3>
+
+                    <span
+                      className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[10px] capitalize sm:text-xs ${
+                        statusStyles[booking.status]
+                      }`}
                     >
-                      {cancellingId === b._id ? "Cancelling..." : "Cancel Booking"}
-                    </button>
-                  )}
+                      {booking.status}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 break-words text-xs text-[#d5dde2] sm:text-sm">
+                    {booking.guideId?.district}
+                    {booking.guideId?.province
+                      ? `, ${booking.guideId.province}`
+                      : ""}
+                  </p>
+
+                  <p className="mt-1 break-words text-xs leading-relaxed text-[#d5dde2] sm:text-sm">
+                    {new Date(booking.date).toLocaleDateString()} ·{" "}
+                    {booking.quantity}{" "}
+                    {booking.durationType === "hourly"
+                      ? booking.quantity === 1
+                        ? "hour"
+                        : "hours"
+                      : booking.quantity === 1
+                      ? "day"
+                      : "days"}{" "}
+                    · {booking.numberOfGuests}{" "}
+                    {booking.numberOfGuests !== 1 ? "guests" : "guest"}
+                  </p>
+
+                  <div className="mt-3 flex flex-col gap-3 border-t border-white/10 pt-3 sm:flex-row sm:items-center sm:justify-between sm:border-0 sm:pt-0">
+                    <p className="text-sm font-semibold text-[#00C896] sm:text-base">
+                      {booking.guideId?.currency}{" "}
+                      {booking.totalPrice?.toLocaleString()}
+                    </p>
+
+                    {booking.status === "pending" && (
+                      <button
+                        onClick={() => handleCancelBooking(booking._id)}
+                        disabled={cancellingId === booking._id}
+                        className="w-full rounded-full border border-red-400 px-3 py-2 text-xs text-red-400 transition hover:bg-red-400/10 disabled:opacity-50 sm:w-auto sm:py-1"
+                      >
+                        {cancellingId === booking._id
+                          ? "Cancelling..."
+                          : "Cancel Booking"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
