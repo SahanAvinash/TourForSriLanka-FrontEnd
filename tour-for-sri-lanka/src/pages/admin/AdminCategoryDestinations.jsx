@@ -11,7 +11,6 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { ImagePlus, X } from "lucide-react";
 
-// fix default leaflet marker icon paths breaking under vite bundling
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
   iconRetinaUrl: markerIcon2x,
@@ -24,7 +23,6 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const SRI_LANKA_CENTER = [7.8731, 80.7718];
 const MAX_IMAGES = 5;
 
-// handles click-to-pick on the map
 function LocationClickHandler({ onPick }) {
   useMapEvents({
     click(e) {
@@ -34,14 +32,13 @@ function LocationClickHandler({ onPick }) {
   return null;
 }
 
-// re-centers the map when a search result is picked
 function FlyToPosition({ position }) {
   const map = useMap();
   useEffect(() => {
     if (position) {
       map.flyTo(position, 14);
     }
-  }, [position]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [position]);
   return null;
 }
 
@@ -58,15 +55,13 @@ export default function AdminCategoryDestinations() {
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
+  const [avgDurationHours, setAvgDurationHours] = useState(2);
   const [saving, setSaving] = useState(false);
 
-  // existingImages = URLs already saved on the destination (only used when editing)
-  // newImages = File objects picked in this session, newPreviews = their object URLs
   const [existingImages, setExistingImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [newPreviews, setNewPreviews] = useState([]);
 
-  // map picker modal state
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [mapQuery, setMapQuery] = useState("");
   const [mapResults, setMapResults] = useState([]);
@@ -105,7 +100,6 @@ export default function AdminCategoryDestinations() {
   }, [categoryId]);
 
   function resetForm() {
-    // revoke any object URLs so we don't leak memory
     newPreviews.forEach((url) => URL.revokeObjectURL(url));
 
     setEditingId(null);
@@ -114,6 +108,7 @@ export default function AdminCategoryDestinations() {
     setLocation("");
     setLatitude(null);
     setLongitude(null);
+    setAvgDurationHours(2);
     setExistingImages([]);
     setNewImages([]);
     setNewPreviews([]);
@@ -133,7 +128,7 @@ export default function AdminCategoryDestinations() {
     setLocation(destination.location || "");
     setLatitude(destination.latitude ?? null);
     setLongitude(destination.longitude ?? null);
-    // support old data that only has a single "image" field, and new "images" array
+    setAvgDurationHours(destination.avgDurationHours ?? 2);
     setExistingImages(destination.images?.length ? destination.images : destination.image ? [destination.image] : []);
     setNewImages([]);
     setNewPreviews([]);
@@ -158,7 +153,7 @@ export default function AdminCategoryDestinations() {
 
     setNewImages((prev) => [...prev, ...filesToAdd]);
     setNewPreviews((prev) => [...prev, ...filesToAdd.map((f) => URL.createObjectURL(f))]);
-    e.target.value = ""; // allow re-selecting the same file later
+    e.target.value = "";
   }
 
   function removeExistingImage(index) {
@@ -188,14 +183,13 @@ export default function AdminCategoryDestinations() {
     formData.append("description", description);
     formData.append("location", location);
     formData.append("category", categoryId);
+    formData.append("avgDurationHours", avgDurationHours);
     if (latitude != null) formData.append("latitude", latitude);
     if (longitude != null) formData.append("longitude", longitude);
 
-    // images the user kept from before (edit mode) - backend keeps these as-is
     if (editingId) {
       formData.append("existingImages", JSON.stringify(existingImages));
     }
-    // new files to upload
     newImages.forEach((file) => formData.append("images", file));
 
     setSaving(true);
@@ -234,8 +228,6 @@ export default function AdminCategoryDestinations() {
   const filtered = destinations.filter((d) =>
     JSON.stringify(d).toLowerCase().includes(search.toLowerCase())
   );
-
-  // ---------- map picker ----------
 
   function openMapPicker() {
     setTempLat(latitude);
@@ -356,6 +348,7 @@ export default function AdminCategoryDestinations() {
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Image</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Name</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Location</th>
+                <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Duration</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Description</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Actions</th>
               </tr>
@@ -385,6 +378,9 @@ export default function AdminCategoryDestinations() {
                     </td>
                     <td className="text-[#CCD0CF] px-4 py-3 text-sm font-medium">{destination.name}</td>
                     <td className="text-[#CCD0CF] px-4 py-3 text-sm">{destination.location || "-"}</td>
+                    <td className="text-[#00C896] px-4 py-3 text-sm font-semibold">
+                      {destination.avgDurationHours || 2} hrs
+                    </td>
                     <td className="text-[#CCD0CF] px-4 py-3 text-sm max-w-[250px] truncate">
                       {destination.description || "-"}
                     </td>
@@ -409,7 +405,7 @@ export default function AdminCategoryDestinations() {
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center text-[#CCD0CF] px-4 py-6">
+                  <td colSpan={6} className="text-center text-[#CCD0CF] px-4 py-6">
                     No destinations found
                   </td>
                 </tr>
@@ -458,6 +454,20 @@ export default function AdminCategoryDestinations() {
                     {latitude.toFixed(5)}, {longitude.toFixed(5)}
                   </p>
                 )}
+              </div>
+              <div>
+                <label className="text-[#CCD0CF] text-sm mb-1 block">
+                  Avg Visiting Duration (Hours)
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  value={avgDurationHours}
+                  onChange={(e) => setAvgDurationHours(e.target.value)}
+                  className="w-full bg-[#253745] text-[#00C896] font-bold px-3 py-2 rounded-lg outline-none"
+                  placeholder="e.g. 2"
+                />
               </div>
               <div>
                 <label className="text-[#CCD0CF] text-sm mb-1 block">
