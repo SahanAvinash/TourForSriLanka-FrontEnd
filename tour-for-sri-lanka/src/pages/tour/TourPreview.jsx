@@ -201,16 +201,18 @@ const TourPreview = () => {
     );
   }
 
-  const { destinations, route, recommendations } = tripData;
+  const { destinations, route, recommendations } = tripData || [];
   const routableStops = route?.routableStops || [];
-  const polylinePositions = route.geometry;
+  const polylinePositions = route.geometry || [];
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
 
-  const centerLat =
-    allMapPositions.reduce((sum, p) => sum + p[0], 0) / allMapPositions.length;
-  const centerLng =
-    allMapPositions.reduce((sum, p) => sum + p[1], 0) / allMapPositions.length;
+  const centerLat = allMapPositions.length > 0
+    ? allMapPositions.reduce((sum, p) => sum + p[0], 0) / allMapPositions.length
+    : 7.8731;
+  const centerLng = allMapPositions.length > 0
+    ? allMapPositions.reduce((sum, p) => sum + p[1], 0) / allMapPositions.length
+    : 80.7718;
 
   const getDestinationDayIndex = (location) => {
     const idx = destinations.findIndex(
