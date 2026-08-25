@@ -13,7 +13,10 @@ export default function AdminHotels() {
         { header: "Email", render: (item) => item.email },
         { header: "District", render: (item) => item.district },
         { header: "Description", render: (item) => item.shortDescription },
-        { header: "Status", render: (item) => item.status },
+        {
+          header: "Approval Status",
+          render: (item) => item.isApproved ? "Approved" : "Pending"
+        }
       ]}
     />
   );
