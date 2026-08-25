@@ -65,7 +65,6 @@ const TourDestinationSelect = () => {
   const location = useLocation();
   const [startDistrict, setStartDistrict] = useState(null);
 
-  // Trip Duration එක කලින් page එකෙන් (TourPage.jsx) ආපු value එකෙන් set කරනවා - මෙතන edit කරන්න බැහැ
   const [tripDurationDays] = useState(() => {
     const fromState = location.state?.tripDuration;
     const fromSession = sessionStorage.getItem("tourTripDuration");
@@ -146,7 +145,6 @@ const TourDestinationSelect = () => {
       return;
     }
 
-    // Pass data to sessionStorage
     sessionStorage.setItem(
       "TourBooking",
       JSON.stringify({
@@ -165,7 +163,6 @@ const TourDestinationSelect = () => {
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold page-title-anim">Plan Your Trip</h1>
 
-        {/* Trip Duration - read-only, කලින් page එකෙන් ආපු value එක */}
         <div className="flex items-center gap-2 bg-[#253745] px-4 py-2 rounded-xl border border-gray-700">
           <span className="text-sm font-medium text-gray-300">Trip Duration:</span>
           <span className="text-sm font-bold text-[#00C896]">
