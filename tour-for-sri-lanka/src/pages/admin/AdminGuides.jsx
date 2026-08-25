@@ -6,10 +6,23 @@ export default function AdminGuides() {
     <AdminApprovalTable
       title="Guides"
       fetchUrl={`${API_BASE_URL}/api/guide`}
-      getId={(item) => item._id}
-      getApproveUrl={(item) => `${API_BASE_URL}/api/guide/approve/${item._id}`}
-      getRemoveUrl={(item) => `${API_BASE_URL}/api/guide/${item._id}`}
+      extractList={(data) => data.guides || data}
+      getId={(item) => item._id || item.email}
+      getApproveUrl={(item) => `${API_BASE_URL}/api/guide/approve/${item._id || item.email}`}
+      getRemoveUrl={(item) => `${API_BASE_URL}/api/guide/${item._id || item.email}`}
       columns={[
+        { 
+          header: "Status", 
+          render: (item) => (
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+              item.isApproved 
+                ? "bg-[#00C896]/10 text-[#00C896] border-[#00C896]/30" 
+                : "bg-yellow-400/10 text-yellow-400 border-yellow-400/30"
+            }`}>
+              {item.isApproved ? "Approved" : "Pending"}
+            </span>
+          )
+        },
         { header: "Name", render: (item) => `${item.firstName || ""} ${item.lastName || ""}` },
         { header: "Email", render: (item) => item.email },
         { header: "District", render: (item) => item.district },
