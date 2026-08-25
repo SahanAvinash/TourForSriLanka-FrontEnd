@@ -64,9 +64,13 @@ const TourDestinationSelect = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [startDistrict, setStartDistrict] = useState(null);
-  
-  // Trip Duration එක තබා ගැනීමට State එකක් (Default = 1 Day)
-  const [tripDurationDays, setTripDurationDays] = useState(1);
+
+  // Trip Duration එක කලින් page එකෙන් (TourPage.jsx) ආපු value එකෙන් set කරනවා - මෙතන edit කරන්න බැහැ
+  const [tripDurationDays] = useState(() => {
+    const fromState = location.state?.tripDuration;
+    const fromSession = sessionStorage.getItem("tourTripDuration");
+    return Number(fromState || fromSession || 1);
+  });
 
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -158,10 +162,10 @@ const TourDestinationSelect = () => {
     // Pass data to sessionStorage
     sessionStorage.setItem(
       "TourBooking",
-      JSON.stringify({ 
-        selectedDestinations: tripDestinations, 
+      JSON.stringify({
+        selectedDestinations: tripDestinations,
         startDistrict,
-        tripDurationDays: Number(tripDurationDays)
+        tripDurationDays: Number(tripDurationDays),
       })
     );
 
@@ -174,17 +178,12 @@ const TourDestinationSelect = () => {
       <div className="max-w-7xl mx-auto px-6 pt-28 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold page-title-anim">Plan Your Trip</h1>
 
-        {/* Trip Duration Input Selector */}
-        <div className="flex items-center gap-3 bg-[#253745] px-4 py-2 rounded-xl border border-gray-700">
-          <label className="text-sm font-medium text-gray-300">Trip Duration (Days):</label>
-          <input
-            type="number"
-            min="1"
-            max="14"
-            value={tripDurationDays}
-            onChange={(e) => setTripDurationDays(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-16 bg-[#11212D] text-center text-[#00C896] font-bold py-1 px-2 rounded border border-gray-600 focus:outline-none focus:border-[#00C896]"
-          />
+        {/* Trip Duration - read-only, කලින් page එකෙන් ආපු value එක */}
+        <div className="flex items-center gap-2 bg-[#253745] px-4 py-2 rounded-xl border border-gray-700">
+          <span className="text-sm font-medium text-gray-300">Trip Duration:</span>
+          <span className="text-sm font-bold text-[#00C896]">
+            {tripDurationDays} {tripDurationDays === 1 ? "Day" : "Days"}
+          </span>
         </div>
       </div>
 
