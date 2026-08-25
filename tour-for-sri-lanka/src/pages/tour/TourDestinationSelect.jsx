@@ -134,7 +134,6 @@ const TourDestinationSelect = () => {
     removeDestination(id);
   };
 
-  // Step 2: Feasibility & Maximum Destinations Validation Rule
   const handleNext = () => {
     if (tripDestinations.length < 2) {
       toast.error("Select at least 2 destinations to generate a trip");
@@ -144,18 +143,6 @@ const TourDestinationSelect = () => {
     if (!startDistrict) {
       toast.error("Select your starting district first");
       navigate("/tours");
-      return;
-    }
-
-    // දවසකට සාමාන්‍යයෙන් 8:00 AM - 6:00 PM අතර යා හැකි උපරිම ස්ථාන ගණන (උදා: 4)
-    const MAX_DEST_PER_DAY = 4;
-    const maxAllowed = tripDurationDays * MAX_DEST_PER_DAY;
-
-    if (tripDestinations.length > maxAllowed) {
-      toast.error(
-        `It is impossible to visit ${tripDestinations.length} destinations in ${tripDurationDays} day(s) (8:00 AM - 6:00 PM). Please select maximum ${maxAllowed} locations or increase trip duration.`,
-        { duration: 5000 }
-      );
       return;
     }
 
