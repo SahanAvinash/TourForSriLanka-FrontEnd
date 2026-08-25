@@ -199,12 +199,14 @@ const TourPreview = () => {
 
       const tripDurationDays = Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1);
       const destinationIds = selectedDestinations.map((d) => d._id);
-
+      console.log("DEBUG: API_BASE_URL =", API_BASE_URL)
+      console.log("DEBUG: calling check-fit with", {destinationIds, tripDurationDays})
       try {
         const res = await axios.post(`${API_BASE_URL}/api/tour/check-fit`, {
           destinationIds,
           tripDurationDays,
         });
+        console.log("DEBUG: check-fit response =", Rss.data)
 
         if (res.data.fits) {
           // Okkoma destinations dawas ganata fit wenawa — suggestions ona nehe, direct route eka generate karanawa
@@ -216,6 +218,9 @@ const TourPreview = () => {
           setPhase("suggestions");
         }
       } catch (err) {
+        console.log("DEBUG: check-fit FULL ERROR OBJECT =", err)
+        console.log("DEBUG: err.message =", err.message)
+        console.log("DEBUG: err.respoonse =", err.response)
         console.error("check-fit failed:", err.response?.data || err.message);
         setError(
           err.response?.data?.message ||
