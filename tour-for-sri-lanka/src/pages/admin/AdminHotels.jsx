@@ -14,10 +14,10 @@ export default function AdminHotels() {
         { 
           header: "Status", 
           render: (item) => (
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
               item.isApproved 
-                ? "bg-green-100 text-green-700 border border-green-300" 
-                : "bg-yellow-100 text-yellow-700 border border-yellow-300"
+                ? "bg-[#00C896]/10 text-[#00C896] border-[#00C896]/30" 
+                : "bg-yellow-400/10 text-yellow-400 border-yellow-400/30"
             }`}>
               {item.isApproved ? "Approved" : "Pending"}
             </span>
