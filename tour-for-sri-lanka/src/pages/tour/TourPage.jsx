@@ -94,6 +94,7 @@ const TourPage = () => {
     return saved ? { value: saved, label: saved } : null;
   });
   const [startDate, setStartDate] = useState(() => sessionStorage.getItem("tourStartDate") || "");
+  const [tripDuration, setTripDuration] = useState(() => sessionStorage.getItem("tourTripDuration") || "");
   const [numberOfGuests, setNumberOfGuests] = useState(() => {
     const saved = sessionStorage.getItem("tourNumberOfGuests");
     if (!saved) return null;
@@ -120,6 +121,10 @@ const TourPage = () => {
   useEffect(() => {
     if (startDate) sessionStorage.setItem("tourStartDate", startDate);
   }, [startDate]);
+
+  useEffect(() => {
+    if (tripDuration) sessionStorage.setItem("tourTripDuration", tripDuration);
+  }, [tripDuration]);
 
   useEffect(() => {
     if (numberOfGuests) sessionStorage.setItem("tourNumberOfGuests", numberOfGuests.value);
@@ -340,6 +345,10 @@ const TourPage = () => {
       setError("Please select your trip start date.");
       return;
     }
+    if (!tripDuration || Number(tripDuration) <= 0) {
+      setError("Please enter a valid trip duration in days.");
+      return;
+    }
     if (!numberOfGuests) {
       setError("Please select the number of guests.");
       return;
@@ -349,6 +358,7 @@ const TourPage = () => {
       state: {
         startDistrict: startDistrict?.value,
         startDate,
+        tripDuration: Number(tripDuration),
         numberOfGuests: numberOfGuests.value,
         startLat: startLocation?.lat,
         startLng: startLocation?.lng,
@@ -407,6 +417,23 @@ const TourPage = () => {
                 setError("");
               }}
               className="w-full bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[#00C896]"
+            />
+          </div>
+
+          <div className="max-w-sm mx-auto mb-4 text-left">
+            <label className="block text-sm text-gray-300 mb-2">
+              Trip Duration (Days)
+            </label>
+            <input
+              type="number"
+              min="1"
+              placeholder="How many days do you plan to travel?"
+              value={tripDuration}
+              onChange={(e) => {
+                setTripDuration(e.target.value);
+                setError("");
+              }}
+              className="w-full bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white placeholder:text-gray-400 focus:outline-none focus:border-[#00C896]"
             />
           </div>
 
