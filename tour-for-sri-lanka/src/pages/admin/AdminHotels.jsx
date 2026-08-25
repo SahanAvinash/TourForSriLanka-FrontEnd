@@ -6,22 +6,26 @@ export default function AdminHotels() {
     <AdminApprovalTable
       title="Hotels"
       fetchUrl={`${API_BASE_URL}/api/hotel`}
-      extractList={(res) => res.hotels || res}
-      getId={(item) => item.email}
+      extractList={(data) => data.hotels || []}
+      getId={(item) => item._id || item.email}
       getApproveUrl={(item) => `${API_BASE_URL}/api/hotel/approve/${item.email}`}
       getRemoveUrl={(item) => `${API_BASE_URL}/api/hotel/${item.email}`}
       columns={[
-        { header: "Email", render: (item) => item.email },
-        { header: "District", render: (item) => item.district },
-        { header: "Description", render: (item) => item.shortDescription },
-        {
-          header: "Status",
+        { 
+          header: "Status", 
           render: (item) => (
-            <span className={item.isApproved ? "text-[#00C896] font-semibold" : "text-yellow-400 font-semibold"}>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              item.isApproved 
+                ? "bg-green-100 text-green-700 border border-green-300" 
+                : "bg-yellow-100 text-yellow-700 border border-yellow-300"
+            }`}>
               {item.isApproved ? "Approved" : "Pending"}
             </span>
           )
-        }
+        },
+        { header: "Email", render: (item) => item.email },
+        { header: "District", render: (item) => item.district },
+        { header: "Description", render: (item) => item.shortDescription },
       ]}
     />
   );
