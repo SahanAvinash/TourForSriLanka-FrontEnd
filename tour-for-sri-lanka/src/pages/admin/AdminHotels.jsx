@@ -6,6 +6,7 @@ export default function AdminHotels() {
     <AdminApprovalTable
       title="Hotels"
       fetchUrl={`${API_BASE_URL}/api/hotel`}
+      extractList={(res) => res.hotels || res}
       getId={(item) => item.email}
       getApproveUrl={(item) => `${API_BASE_URL}/api/hotel/approve/${item.email}`}
       getRemoveUrl={(item) => `${API_BASE_URL}/api/hotel/${item.email}`}
