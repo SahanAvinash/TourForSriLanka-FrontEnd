@@ -176,7 +176,8 @@ const TourPreview = () => {
         });
         setTripData(res.data);
       } catch (err) {
-        setError("");
+        console.error("generate-trip failed:", err.response?.data || err.message)
+        setError(err.response?.data?.message || "Could not generate your trip route. Please try again later");
       } finally {
         setLoading(false);
       }
