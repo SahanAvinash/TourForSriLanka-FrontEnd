@@ -1,27 +1,33 @@
 import { API_BASE_URL } from "../../config/api";
 import AdminApprovalTable from "./AdminApprovalTable";
 
-export default function AdminVehicles() {
+export default function AdminTransport() {
   return (
     <AdminApprovalTable
-      title="Vehicles"
-      fetchUrl={`${API_BASE_URL}/api/vehicle`}
-      extractList={(res) => res.vehicles || res.vehicle || res.data || res}
-      getId={(item) => item.email || item._id}
-      getApproveUrl={(item) => `${API_BASE_URL}/api/vehicle/approve/${item.email}`}
-      getRemoveUrl={(item) => `${API_BASE_URL}/api/vehicle/${item.email}`}
+      title="Transport"
+      fetchUrl={`${API_BASE_URL}/api/transport/pending`}
+      extractList={(data) => data.vehicles || []}
+      getId={(item) => item._id}
+      getApproveUrl={(item) => `${API_BASE_URL}/api/transport/approve/${item._id}`}
+      getRemoveUrl={(item) => `${API_BASE_URL}/api/transport/${item._id}`}
       columns={[
-        { header: "Email", render: (item) => item.email },
-        { header: "Vehicle Type", render: (item) => item.vehicleType || item.type || "N/A" },
-        { header: "District", render: (item) => item.district || "N/A" },
-        {
-          header: "Status",
+        { 
+          header: "Status", 
           render: (item) => (
-            <span className={item.isApproved ? "text-[#00C896] font-semibold" : "text-yellow-400 font-semibold"}>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              item.isApproved 
+                ? "bg-green-100 text-green-700 border border-green-300" 
+                : "bg-yellow-100 text-yellow-700 border border-yellow-300"
+            }`}>
               {item.isApproved ? "Approved" : "Pending"}
             </span>
           )
-        }
+        },
+        { header: "Owner", render: (item) => `${item.firstName || ""} ${item.lastName || ""}` },
+        { header: "Email", render: (item) => item.email },
+        { header: "Vehicle", render: (item) => `${item.vehicleBrand || ""} ${item.vehicleModel || ""}` },
+        { header: "Type", render: (item) => item.vehicleType },
+        { header: "Area", render: (item) => (item.availableArea || []).join(", ") },
       ]}
     />
   );
