@@ -202,7 +202,7 @@ const TourPreview = () => {
   }
 
   const { destinations, route, recommendations } = tripData;
-  const routableStops = route.routableStops;
+  const routableStops = route?.routableStops || [];
   const polylinePositions = route.geometry;
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
