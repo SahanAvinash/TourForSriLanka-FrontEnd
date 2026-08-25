@@ -208,7 +208,10 @@ export default function AdminCategoryDestinations() {
         resetForm();
         loadDestinations();
       })
-      .catch(() => toast.error("Failed to save destination"))
+      .catch((err) => {
+        console.error(err.response?.data || err.message)
+        toast.error(err.response?.data?.message || "Failed to save destination")
+      })
       .finally(() => setSaving(false));
   }
 
