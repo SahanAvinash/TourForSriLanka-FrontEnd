@@ -15,8 +15,12 @@ export default function AdminHotels() {
         { header: "District", render: (item) => item.district },
         { header: "Description", render: (item) => item.shortDescription },
         {
-          header: "Approval Status",
-          render: (item) => item.isApproved ? "Approved" : "Pending"
+          header: "Status",
+          render: (item) => (
+            <span className={item.isApproved ? "text-[#00C896] font-semibold" : "text-yellow-400 font-semibold"}>
+              {item.isApproved ? "Approved" : "Pending"}
+            </span>
+          )
         }
       ]}
     />
