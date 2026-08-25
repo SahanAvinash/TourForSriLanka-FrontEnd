@@ -31,10 +31,16 @@ const HotelList = ({ filters }) => {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        setHotels(Array.isArray(data) ? data : []);
+        // Response එක direct array එකක්ද නැතහොත් Object wrapper එකක්ද කියා පරීක්ෂා කිරීම
+        const extractedList = Array.isArray(data)
+          ? data
+          : data.hotels || data.data || [];
+
+        setHotels(extractedList);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Fetch error:", err);
         setHotels([]);
         setLoading(false);
       });
@@ -46,9 +52,7 @@ const HotelList = ({ filters }) => {
       className="bg-[#11212D] px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12"
     >
       <div className="max-w-7xl mx-auto">
-
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-
           <div>
             <h2 className="text-[20px] sm:text-[22px] lg:text-[24px] font-bold text-white">
               {isSearching ? "Search Result" : "Popular Hotels"}
@@ -67,7 +71,6 @@ const HotelList = ({ filters }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-
           {loading ? (
             <p className="text-gray-400 col-span-full text-center text-[13px] sm:text-[14px]">
               Loading hotels...
@@ -81,12 +84,11 @@ const HotelList = ({ filters }) => {
           ) : (
             hotels.map((hotel) => (
               <HotelCard
-                key={hotel._id}
+                key={hotel._id || hotel.email}
                 hotel={hotel}
               />
             ))
           )}
-
         </div>
       </div>
     </section>
