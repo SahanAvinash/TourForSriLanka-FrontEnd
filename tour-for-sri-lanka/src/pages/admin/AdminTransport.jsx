@@ -6,14 +6,14 @@ export default function AdminVehicles() {
     <AdminApprovalTable
       title="Vehicles"
       fetchUrl={`${API_BASE_URL}/api/vehicle`}
-      extractList={(res) => res.vehicles || res}
-      getId={(item) => item.email}
+      extractList={(res) => res.vehicles || res.vehicle || res.data || res}
+      getId={(item) => item.email || item._id}
       getApproveUrl={(item) => `${API_BASE_URL}/api/vehicle/approve/${item.email}`}
       getRemoveUrl={(item) => `${API_BASE_URL}/api/vehicle/${item.email}`}
       columns={[
         { header: "Email", render: (item) => item.email },
-        { header: "Vehicle Type", render: (item) => item.vehicleType || item.type },
-        { header: "District", render: (item) => item.district },
+        { header: "Vehicle Type", render: (item) => item.vehicleType || item.type || "N/A" },
+        { header: "District", render: (item) => item.district || "N/A" },
         {
           header: "Status",
           render: (item) => (
