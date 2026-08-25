@@ -22,7 +22,10 @@ export default function AdminApprovalTable({
     axios
       .get(fetchUrl, { headers: { Authorization: "Bearer " + token } })
       .then((res) => {
-        const data = extractList ? extractList(res.data) : res.data;
+        let data = extractList ? extractList(res.data) : res.data;
+        if (!Array.isArray(data) && data && typeof data === "object") {
+          data = data.hotels || data.vehicles || data.guides || [];
+        }
         setItems(Array.isArray(data) ? data : []);
       })
       .catch(() => {
@@ -86,7 +89,6 @@ export default function AdminApprovalTable({
                     {col.header}
                   </th>
                 ))}
-                <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Status</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Actions</th>
               </tr>
             </thead>
@@ -101,17 +103,6 @@ export default function AdminApprovalTable({
                       {col.render(item)}
                     </td>
                   ))}
-                  <td className="px-4 py-3 text-sm">
-                    <span
-                      className={
-                        item.isApproved
-                          ? "text-[#00C896] font-semibold"
-                          : "text-yellow-400 font-semibold"
-                      }
-                    >
-                      {item.isApproved ? "Approved" : "Pending"}
-                    </span>
-                  </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex gap-2">
                       {!item.isApproved && (
@@ -134,7 +125,7 @@ export default function AdminApprovalTable({
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={columns.length + 2} className="text-center text-[#CCD0CF] px-4 py-6">
+                  <td colSpan={columns.length + 1} className="text-center text-[#CCD0CF] px-4 py-6">
                     No records found
                   </td>
                 </tr>
