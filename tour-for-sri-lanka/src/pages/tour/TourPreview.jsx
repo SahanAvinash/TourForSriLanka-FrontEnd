@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute } from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -63,14 +63,24 @@ const FitRouteBounds = ({ positions }) => {
 
 const TourPreview = () => {
   const navigate = useNavigate();
-  const [tripData, setTripData] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  // --- Trip-fit check + suggestion selection flow ---
+  // phase: "checking" -> "suggestions" (destinations don't fit in the days) OR "building-route" -> "ready"
+  const [phase, setPhase] = useState("checking");
+  const [suggestions, setSuggestions] = useState([]);
+  const [fitMessage, setFitMessage] = useState("");
   const [error, setError] = useState(null);
+  const [tripData, setTripData] = useState(null);
+
+  const [startDistrict, setStartDistrict] = useState(null);
+
+  // TourPage eke user select kala trip start date eka methanata gennawa
+  const [tripStartDate, setTripStartDate] = useState("");
+  const [tripGuestCount, setTripGuestCount] = useState(null); // TourPage eke user select kala number of guests eka methanata gennawa
 
   // --- Guide booking modal state ---
   const [activeGuideModal, setActiveGuideModal] = useState(null); // { location, guides }
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
-  const [tripGuestCount, setTripGuestCount] = useState(null); // TourPage eke user select kala number of guests eka methanata gennawa
   const [modalView, setModalView] = useState("list"); // "list" | "book"
   const [selectedGuide, setSelectedGuide] = useState(null);
   const [bookingError, setBookingError] = useState("");
@@ -82,10 +92,6 @@ const TourPreview = () => {
     numberOfGuests: 1,
     message: "",
   });
-  const [startDistrict, setStartDistrict] = useState(null);
-
-  // TourPage eke user select kala trip start date eka methanata gennawa
-  const [tripStartDate, setTripStartDate] = useState("");
 
   // --- Transport booking modal state ---
   const [activeTransportModal, setActiveTransportModal] = useState(null); // { location, transports }
@@ -143,15 +149,39 @@ const TourPreview = () => {
     return date.toISOString().split("T")[0];
   };
 
+  // Selected destination subset ekakට (okkoma, nattam suggestion ekකින් tōragattu ewa) ORS route eka + nearby
+  // guides/hotels/transport recommendations gennawa. Meka "Select this plan" click karama, nattam okkoma
+  // trip duration ekata fit unoth direct-ma call wenawa.
+  const buildRoute = async (destinationIds, district) => {
+    setPhase("building-route");
+    setError(null);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/tour/generate-trip`, {
+        destinationIds,
+        startDistrict: district,
+      });
+      setTripData(res.data);
+      setPhase("ready");
+    } catch (err) {
+      console.error("generate-trip failed:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Could not generate your trip route. Please try again later");
+      setPhase("error");
+    }
+  };
+
   useEffect(() => {
-    const generateTrip = async () => {
+    const checkFit = async () => {
       const saved = sessionStorage.getItem("TourBooking");
       if (!saved) {
         navigate("/tours/plan");
         return;
       }
-      const { selectedDestinations, startDistrict } = JSON.parse(saved);
-      setStartDistrict(startDistrict);
+      const {
+        selectedDestinations,
+        startDistrict: district,
+        tripDurationDays: savedDuration,
+      } = JSON.parse(saved);
+      setStartDistrict(district);
 
       // TourPage eke sessionStorage.setItem("tourStartDate", ...) karapu eka read karanawa
       const savedStartDate = sessionStorage.getItem("tourStartDate");
@@ -160,49 +190,123 @@ const TourPreview = () => {
       const savedGuestCount = sessionStorage.getItem("tourNumberOfGuests");
       if (savedGuestCount) setTripGuestCount(Number(savedGuestCount));
 
-      const destinationIds = selectedDestinations.map((d) => d._id);
-
-      if (!startDistrict) {
+      if (!district) {
         setError("Select your starting district first");
-        setLoading(false);
+        setPhase("error");
         navigate("/tours");
         return;
       }
 
+      const tripDurationDays = Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1);
+      const destinationIds = selectedDestinations.map((d) => d._id);
+
       try {
-        const res = await axios.post(`${API_BASE_URL}/api/tour/generate-trip`, {
+        const res = await axios.post(`${API_BASE_URL}/api/tour/check-fit`, {
           destinationIds,
-          startDistrict,
+          tripDurationDays,
         });
-        setTripData(res.data);
+
+        if (res.data.fits) {
+          // Okkoma destinations dawas ganata fit wenawa — suggestions ona nehe, direct route eka generate karanawa
+          await buildRoute(destinationIds, district);
+        } else {
+          // Fit wenne nehe — pahat-inma-aduwen destinations remove karapu suggestion 3ක් pennanawa
+          setSuggestions(res.data.suggestions || []);
+          setFitMessage(res.data.message || "");
+          setPhase("suggestions");
+        }
       } catch (err) {
-        console.error("generate-trip failed:", err.response?.data || err.message)
-        setError(err.response?.data?.message || "Could not generate your trip route. Please try again later");
-      } finally {
-        setLoading(false);
+        console.error("check-fit failed:", err.response?.data || err.message);
+        setError(
+          err.response?.data?.message ||
+            "Could not check your trip against your selected days. Please try again later"
+        );
+        setPhase("error");
       }
     };
 
-    generateTrip();
+    checkFit();
   }, [navigate]);
 
-  if (loading) {
+  const handleSelectSuggestion = (suggestion) => {
+    buildRoute(suggestion.destinationIds, startDistrict);
+  };
+
+  // --- Checking / suggestions / building-route / error screens ---
+  if (phase === "checking") {
     return (
       <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
-        Genarating your trip route...
+        Checking your trip against your selected days...
       </div>
     );
   }
 
-  if (error || !tripData) {
+  if (phase === "error") {
     return (
-      <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
-        {error || "Data eka load karanna bæri una"}
+      <div className="min-h-screen bg-[#11212D] text-white flex flex-col items-center justify-center text-center px-6">
+        <p className="mb-4">{error || "Data eka load karanna bæri una"}</p>
+        <button onClick={() => navigate("/tours/plan")} className="text-[#00C896] text-sm underline">
+          ← Change your destinations
+        </button>
       </div>
     );
   }
 
-  const { destinations, route, recommendations } = tripData || [];
+  if (phase === "suggestions") {
+    return (
+      <div className="min-h-screen bg-[#11212D] text-white">
+        <Navbar />
+        <div className="px-6 py-10 max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold mb-2">Your Trip Needs a Little Trimming</h1>
+          <p className="text-gray-400 mb-8">{fitMessage}</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {suggestions.map((s, i) => (
+              <div key={i} className="bg-[#253745] rounded-xl p-5 flex flex-col">
+                <h3 className="text-[#00C896] font-semibold mb-1">{s.label}</h3>
+                <p className="text-xs text-gray-400 mb-4">
+                  {s.destinationCount} destination{s.destinationCount !== 1 ? "s" : ""} included
+                  {s.excludedCount > 0 && ` · ${s.excludedCount} left out`}
+                </p>
+                <div className="flex flex-col gap-2 mb-4 flex-1">
+                  {s.destinations.map((d) => (
+                    <div key={d._id} className="flex items-center gap-2 bg-[#1a2530] rounded-lg px-3 py-2">
+                      {d.image && (
+                        <img src={d.image} alt={d.name} className="w-8 h-8 rounded object-cover flex-shrink-0" />
+                      )}
+                      <span className="text-sm truncate">{d.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => handleSelectSuggestion(s)}
+                  className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+                >
+                  <FaRoute size={12} /> Select this plan
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={() => navigate("/tours/plan")} className="mt-8 text-gray-400 text-sm hover:text-white">
+            ← Change your destinations instead
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (phase === "building-route" || !tripData) {
+    return (
+      <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
+        Generating your trip route...
+      </div>
+    );
+  }
+
+  // --- phase === "ready" — okkoma pahalin thiyenne kalinma tibba widiyatama ---
+  const { destinations, route, recommendations } = tripData || {};
   const routableStops = route?.routableStops || [];
   const polylinePositions = route.geometry || [];
   const returnPolylinePositions = route.returnGeometry || [];
@@ -239,9 +343,7 @@ const TourPreview = () => {
 
   const totalPrice = selectedGuide ? bookingForm.quantity * selectedGuide.pricePerDay : 0;
 
-  // Backend ekata direct request yanne na dæන් — cart ekකට witharai add karanawa
-  // Backend ekata direct request yanne na dæন් — cart ekකට witharai add karanawa, ehet availability check karala
-
+  // Backend ekata direct request yanne na dæं — cart ekකට witharai add karanawa, ehet availability check karala
   const handleAddGuideToCart = async () => {
     setBookingError("");
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -373,7 +475,7 @@ const TourPreview = () => {
     }
   };
 
-  // Backend ekata direct request yanne na dæන් — cart ekකට witharai add karanawa
+  // Backend ekata direct request yanne na dæं — cart ekකට witharai add karanawa
   const handleAddTransportToCart = async () => {
   setTransportBookingError("");
   const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -513,7 +615,6 @@ const TourPreview = () => {
 
   const hotelTotalPrice = selectedRoom ? hotelNights * selectedRoom.pricePerNight : 0;
 
-  // Backend ekata direct request yanne na dæน — cart ekකට witharai add karanawa
   // Backend ekata direct request yanne na dæน — cart ekකට witharai add karanawa, ehet availability check karala
   const handleAddHotelToCart = async () => {
     setHotelBookingError("");
