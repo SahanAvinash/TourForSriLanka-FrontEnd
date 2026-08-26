@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt } from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -58,6 +58,30 @@ const FitRouteBounds = ({ positions }) => {
   return null;
 };
 
+const formatDuration = (minutes) => {
+  if (!minutes && minutes !== 0) return "—";
+  const h = Math.floor(minutes / 60);
+  const m = Math.round(minutes % 60);
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+};
+
+const ROUTE_OPTION_META = {
+  shortestDistance: {
+    icon: FaRulerHorizontal,
+    tagline: "Reorders your stops to cover the least total distance.",
+  },
+  fastestRoute: {
+    icon: FaClock,
+    tagline: "Reorders your stops to minimize total driving time.",
+  },
+  bestOverall: {
+    icon: FaMapMarkedAlt,
+    tagline: "A fresh, varied trip built from destinations across Sri Lanka, sized to fit your days comfortably.",
+  },
+};
+
 const TourPreview = () => {
   const navigate = useNavigate();
 
@@ -66,6 +90,7 @@ const TourPreview = () => {
   const [fitMessage, setFitMessage] = useState("");
   const [error, setError] = useState(null);
   const [tripData, setTripData] = useState(null);
+  const [routeOptions, setRouteOptions] = useState(null);
 
   const [startDistrict, setStartDistrict] = useState(null);
 
@@ -138,16 +163,17 @@ const TourPreview = () => {
     return date.toISOString().split("T")[0];
   };
 
-  const buildRoute = async (destinationIds, district) => {
+  const buildRoute = async (destinationIds, district, tripDurationDaysOverride) => {
     setPhase("building-route");
     setError(null);
     try {
       const res = await axios.post(`${API_BASE_URL}/api/tour/generate-trip`, {
         destinationIds,
         startDistrict: district,
+        tripDurationDays: tripDurationDaysOverride,
       });
-      setTripData(res.data);
-      setPhase("ready");
+      setRouteOptions(res.data.options);
+      setPhase("route-options");
     } catch (err) {
       console.error("generate-trip failed:", err.response?.data || err.message);
       setError(err.response?.data?.message || "Could not generate your trip route. Please try again later");
@@ -184,28 +210,21 @@ const TourPreview = () => {
 
       const tripDurationDays = Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1);
       const destinationIds = selectedDestinations.map((d) => d._id);
-      console.log("DEBUG: API_BASE_URL =", API_BASE_URL)
-      console.log("DEBUG: calling check-fit with", {destinationIds, tripDurationDays})
+
       try {
         const res = await axios.post(`${API_BASE_URL}/api/tour/check-fit`, {
           destinationIds,
           tripDurationDays,
         });
-        console.log("DEBUG: check-fit response =", Rss.data)
 
         if (res.data.fits) {
-
-          await buildRoute(destinationIds, district);
+          await buildRoute(destinationIds, district, tripDurationDays);
         } else {
-
           setSuggestions(res.data.suggestions || []);
           setFitMessage(res.data.message || "");
           setPhase("suggestions");
         }
       } catch (err) {
-        console.log("DEBUG: check-fit FULL ERROR OBJECT =", err)
-        console.log("DEBUG: err.message =", err.message)
-        console.log("DEBUG: err.respoonse =", err.response)
         console.error("check-fit failed:", err.response?.data || err.message);
         setError(
           err.response?.data?.message ||
@@ -219,7 +238,14 @@ const TourPreview = () => {
   }, [navigate]);
 
   const handleSelectSuggestion = (suggestion) => {
-    buildRoute(suggestion.destinationIds, startDistrict);
+    const tripDurationDays = Number(sessionStorage.getItem("tourTripDuration") || 1);
+    buildRoute(suggestion.destinationIds, startDistrict, tripDurationDays);
+  };
+
+  const handleSelectRouteOption = (optionKey) => {
+    if (!routeOptions || !routeOptions[optionKey]) return;
+    setTripData(routeOptions[optionKey]);
+    setPhase("ready");
   };
 
   if (phase === "checking") {
@@ -286,10 +312,96 @@ const TourPreview = () => {
     );
   }
 
-  if (phase === "building-route" || !tripData) {
+  if (phase === "building-route") {
     return (
       <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
         Generating your trip route...
+      </div>
+    );
+  }
+
+  if (phase === "route-options") {
+    if (!routeOptions) {
+      return (
+        <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
+          Loading route options...
+        </div>
+      );
+    }
+
+    const optionKeys = ["shortestDistance", "fastestRoute", "bestOverall"];
+
+    return (
+      <div className="min-h-screen bg-[#11212D] text-white">
+        <Navbar />
+        <div className="px-6 py-10 max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold mb-2">Choose Your Trip Style</h1>
+          <p className="text-gray-400 mb-8">
+            We've put together a few different ways to run this trip — pick the one that fits you best.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {optionKeys.map((key) => {
+              const option = routeOptions[key];
+              if (!option) return null;
+              const meta = ROUTE_OPTION_META[key];
+              const Icon = meta.icon;
+
+              return (
+                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className="text-[#00C896]" size={18} />
+                    <h3 className="text-[#00C896] font-semibold">{option.label}</h3>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-4">{meta.tagline}</p>
+
+                  <div className="flex flex-col gap-2 mb-4 bg-[#1a2530] rounded-lg p-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Destinations</span>
+                      <span className="font-semibold">{option.destinations.length}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Total distance</span>
+                      <span className="font-semibold">{option.route.distanceKm} km</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Driving time</span>
+                      <span className="font-semibold">{formatDuration(option.route.durationMin)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 mb-4 flex-1 max-h-40 overflow-y-auto">
+                    {option.destinations.map((d, i) => (
+                      <div key={d._id || i} className="text-xs text-gray-300 truncate">
+                        {i + 1}. {d.name}
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => handleSelectRouteOption(key)}
+                    className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+                  >
+                    <FaRoute size={12} /> Choose this trip
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <button onClick={() => navigate("/tours/plan")} className="mt-8 text-gray-400 text-sm hover:text-white">
+            ← Change your destinations instead
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!tripData) {
+    return (
+      <div className="min-h-screen bg-[#11212D] text-white flex items-center justify-center">
+        Loading your trip...
       </div>
     );
   }
@@ -896,6 +1008,12 @@ const TourPreview = () => {
         <p className="text-gray-400 mb-2">
           Total distance (round trip):{" "}
           <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
+          {typeof route.durationMin === "number" && (
+            <>
+              {" "}· Driving time:{" "}
+              <span className="text-[#00C896] font-semibold">{formatDuration(route.durationMin)}</span>
+            </>
+          )}
         </p>
         <div className="flex gap-5 mb-6 text-sm text-gray-400">
           <span className="flex items-center gap-2">
