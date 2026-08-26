@@ -280,79 +280,62 @@ const TourPreview = () => {
               const Icon = meta.icon;
 
               return (
-                <div
-                  key={key}
-                  className="bg-[#253745] rounded-xl p-5 flex flex-col h-full min-h-[520px]"
-                >
-                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
                     <Icon className="text-[#00C896]" size={18} />
-                    <h3 className="text-[#00C896] font-semibold text-base leading-tight">
-                      {option.label}
-                    </h3>
+                    <h3 className="text-[#00C896] font-semibold">{option.label}</h3>
                   </div>
-
-                  <p className="text-sm text-gray-400 leading-relaxed mb-4 min-h-[48px] shrink-0">
-                    {meta.tagline}
-                  </p>
+                  <p className="text-xs text-gray-400 mb-4">{meta.tagline}</p>
 
                   {key === "shortestDistance" && option.itinerary && (
-                    <div className="mb-4 bg-[#1a2530] rounded-lg p-3 shrink-0">
-                      <div className="flex justify-between items-center gap-3 text-sm">
+                    <div className="mb-4 bg-[#1a2530] rounded-lg p-3">
+                      <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Estimated trip length</span>
-                        <span className="font-semibold text-[#00C896] whitespace-nowrap">
+                        <span className="font-semibold text-[#00C896]">
                           {option.estimatedDays || option.itinerary.length} day
                           {(option.estimatedDays || option.itinerary.length) > 1 ? "s" : ""}
                         </span>
                       </div>
-                      <p className="text-[11px] text-gray-500 leading-relaxed mt-2">
+                      <p className="text-[11px] text-gray-500 mt-2">
                         Calculated from typical visit times for all {option.destinations.length} selected destinations.
                       </p>
                     </div>
                   )}
 
                   {key === "fastestRoute" && option.excludedCount > 0 && (
-                    <p className="text-[11px] text-yellow-400 leading-relaxed mb-3 shrink-0">
+                    <p className="text-[11px] text-yellow-400 mb-3">
                       {option.excludedCount} destination{option.excludedCount > 1 ? "s" : ""} trimmed to fit {tripDurationDays} day{tripDurationDays > 1 ? "s" : ""}
                     </p>
                   )}
 
-                  <div className="flex flex-col gap-2 mb-4 bg-[#1a2530] rounded-lg p-3 shrink-0">
-                    <div className="flex justify-between items-center gap-3 text-sm">
+                  <div className="flex flex-col gap-2 mb-4 bg-[#1a2530] rounded-lg p-3">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Destinations</span>
-                      <span className="font-semibold whitespace-nowrap">{option.destinations.length}</span>
+                      <span className="font-semibold">{option.destinations.length}</span>
                     </div>
-                    <div className="flex justify-between items-center gap-3 text-sm">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Total distance</span>
-                      <span className="font-semibold whitespace-nowrap">{option.route.distanceKm} km</span>
+                      <span className="font-semibold">{option.route.distanceKm} km</span>
                     </div>
-                    <div className="flex justify-between items-center gap-3 text-sm">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Driving time</span>
-                      <span className="font-semibold whitespace-nowrap">{formatDuration(option.route.durationMin)}</span>
+                      <span className="font-semibold">{formatDuration(option.route.durationMin)}</span>
                     </div>
                   </div>
 
-                  <div className="flex-1 min-h-0 mb-4 bg-[#1a2530] rounded-lg p-3 overflow-hidden">
-                    <div className="h-full max-h-[220px] overflow-y-auto pr-2 [scrollbar-width:thin] [scrollbar-color:#00C896_#253745]">
-                      <div className="flex flex-col gap-2">
-                        {option.destinations.map((d, i) => (
-                          <div
-                            key={d._id || i}
-                            className="text-sm text-gray-300 leading-5 break-words"
-                          >
-                            <span className="text-gray-500 mr-1">{i + 1}.</span>
-                            {d.name}
-                          </div>
-                        ))}
+                  <div className="flex flex-col gap-1.5 mb-4 flex-1 max-h-40 overflow-y-auto">
+                    {option.destinations.map((d, i) => (
+                      <div key={d._id || i} className="text-xs text-gray-300 truncate">
+                        {i + 1}. {d.name}
                       </div>
-                    </div>
+                    ))}
                   </div>
 
                   <button
                     onClick={() => handleSelectRouteOption(key)}
-                    className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors shrink-0"
+                    className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
                   >
-                    <FaRoute size={12} />
-                    Choose this trip
+                    <FaRoute size={12} /> Choose this trip
                   </button>
                 </div>
               );
@@ -1044,17 +1027,15 @@ const TourPreview = () => {
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3">Trip Order</h2>
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {destinations.map((dest, index) => (
-              <div key={dest.id || `stop-${index}`} className="bg-[#253745] rounded-lg px-4 py-3 flex justify-between items-center">
-                <span>
-                  {index + 1}. {dest.name} {dest.location && `(${dest.location})`}
+              <div
+                key={dest.id || `stop-${index}`}
+                className="bg-[#253745] rounded-lg px-4 py-3 flex items-center"
+              >
+                <span className="text-sm sm:text-base text-white font-medium">
+                  {index + 1}. {dest.name}
                 </span>
-                {index === 0 && (
-                  <span className="text-sm text-gray-400">
-                    Total : {route.distanceKm} km
-                  </span>
-                )}
               </div>
             ))}
           </div>
@@ -1611,8 +1592,11 @@ const TourPreview = () => {
                         />
                         <div className="flex-1 min-w-0">
                             <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
-                              <span className="truncate">{h.hotelName}</span>
-                            </h4>
+                            <span className="truncate">{r.roomType} · Room {r.roomNumber}</span>
+                            {bookedRoomIds.has(r._id) && (
+                              <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
+                            )}
+                          </h4>
                         </div>
                         <button
                             onClick={() => {
@@ -1780,4 +1764,4 @@ const TourPreview = () => {
   );
 };
 
-export default TourPreview; 
+export default TourPreview;
