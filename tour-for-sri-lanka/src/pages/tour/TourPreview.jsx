@@ -1780,4 +1780,4 @@ const TourPreview = () => {
   );
 };
 
-export default TourPreview;
+export default TourPreview; 
