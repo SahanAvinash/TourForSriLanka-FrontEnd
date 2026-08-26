@@ -1228,8 +1228,8 @@ const TourPreview = () => {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-white font-semibold text-sm truncate flex items-center gap-1">
-                            {g.firstName} {g.lastName}
+                          <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
+                            <span className="truncate">{g.firstName} {g.lastName}</span>
                             {bookedGuideIds.has(g._id) && (
                               <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
                             )}
@@ -1432,8 +1432,8 @@ const TourPreview = () => {
                         className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-white font-semibold text-sm truncate flex items-center gap-1">
-                          {t.vehicleBrand} {t.vehicleModel}
+                        <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
+                          <span className="truncate">{t.vehicleBrand} {t.vehicleModel}</span>
                           {bookedTransportIds.has(t._id) && (
                             <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
                           )}
@@ -1593,11 +1593,12 @@ const TourPreview = () => {
                             className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
-                            <div className="flex items-center gap-1 text-gray-400 text-[11px] mt-[4px]">
-                            <FaMapMarkerAlt className="text-[#00C896] text-[12px]" />
-                            <span className="truncate">{h.location}</span>
-                            </div>
+                            <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
+                            <span className="truncate">{r.roomType} · Room {r.roomNumber}</span>
+                            {bookedRoomIds.has(r._id) && (
+                              <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
+                            )}
+                          </h4>
                         </div>
                         <button
                             onClick={() => {
@@ -1639,8 +1640,8 @@ const TourPreview = () => {
                             className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-semibold text-sm truncate flex items-center gap-1">
-                              {r.roomType} · Room {r.roomNumber}
+                            <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
+                              <span className="truncate">{r.roomType} · Room {r.roomNumber}</span>
                               {bookedRoomIds.has(r._id) && (
                                 <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
                               )}
