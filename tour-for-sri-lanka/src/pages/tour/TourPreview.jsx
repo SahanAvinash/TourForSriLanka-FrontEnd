@@ -323,9 +323,9 @@ const TourPreview = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 mb-4 flex-1 max-h-40 overflow-y-auto">
+                  <div className="flex flex-col gap-1.5 mb-4 flex-1">
                     {option.destinations.map((d, i) => (
-                      <div key={d._id || i} className="text-xs text-gray-300 truncate">
+                      <div key={d._id || i} className="text-xs text-gray-300 whitespace-normal break-words leading-5">
                         {i + 1}. {d.name}
                       </div>
                     ))}
