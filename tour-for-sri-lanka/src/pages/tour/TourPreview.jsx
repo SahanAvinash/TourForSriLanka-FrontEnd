@@ -70,7 +70,7 @@ const formatDuration = (minutes) => {
 const ROUTE_OPTION_META = {
   shortestDistance: {
     icon: FaRulerHorizontal,
-    tagline: "All your selected destinations, packed across your chosen days.",
+    tagline: "All your selected destinations — we calculate how many days you'll need.",
   },
   fastestRoute: {
     icon: FaClock,
@@ -96,9 +96,6 @@ const TourPreview = () => {
   const [tripGuestCount, setTripGuestCount] = useState(null);
 
   const [tripDurationDays, setTripDurationDays] = useState(1);
-  const [daysInput, setDaysInput] = useState(1);
-  const [updatingDays, setUpdatingDays] = useState(false);
-  const [selectedDestinationIds, setSelectedDestinationIds] = useState([]);
 
   const [activeGuideModal, setActiveGuideModal] = useState(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
@@ -215,8 +212,6 @@ const TourPreview = () => {
       const destinationIds = selectedDestinations.map((d) => d._id);
 
       setTripDurationDays(initialDays);
-      setDaysInput(initialDays);
-      setSelectedDestinationIds(destinationIds);
 
       await buildRoute(destinationIds, district, initialDays);
     };
@@ -228,16 +223,6 @@ const TourPreview = () => {
     if (!routeOptions || !routeOptions[optionKey]) return;
     setTripData(routeOptions[optionKey]);
     setPhase("ready");
-  };
-
-  const handleUpdateDays = async () => {
-    const newDays = Math.max(1, Number(daysInput) || 1);
-    setDaysInput(newDays);
-    setTripDurationDays(newDays);
-    sessionStorage.setItem("tourTripDuration", String(newDays));
-    setUpdatingDays(true);
-    await buildRoute(selectedDestinationIds, startDistrict, newDays);
-    setUpdatingDays(false);
   };
 
   if (phase === "checking") {
@@ -302,30 +287,18 @@ const TourPreview = () => {
                   </div>
                   <p className="text-xs text-gray-400 mb-4">{meta.tagline}</p>
 
-                  {key === "shortestDistance" && (
+                  {key === "shortestDistance" && option.itinerary && (
                     <div className="mb-4 bg-[#1a2530] rounded-lg p-3">
-                      <label className="text-xs text-gray-400 block mb-1">Trip length (days)</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          min="1"
-                          value={daysInput}
-                          onChange={(e) => setDaysInput(e.target.value)}
-                          className="w-20 bg-[#253745] rounded-md px-2 py-1 text-sm outline-none text-white"
-                        />
-                        <button
-                          onClick={handleUpdateDays}
-                          disabled={updatingDays}
-                          className="text-xs px-3 py-1 rounded-md border border-[#00C896] text-[#00C896] hover:bg-[#00C896] hover:text-white transition-colors disabled:opacity-50"
-                        >
-                          {updatingDays ? "Updating..." : "Update"}
-                        </button>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Estimated trip length</span>
+                        <span className="font-semibold text-[#00C896]">
+                          {option.estimatedDays || option.itinerary.length} day
+                          {(option.estimatedDays || option.itinerary.length) > 1 ? "s" : ""}
+                        </span>
                       </div>
-                      {option.itinerary && (
-                        <p className="text-[11px] text-gray-500 mt-2">
-                          {option.itinerary.length}-day itinerary · all {option.destinations.length} selected destinations included
-                        </p>
-                      )}
+                      <p className="text-[11px] text-gray-500 mt-2">
+                        Calculated from typical visit times for all {option.destinations.length} selected destinations.
+                      </p>
                     </div>
                   )}
 
