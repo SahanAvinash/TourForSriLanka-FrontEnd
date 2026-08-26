@@ -86,8 +86,6 @@ const TourPreview = () => {
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState("checking");
-  const [suggestions, setSuggestions] = useState([]);
-  const [fitMessage, setFitMessage] = useState("");
   const [error, setError] = useState(null);
   const [tripData, setTripData] = useState(null);
   const [routeOptions, setRouteOptions] = useState(null);
@@ -182,7 +180,7 @@ const TourPreview = () => {
   };
 
   useEffect(() => {
-    const checkFit = async () => {
+    const loadTrip = async () => {
       const saved = sessionStorage.getItem("TourBooking");
       if (!saved) {
         navigate("/tours/plan");
@@ -211,36 +209,11 @@ const TourPreview = () => {
       const tripDurationDays = Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1);
       const destinationIds = selectedDestinations.map((d) => d._id);
 
-      try {
-        const res = await axios.post(`${API_BASE_URL}/api/tour/check-fit`, {
-          destinationIds,
-          tripDurationDays,
-        });
-
-        if (res.data.fits) {
-          await buildRoute(destinationIds, district, tripDurationDays);
-        } else {
-          setSuggestions(res.data.suggestions || []);
-          setFitMessage(res.data.message || "");
-          setPhase("suggestions");
-        }
-      } catch (err) {
-        console.error("check-fit failed:", err.response?.data || err.message);
-        setError(
-          err.response?.data?.message ||
-            "Could not check your trip against your selected days. Please try again later"
-        );
-        setPhase("error");
-      }
+      await buildRoute(destinationIds, district, tripDurationDays);
     };
 
-    checkFit();
+    loadTrip();
   }, [navigate]);
-
-  const handleSelectSuggestion = (suggestion) => {
-    const tripDurationDays = Number(sessionStorage.getItem("tourTripDuration") || 1);
-    buildRoute(suggestion.destinationIds, startDistrict, tripDurationDays);
-  };
 
   const handleSelectRouteOption = (optionKey) => {
     if (!routeOptions || !routeOptions[optionKey]) return;
@@ -263,51 +236,6 @@ const TourPreview = () => {
         <button onClick={() => navigate("/tours/plan")} className="text-[#00C896] text-sm underline">
           ← Change your destinations
         </button>
-      </div>
-    );
-  }
-
-  if (phase === "suggestions") {
-    return (
-      <div className="min-h-screen bg-[#11212D] text-white">
-        <Navbar />
-        <div className="px-6 py-10 max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold mb-2">Your Trip Needs a Little Trimming</h1>
-          <p className="text-gray-400 mb-8">{fitMessage}</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {suggestions.map((s, i) => (
-              <div key={i} className="bg-[#253745] rounded-xl p-5 flex flex-col">
-                <h3 className="text-[#00C896] font-semibold mb-1">{s.label}</h3>
-                <p className="text-xs text-gray-400 mb-4">
-                  {s.destinationCount} destination{s.destinationCount !== 1 ? "s" : ""} included
-                  {s.excludedCount > 0 && ` · ${s.excludedCount} left out`}
-                </p>
-                <div className="flex flex-col gap-2 mb-4 flex-1">
-                  {s.destinations.map((d) => (
-                    <div key={d._id} className="flex items-center gap-2 bg-[#1a2530] rounded-lg px-3 py-2">
-                      {d.image && (
-                        <img src={d.image} alt={d.name} className="w-8 h-8 rounded object-cover flex-shrink-0" />
-                      )}
-                      <span className="text-sm truncate">{d.name}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => handleSelectSuggestion(s)}
-                  className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
-                >
-                  <FaRoute size={12} /> Select this plan
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <button onClick={() => navigate("/tours/plan")} className="mt-8 text-gray-400 text-sm hover:text-white">
-            ← Change your destinations instead
-          </button>
-        </div>
-        <Footer />
       </div>
     );
   }
