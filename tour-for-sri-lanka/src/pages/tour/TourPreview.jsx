@@ -379,6 +379,12 @@ const TourPreview = () => {
     return idx >= 0 ? idx : 0;
   };
 
+  const getRecommendationForLocation = (location) => {
+    return recommendations.find(
+      (rec) => rec.location?.toLowerCase().trim() === location?.toLowerCase().trim()
+    );
+  };
+
   const getMinCheckInDate = (dayIndex) => {
     if (dayIndex === 0) return tripStartDate;
     return hotelStayDates[dayIndex - 1] || tripStartDate;
@@ -1027,25 +1033,125 @@ const TourPreview = () => {
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3">Trip Order</h2>
-          <div className="flex flex-col gap-2">
-            <div className="bg-[#253745] rounded-lg px-4 py-3 flex justify-between items-center">
-              <span className="flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
-                  Start
-                </span>
-                {startDistrict}
-              </span>
-              <span className="text-sm text-gray-400">
-                Total : {route.distanceKm} km
-              </span>
-            </div>
-            {destinations.map((dest, index) => (
-              <div key={dest.id || `stop-${index}`} className="bg-[#253745] rounded-lg px-4 py-3 flex items-center">
-                <span>
-                  {index + 1}. {dest.name}
-                </span>
-              </div>
-            ))}
+          <div className="flex flex-col gap-3">
+            {(() => {
+              const startRec = getRecommendationForLocation(startDistrict);
+              const startGuides = startRec?.guides || [];
+              const startHotels = startRec?.hotels || [];
+              const startTransports = startRec?.transports || [];
+              return (
+                <div className="bg-[#253745] rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                        Start
+                      </span>
+                      {startDistrict}
+                    </span>
+                    <span className="text-sm text-gray-400">
+                      Total : {route.distanceKm} km
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      onClick={() =>
+                        startRec && setActiveGuideModal({ location: startRec.location, guides: startGuides })
+                      }
+                    >
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                        Guides ({startGuides.length})
+                        {startGuides.some((g) => bookedGuideIds.has(g._id)) && (
+                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                        )}
+                      </p>
+                      {startGuides.slice(0, 2).map((g) => (
+                        <p key={g._id} className="text-xs text-gray-400 truncate">{g.firstName} {g.lastName}</p>
+                      ))}
+                      {startGuides.length > 2 && (
+                        <p className="text-xs text-[#00C896] mt-1">+{startGuides.length - 2} more · click to view</p>
+                      )}
+                    </div>
+                    <div
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      onClick={() =>
+                        startRec &&
+                        setActiveHotelModal({ location: startRec.location, hotels: startHotels, dayIndex: 0 })
+                      }
+                    >
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                        Hotels ({startHotels.length})
+                        {hotelStayDates[0] && (
+                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                        )}
+                      </p>
+                      {startHotels.slice(0, 2).map((h) => (
+                        <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
+                      ))}
+                      {startHotels.length > 2 && (
+                        <p className="text-xs text-[#00C896] mt-1">+{startHotels.length - 2} more · click to view</p>
+                      )}
+                    </div>
+                    <div
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      onClick={() =>
+                        startRec &&
+                        setActiveTransportModal({ location: startRec.location, transports: startTransports })
+                      }
+                    >
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                        Transport ({startTransports.length})
+                        {startTransports.some((t) => bookedTransportIds.has(t._id)) && (
+                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                        )}
+                      </p>
+                      {startTransports.slice(0, 2).map((t) => (
+                        <p key={t._id} className="text-xs text-gray-400 truncate">{t.vehicleBrand} {t.vehicleModel}</p>
+                      ))}
+                      {startTransports.length > 2 && (
+                        <p className="text-xs text-[#00C896] mt-1">+{startTransports.length - 2} more · click to view</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {destinations.map((dest, index) => {
+              const destRec = getRecommendationForLocation(dest.location);
+              const destHotels = destRec?.hotels || [];
+              const dayIndex = getDestinationDayIndex(dest.location);
+              return (
+                <div
+                  key={dest.id || `stop-${index}`}
+                  className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center"
+                >
+                  <span>
+                    {index + 1}. {dest.name}
+                  </span>
+                  <div
+                    className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                    onClick={() =>
+                      destRec &&
+                      setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
+                    }
+                  >
+                    <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                      Hotels ({destHotels.length})
+                      {hotelStayDates[dayIndex] && (
+                        <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                      )}
+                    </p>
+                    {destHotels.slice(0, 2).map((h) => (
+                      <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
+                    ))}
+                    {destHotels.length > 2 && (
+                      <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
