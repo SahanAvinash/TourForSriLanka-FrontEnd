@@ -10,13 +10,20 @@ const statusStyles = {
   completed: "bg-blue-500/20 text-blue-400",
 };
 
-export default function YourBookings() {
-  const storedUser = JSON.parse(
-    localStorage.getItem("user") ||
-      sessionStorage.getItem("user") ||
-      "null"
-  );
+function getStoredUser() {
+  try {
+    return JSON.parse(
+      localStorage.getItem("user") ||
+        sessionStorage.getItem("user") ||
+        "null"
+    );
+  } catch {
+    return null;
+  }
+}
 
+export default function YourBookings() {
+  const storedUser = getStoredUser();
   const travelerId = storedUser?._id;
 
   const [bookings, setBookings] = useState([]);
@@ -29,6 +36,8 @@ export default function YourBookings() {
       return;
     }
 
+    let cancelled = false;
+
     const fetchBookings = async () => {
       setLoadingBookings(true);
 
@@ -39,21 +48,40 @@ export default function YourBookings() {
 
         const data = await res.json();
 
-        if (res.ok) {
+        if (!res.ok) {
+          throw new Error(
+            data?.message || "Failed to load bookings"
+          );
+        }
+
+        if (!cancelled) {
           setBookings(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        if (!cancelled) {
+          setBookings([]);
+          toast.error(error.message || "Failed to load bookings");
+        }
       } finally {
-        setLoadingBookings(false);
+        if (!cancelled) {
+          setLoadingBookings(false);
+        }
       }
     };
 
     fetchBookings();
+
+    return () => {
+      cancelled = true;
+    };
   }, [travelerId]);
 
   const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm("Cancel this booking?")) return;
+    if (!bookingId) return;
+
+    if (!window.confirm("Cancel this booking?")) {
+      return;
+    }
 
     setCancellingId(bookingId);
 
@@ -71,25 +99,35 @@ export default function YourBookings() {
         }
       );
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to cancel booking");
+        throw new Error(
+          data?.message || "Failed to cancel booking"
+        );
       }
 
       setBookings((prev) =>
-        prev.filter((booking) => booking._id !== bookingId)
+        prev.map((booking) =>
+          booking._id === bookingId
+            ? { ...booking, status: "cancelled" }
+            : booking
+        )
       );
 
       toast.success("Booking cancelled");
-    } catch (err) {
-      toast.error(err.message);
+    } catch (error) {
+      toast.error(
+        error.message || "Failed to cancel booking"
+      );
     } finally {
       setCancellingId(null);
     }
   };
 
-  if (!travelerId) return null;
+  if (!travelerId) {
+    return null;
+  }
 
   const activeBookings = bookings.filter(
     (booking) => booking.status !== "cancelled"
@@ -98,13 +136,10 @@ export default function YourBookings() {
   return (
     <section className="bg-[#11212D] px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       <div className="max-w-7xl mx-auto">
-
         <div className="flex items-center justify-between mb-5 sm:mb-6">
-          <div>
-            <h2 className="text-[20px] sm:text-[22px] lg:text-[24px] font-bold text-white">
-              Your Bookings
-            </h2>
-          </div>
+          <h2 className="text-[20px] sm:text-[22px] lg:text-[24px] font-bold text-white">
+            Your Bookings
+          </h2>
         </div>
 
         {loadingBookings && (
@@ -122,11 +157,20 @@ export default function YourBookings() {
         {!loadingBookings && activeBookings.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
             {activeBookings.map((booking) => {
-              const nights = Math.ceil(
-                (new Date(booking.checkOutDate) -
-                  new Date(booking.checkInDate)) /
-                  (1000 * 60 * 60 * 24)
+              const checkIn = new Date(booking.checkInDate);
+              const checkOut = new Date(booking.checkOutDate);
+
+              const nights = Math.max(
+                1,
+                Math.ceil(
+                  (checkOut - checkIn) /
+                    (1000 * 60 * 60 * 24)
+                )
               );
+
+              const statusClass =
+                statusStyles[booking.status] ||
+                statusStyles.pending;
 
               return (
                 <div
@@ -140,57 +184,67 @@ export default function YourBookings() {
                     }
                     alt={booking.roomId?.roomType || "Room"}
                     className="w-full h-[180px] sm:w-[125px] sm:h-[100px] object-cover rounded-[12px] sm:rounded-[14px] shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "/room_placeholder.jpg";
+                    }}
                   />
 
                   <div className="flex-1 min-w-0">
-
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-semibold text-white text-[14px] sm:text-[15px] truncate">
-                        {booking.hotelId?.hotelName}
+                        {booking.hotelId?.hotelName ||
+                          "Hotel"}
                       </h3>
 
                       <span
-                        className={`text-[10px] sm:text-xs px-2.5 py-1 rounded-full capitalize shrink-0 ${
-                          statusStyles[booking.status]
-                        }`}
+                        className={`text-[10px] sm:text-xs px-2.5 py-1 rounded-full capitalize shrink-0 ${statusClass}`}
                       >
-                        {booking.status}
+                        {booking.status || "pending"}
                       </span>
                     </div>
 
                     <p className="text-[12px] sm:text-[13px] text-[#d5dde2] mt-1">
-                      {booking.roomId?.roomType} · Room{" "}
-                      {booking.roomId?.roomNumber}
+                      {booking.roomId?.roomType ||
+                        "Room"}{" "}
+                      · Room{" "}
+                      {booking.roomId?.roomNumber || "-"}
                     </p>
 
                     <p className="text-[12px] sm:text-[13px] text-[#d5dde2] mt-1">
-                      {new Date(
-                        booking.checkInDate
-                      ).toLocaleDateString()}{" "}
-                      –{" "}
-                      {new Date(
-                        booking.checkOutDate
-                      ).toLocaleDateString()}
+                      {checkIn.toLocaleDateString()} –{" "}
+                      {checkOut.toLocaleDateString()}
                     </p>
 
                     <p className="text-[11px] sm:text-[12px] text-gray-400 mt-1">
-                      {nights} night{nights !== 1 ? "s" : ""}
+                      {nights} night
+                      {nights !== 1 ? "s" : ""}
                     </p>
 
                     <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 mt-3">
                       <p className="text-[13px] sm:text-[14px] font-semibold text-[#00C896]">
-                        Rs. {booking.totalPrice?.toLocaleString()}
+                        Rs.{" "}
+                        {Number(
+                          booking.totalPrice || 0
+                        ).toLocaleString()}
                       </p>
 
                       {booking.status === "pending" && (
                         <button
+                          type="button"
                           onClick={() =>
-                            handleCancelBooking(booking._id)
+                            handleCancelBooking(
+                              booking._id
+                            )
                           }
-                          disabled={cancellingId === booking._id}
+                          disabled={
+                            cancellingId ===
+                            booking._id
+                          }
                           className="w-full xs:w-auto text-[11px] sm:text-xs px-3 py-1.5 rounded-full border border-red-400 text-red-400 hover:bg-red-400/10 disabled:opacity-50 transition"
                         >
-                          {cancellingId === booking._id
+                          {cancellingId ===
+                          booking._id
                             ? "Cancelling..."
                             : "Cancel Booking"}
                         </button>

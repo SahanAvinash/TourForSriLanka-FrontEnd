@@ -10,8 +10,11 @@ const HotelPage = () => {
   return (
     <div className="min-h-screen bg-[#11212D]">
       <HotelHeroSection onFilterChange={setFilters} />
+
       <YourBookings />
+
       <HotelList filters={filters} />
+
       <Footer />
     </div>
   );

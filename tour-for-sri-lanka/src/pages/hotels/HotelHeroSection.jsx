@@ -52,7 +52,7 @@ const selectStyles = {
 
   valueContainer: (base) => ({
     ...base,
-    padding: "0px",
+    padding: "0",
     flex: "0 1 auto",
   }),
 
@@ -98,7 +98,7 @@ const selectStyles = {
 
   dropdownIndicator: (base) => ({
     ...base,
-    padding: "0",
+    padding: 0,
     color: "#CCD0CF",
     "&:hover": {
       color: "#00C896",
@@ -123,20 +123,24 @@ const HotelHeroSection = ({ onFilterChange }) => {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
 
+  const today = new Date().toISOString().split("T")[0];
+
   const districtOptions = DISTRICT_OPTIONS.map((district) => ({
     label: district,
     value: district,
   }));
 
   const handleSearch = () => {
-    if (onFilterChange) {
-      onFilterChange({
-        destination: destination?.value || "",
-        checkIn,
-        checkOut,
-        guests,
-      });
+    if (checkIn && checkOut && checkOut <= checkIn) {
+      return;
     }
+
+    onFilterChange?.({
+      destination: destination?.value || "",
+      checkIn,
+      checkOut,
+      guests,
+    });
   };
 
   return (
@@ -144,143 +148,34 @@ const HotelHeroSection = ({ onFilterChange }) => {
       <Navbar />
 
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
-
-        {/* Background */}
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
-
           <img
             src={hotel_bg}
             alt="Hotel"
             className="absolute inset-0 w-full h-full object-cover"
           />
 
-          {/* Main dark overlay */}
           <div className="absolute inset-0 bg-black/45" />
 
-          {/* Bottom fade into page background */}
-          <div
-            className="
-              absolute
-              inset-x-0
-              bottom-0
-              h-[330px]
-              sm:h-[280px]
-              lg:h-[190px]
-              bg-gradient-to-b
-              from-transparent
-              via-[#11212D]/70
-              to-[#11212D]
-            "
-          />
+          <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#11212D]/70 to-[#11212D]" />
 
-          {/* Extra soft bottom blend */}
-          <div
-            className="
-              absolute
-              inset-x-0
-              bottom-0
-              h-[100px]
-              sm:h-[90px]
-              lg:h-[70px]
-              bg-gradient-to-b
-              from-transparent
-              to-[#11212D]
-            "
-          />
+          <div className="absolute inset-x-0 bottom-0 h-[100px] sm:h-[90px] lg:h-[70px] bg-gradient-to-b from-transparent to-[#11212D]" />
         </div>
 
-        {/* Hero Content */}
-        <div
-          className="
-            absolute
-            left-5
-            right-5
-            sm:left-10
-            sm:right-10
-            lg:left-12
-            lg:right-auto
-            top-10
-            sm:top-16
-            z-10
-          "
-        >
-          <h1
-            className="
-              hero-title-anim
-              text-white
-              text-[32px]
-              sm:text-5xl
-              lg:text-6xl
-              font-bold
-              leading-tight
-            "
-          >
+        <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-10 sm:top-16 z-10">
+          <h1 className="hero-title-anim text-white text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
             Hotel Stay
           </h1>
 
-          <p
-            className="
-              hero-desc-anim
-              text-gray-300
-              text-sm
-              sm:text-lg
-              mt-3
-              sm:mt-5
-              max-w-md
-            "
-          >
+          <p className="hero-desc-anim text-gray-300 text-sm sm:text-lg mt-3 sm:mt-5 max-w-md">
             Discover and book amazing hotels across Sri Lanka.
           </p>
         </div>
 
-        {/* Search Box */}
-        <div
-          className="
-            animate-box
-            absolute
-            top-[205px]
-            sm:top-[235px]
-            lg:-bottom-12
-            lg:top-auto
-            left-3
-            right-3
-            sm:left-8
-            sm:right-8
-            lg:left-1/2
-            lg:right-auto
-            lg:-translate-x-1/2
-            w-auto
-            lg:w-full
-            lg:max-w-[1100px]
-            z-20
-          "
-        >
-          <div
-            className="
-              bg-[#455766]/70
-              sm:bg-[#455766]/75
-              lg:bg-[#455766]/90
-              backdrop-blur-xl
-              rounded-[20px]
-              sm:rounded-[28px]
-              border
-              border-white/10
-              shadow-2xl
-              p-4
-              sm:p-6
-              lg:p-0
-              lg:h-[100px]
-              flex
-              flex-col
-              lg:flex-row
-              lg:items-center
-              lg:px-8
-            "
-          >
-
-            {/* Destination */}
+        <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
+          <div className="bg-[#455766]/70 sm:bg-[#455766]/75 lg:bg-[#455766]/90 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <FaMapMarkerAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
@@ -296,17 +191,19 @@ const HotelHeroSection = ({ onFilterChange }) => {
                   placeholder="Stay"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
-                  menuPortalTarget={document.body}
+                  menuPortalTarget={
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
+                  }
                   className="mt-1"
                 />
               </div>
             </div>
 
             <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
-
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
-            {/* Check In */}
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
@@ -318,35 +215,23 @@ const HotelHeroSection = ({ onFilterChange }) => {
                 <input
                   type="date"
                   value={checkIn}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={today}
                   onChange={(e) => {
-                    const newCheckIn = e.target.value;
+                    const value = e.target.value;
+                    setCheckIn(value);
 
-                    setCheckIn(newCheckIn);
-
-                    if (checkOut && checkOut < newCheckIn) {
+                    if (checkOut && checkOut <= value) {
                       setCheckOut("");
                     }
                   }}
-                  className="
-                    w-full
-                    bg-transparent
-                    text-white
-                    outline-none
-                    mt-1
-                    text-sm
-                    sm:text-base
-                    min-w-0
-                  "
+                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0"
                 />
               </div>
             </div>
 
             <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
-
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
-            {/* Check Out */}
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
@@ -358,27 +243,17 @@ const HotelHeroSection = ({ onFilterChange }) => {
                 <input
                   type="date"
                   value={checkOut}
-                  min={checkIn || undefined}
+                  min={checkIn ? checkIn : today}
+                  disabled={!checkIn}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="
-                    w-full
-                    bg-transparent
-                    text-white
-                    outline-none
-                    mt-1
-                    text-sm
-                    sm:text-base
-                    min-w-0
-                  "
+                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0 disabled:opacity-50"
                 />
               </div>
             </div>
 
             <div className="hidden lg:block w-px h-12 bg-white/20 mx-4" />
-
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
-            {/* Guests */}
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <FaUsers className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
@@ -400,31 +275,16 @@ const HotelHeroSection = ({ onFilterChange }) => {
                         setGuests(value);
                       }
                     }}
-                    className="
-                      w-full
-                      bg-transparent
-                      text-white
-                      outline-none
-                      [appearance:textfield]
-                      [&::-webkit-outer-spin-button]:appearance-none
-                      [&::-webkit-inner-spin-button]:appearance-none
-                    "
+                    className="w-full bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
 
                   <div className="flex flex-col ml-2 shrink-0">
                     <button
                       type="button"
                       onClick={() =>
-                        setGuests((g) => Math.min(20, Number(g) + 1))
+                        setGuests((g) => Math.min(20, g + 1))
                       }
-                      className="
-                        text-[#CCD0CF]
-                        hover:text-[#00C896]
-                        hover:opacity-80
-                        leading-none
-                        transition-all
-                        duration-300
-                      "
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none transition-all duration-300"
                     >
                       <FaChevronUp size={10} />
                     </button>
@@ -432,17 +292,9 @@ const HotelHeroSection = ({ onFilterChange }) => {
                     <button
                       type="button"
                       onClick={() =>
-                        setGuests((g) => Math.max(1, Number(g) - 1))
+                        setGuests((g) => Math.max(1, g - 1))
                       }
-                      className="
-                        text-[#CCD0CF]
-                        hover:text-[#00C896]
-                        hover:opacity-80
-                        leading-none
-                        mt-1
-                        transition-all
-                        duration-300
-                      "
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none mt-1 transition-all duration-300"
                     >
                       <FaChevronDown size={10} />
                     </button>
@@ -451,32 +303,11 @@ const HotelHeroSection = ({ onFilterChange }) => {
               </div>
             </div>
 
-            {/* Search Button */}
             <button
+              type="button"
               onClick={handleSearch}
-              className="
-                mt-4
-                lg:mt-0
-                lg:ml-6
-                bg-[#00C896]
-                hover:bg-[#00b383]
-                duration-300
-                text-white
-                px-6
-                sm:px-8
-                py-3.5
-                rounded-full
-                flex
-                items-center
-                justify-center
-                gap-2
-                font-semibold
-                w-full
-                lg:w-auto
-                whitespace-nowrap
-                text-sm
-                sm:text-base
-              "
+              disabled={checkIn && checkOut && checkOut <= checkIn}
+              className="mt-4 lg:mt-0 lg:ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-6 sm:px-8 py-3.5 rounded-full flex items-center justify-center gap-2 font-semibold w-full lg:w-auto whitespace-nowrap text-sm sm:text-base disabled:opacity-50"
             >
               <FaSearch />
               Search Hotels
@@ -485,7 +316,6 @@ const HotelHeroSection = ({ onFilterChange }) => {
         </div>
       </div>
 
-      {/* Smooth continuation to next section */}
       <div className="h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D]" />
     </section>
   );

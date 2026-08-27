@@ -7,44 +7,89 @@ const HotelList = ({ filters }) => {
   const [loading, setLoading] = useState(true);
 
   const isSearching =
-    filters && (filters.destination || filters.guests);
+    !!filters &&
+    !!(
+      filters.destination ||
+      filters.guests ||
+      filters.checkIn ||
+      filters.checkOut
+    );
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
 
-    let url = `${API_BASE_URL}/api/hotel/`;
+    const fetchHotels = async () => {
+      setLoading(true);
 
-    if (isSearching) {
-      const params = new URLSearchParams();
+      try {
+        let url = `${API_BASE_URL}/api/hotel/`;
 
-      if (filters.destination) {
-        params.append("district", filters.destination);
-      }
+        if (isSearching) {
+          const params = new URLSearchParams();
 
-      if (filters.guests) {
-        params.append("guests", filters.guests);
-      }
+          if (filters?.destination) {
+            params.append("district", filters.destination);
+          }
 
-      url = `${API_BASE_URL}/api/hotel/search?${params.toString()}`;
-    }
+          if (filters?.guests) {
+            params.append("guests", filters.guests);
+          }
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        // Response එක direct array එකක්ද නැතහොත් Object wrapper එකක්ද කියා පරීක්ෂා කිරීම
+          if (filters?.checkIn) {
+            params.append("checkIn", filters.checkIn);
+          }
+
+          if (filters?.checkOut) {
+            params.append("checkOut", filters.checkOut);
+          }
+
+          url = `${API_BASE_URL}/api/hotel/search?${params.toString()}`;
+        }
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch hotels");
+        }
+
+        const data = await res.json();
+
         const extractedList = Array.isArray(data)
           ? data
-          : data.hotels || data.data || [];
+          : Array.isArray(data?.hotels)
+          ? data.hotels
+          : Array.isArray(data?.data)
+          ? data.data
+          : [];
 
-        setHotels(extractedList);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setHotels([]);
-        setLoading(false);
-      });
+        if (!cancelled) {
+          setHotels(extractedList);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Fetch hotels error:", error);
+          setHotels([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchHotels();
+
+    return () => {
+      cancelled = true;
+    };
   }, [filters, isSearching]);
+
+  const handleViewAll = () => {
+    window.scrollTo({
+      top: document.getElementById("hotel-results")?.offsetTop || 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <section
@@ -55,7 +100,7 @@ const HotelList = ({ filters }) => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="text-[20px] sm:text-[22px] lg:text-[24px] font-bold text-white">
-              {isSearching ? "Search Result" : "Popular Hotels"}
+              {isSearching ? "Search Results" : "Popular Hotels"}
             </h2>
 
             <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-gray-400 mt-1.5 sm:mt-2">
@@ -65,9 +110,15 @@ const HotelList = ({ filters }) => {
             </p>
           </div>
 
-          <button className="self-start sm:self-auto border border-[#00C896] text-[#00C896] px-5 sm:px-6 py-2 rounded-full text-[12px] sm:text-[13px] hover:bg-[#00C896] hover:text-white duration-300">
-            View All
-          </button>
+          {!isSearching && hotels.length > 0 && (
+            <button
+              type="button"
+              onClick={handleViewAll}
+              className="self-start sm:self-auto border border-[#00C896] text-[#00C896] px-5 sm:px-6 py-2 rounded-full text-[12px] sm:text-[13px] hover:bg-[#00C896] hover:text-white duration-300"
+            >
+              View All
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">

@@ -8,6 +8,10 @@ const HotelCard = ({ hotel }) => {
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
+    const element = cardRef.current;
+
+    if (!element) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -15,31 +19,36 @@ const HotelCard = ({ hotel }) => {
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      {
+        threshold: 0.15,
+      }
     );
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
+    observer.observe(element);
 
     return () => observer.disconnect();
   }, []);
 
-  let imagesArray = [];
+  let images = [];
 
   try {
-    imagesArray =
-      typeof hotel.images === "string"
-        ? JSON.parse(hotel.images)
-        : hotel.images || [];
+    if (Array.isArray(hotel?.images)) {
+      images = hotel.images;
+    } else if (typeof hotel?.images === "string") {
+      const parsed = JSON.parse(hotel.images);
+      images = Array.isArray(parsed) ? parsed : [];
+    }
   } catch {
-    imagesArray = [];
+    images = [];
   }
 
-  const image =
-    imagesArray.length > 0
-      ? imagesArray[0]
-      : "/hotel_placeholder.jpg";
+  const image = images[0] || "/hotel_placeholder.jpg";
+
+  const handleViewDetails = () => {
+    if (hotel?._id) {
+      navigate(`/hotel/${hotel._id}`);
+    }
+  };
 
   return (
     <div
@@ -51,36 +60,48 @@ const HotelCard = ({ hotel }) => {
       <div className="w-full h-[165px] xs:h-[180px] sm:h-[200px] md:h-[210px] overflow-hidden">
         <img
           src={image}
-          alt={hotel.hotelName}
+          alt={hotel?.hotelName || "Hotel"}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          onError={(e) => {
+            e.currentTarget.src = "/hotel_placeholder.jpg";
+          }}
         />
       </div>
 
       <div className="p-[13px] xs:p-[15px] sm:p-[18px]">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-white font-bold text-[14px] xs:text-[15px] sm:text-[16px] truncate min-w-0 leading-5">
-            {hotel.hotelName}
+            {hotel?.hotelName || "Hotel"}
           </h3>
 
-          <span className="shrink-0 max-w-[90px] sm:max-w-none text-[8px] xs:text-[9px] sm:text-[10px] text-[#00C896] bg-[#00C896]/10 px-[6px] xs:px-[7px] sm:px-[8px] py-[2px] rounded-full whitespace-nowrap overflow-hidden text-ellipsis">
-            {hotel.hotelType}
-          </span>
+          {hotel?.hotelType && (
+            <span className="shrink-0 max-w-[90px] sm:max-w-none text-[8px] xs:text-[9px] sm:text-[10px] text-[#00C896] bg-[#00C896]/10 px-[6px] xs:px-[7px] sm:px-[8px] py-[2px] rounded-full whitespace-nowrap overflow-hidden text-ellipsis">
+              {hotel.hotelType}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-1.5 mt-[7px] text-gray-400 text-[11px] xs:text-[12px]">
-          <FaMapMarkerAlt className="text-[#00C896] text-[15px] xs:text-[16px] sm:text-[18px] shrink-0" />
+        {(hotel?.location || hotel?.district) && (
+          <div className="flex items-center gap-1.5 mt-[7px] text-gray-400 text-[11px] xs:text-[12px]">
+            <FaMapMarkerAlt className="text-[#00C896] text-[15px] xs:text-[16px] sm:text-[18px] shrink-0" />
 
-          <span className="truncate min-w-0">
-            {hotel.location}, {hotel.district}
-          </span>
-        </div>
+            <span className="truncate min-w-0">
+              {[hotel.location, hotel.district]
+                .filter(Boolean)
+                .join(", ")}
+            </span>
+          </div>
+        )}
 
-        <p className="text-gray-400 text-[11px] xs:text-[12px] sm:text-[13px] mt-[9px] line-clamp-2 leading-4 xs:leading-5">
-          {hotel.shortDescription}
-        </p>
+        {hotel?.shortDescription && (
+          <p className="text-gray-400 text-[11px] xs:text-[12px] sm:text-[13px] mt-[9px] line-clamp-2 leading-4 xs:leading-5">
+            {hotel.shortDescription}
+          </p>
+        )}
 
         <button
-          onClick={() => navigate(`/hotel/${hotel._id}`)}
+          type="button"
+          onClick={handleViewDetails}
           className="mt-[12px] xs:mt-[14px] w-full border border-[#00C896] text-[#00C896] py-[8px] xs:py-[9px] rounded-full text-[11px] xs:text-[12px] sm:text-[13px] hover:bg-[#00C896] hover:text-white transition-all duration-300"
         >
           View Details
