@@ -136,6 +136,8 @@ const TourPreview = () => {
   const [routeOptions, setRouteOptions] = useState(null);
 
   const [startDistrict, setStartDistrict] = useState(null);
+  // ★ NEW — the exact pinned start location (lat/lng/address) chosen on the map in TourPage.jsx
+  const [startCoords, setStartCoords] = useState(null);
 
   const [tripStartDate, setTripStartDate] = useState("");
   const [tripGuestCount, setTripGuestCount] = useState(null);
@@ -208,7 +210,8 @@ const TourPreview = () => {
     return date.toISOString().split("T")[0];
   };
 
-  const buildRoute = async (destinationIds, district, tripDurationDaysOverride) => {
+  // ★ CHANGED — now accepts startCoordsOverride and forwards lat/lng to the backend
+  const buildRoute = async (destinationIds, district, tripDurationDaysOverride, startCoordsOverride) => {
     setPhase("building-route");
     setError(null);
     try {
@@ -216,6 +219,10 @@ const TourPreview = () => {
         destinationIds,
         startDistrict: district,
         tripDurationDays: tripDurationDaysOverride,
+        // ★ NEW — exact pinned coordinates so the backend can route from the real start point
+        // instead of guessing a coordinate from the district name.
+        startLat: startCoordsOverride?.lat,
+        startLng: startCoordsOverride?.lng,
       });
       setRouteOptions(res.data.options);
       setPhase("route-options");
@@ -246,6 +253,20 @@ const TourPreview = () => {
       const savedGuestCount = sessionStorage.getItem("tourNumberOfGuests");
       if (savedGuestCount) setTripGuestCount(Number(savedGuestCount));
 
+      // ★ NEW — read the exact pinned start location saved by TourPage.jsx's map picker
+      const savedStartLat = sessionStorage.getItem("tourStartLat");
+      const savedStartLng = sessionStorage.getItem("tourStartLng");
+      const savedStartAddress = sessionStorage.getItem("tourStartAddress");
+      let startCoordsForRoute = null;
+      if (savedStartLat && savedStartLng) {
+        startCoordsForRoute = {
+          lat: Number(savedStartLat),
+          lng: Number(savedStartLng),
+          address: savedStartAddress || district,
+        };
+        setStartCoords(startCoordsForRoute);
+      }
+
       if (!district) {
         setError("Select your starting district first");
         setPhase("error");
@@ -258,7 +279,8 @@ const TourPreview = () => {
 
       setTripDurationDays(initialDays);
 
-      await buildRoute(destinationIds, district, initialDays);
+      // ★ CHANGED — pass the pinned coords through to buildRoute
+      await buildRoute(destinationIds, district, initialDays, startCoordsForRoute);
     };
 
     loadTrip();
@@ -410,15 +432,23 @@ const TourPreview = () => {
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
 
+  // ★ FIXED — the real pinned start location (from the map picker in TourPage.jsx) now takes
+  // priority over anything the backend derived from the district name. This is the actual bug fix:
+  // previously this always fell through to routableStops[0]/geometry[0], which could resolve to
+  // the 1st destination instead of the user's real starting point.
   const startCoord =
+    (startCoords && startCoords.lat != null && startCoords.lng != null
+      ? [startCoords.lat, startCoords.lng]
+      : null) ||
     getCoordFromStop(routableStops[0]) ||
     (polylinePositions.length > 0 ? polylinePositions[0] : null);
 
-  if (!getCoordFromStop(routableStops[0])) {
+  if (!startCoords && !getCoordFromStop(routableStops[0])) {
     console.warn(
-      "TourPreview: couldn't read a start coordinate from route.routableStops[0] — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point. Check the shape of routableStops in the API response."
+      "TourPreview: no pinned start location found in sessionStorage (tourStartLat/tourStartLng) and no routableStops[0] from the API — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point."
     );
   }
+
   const legDistances = destinations.map((dest, index) => {
     const prevCoord = index === 0
       ? startCoord
@@ -659,10 +689,11 @@ const TourPreview = () => {
     vehicleId: selectedTransport._id,
     pickupLocation: startDistrict,
     dropoffLocation: activeTransportModal.location,
-    pickup: {
-      lat: destinations[0].latitude,
-      lng: destinations[0].longitude,
-    },
+    // ★ FIXED — use the real pinned start location for pickup coordinates instead of
+    // always defaulting to the 1st destination's coordinates.
+    pickup: startCoords
+      ? { lat: startCoords.lat, lng: startCoords.lng }
+      : { lat: destinations[0].latitude, lng: destinations[0].longitude },
     destination: {
       lat: destinations[destinations.length - 1].latitude,
       lng: destinations[destinations.length - 1].longitude,
@@ -1069,7 +1100,8 @@ const TourPreview = () => {
             {startCoord && (
               <Marker position={startCoord} icon={createStartIcon()}>
                 <Popup>
-                  <strong>Start — {startDistrict}</strong>
+                  {/* ★ FIXED — shows the pinned address when available, falls back to district name */}
+                  <strong>Start — {startCoords?.address || startDistrict}</strong>
                 </Popup>
               </Marker>
             )}
@@ -1123,7 +1155,7 @@ const TourPreview = () => {
                       <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
                         Start
                       </span>
-                      {startDistrict}
+                      {startCoords?.address || startDistrict}
                     </span>
                     <span className="text-sm text-gray-400">
                       Total : {route.distanceKm} km
@@ -1656,7 +1688,7 @@ const TourPreview = () => {
                         readOnly
                         className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Vehicle returns you to {startDistrict} — price includes the full round trip.</p>
+                      <p className="text-xs text-gray-500 mt-1">Vehicle returns you to {startCoords?.address || startDistrict} — price includes the full round trip.</p>
                     </div>
 
                     <div>
