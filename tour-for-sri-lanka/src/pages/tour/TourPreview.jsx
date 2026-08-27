@@ -392,8 +392,6 @@ const TourPreview = () => {
   const getDayInfoForDestination = (dest, index) => {
     const info = destinationDayInfo.get(String(dest._id || dest.id));
     if (info) return info;
-    // No itinerary data for this route option — fall back to one stop per day
-    // so the page still works, but hotel booking won't be limited correctly.
     return { dayNumber: index + 1, timeSlot: null, isDayEnd: true };
   };
 
@@ -784,11 +782,6 @@ const TourPreview = () => {
     setStartTourError("");
     setStartTourSuccess(false);
 
-    if (totalCartItems === 0) {
-      setStartTourError("Add at least one guide, hotel or vehicle to your cart before starting the tour");
-      return;
-    }
-
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
     const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
@@ -1074,6 +1067,9 @@ const TourPreview = () => {
                         startRec && setActiveGuideModal({ location: startRec.location, guides: startGuides })
                       }
                     >
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        You can book a guide if you wish. Your guide will accompany you throughout your entire trip.
+                      </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaUserTie className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Guides ({startGuides.length})
@@ -1095,6 +1091,9 @@ const TourPreview = () => {
                         setActiveHotelModal({ location: startRec.location, hotels: startHotels, dayIndex: 0 })
                       }
                     >
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        If you need accommodation at your destination, you can book a hotel that suits your needs.
+                      </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Hotels ({startHotels.length})
@@ -1116,6 +1115,9 @@ const TourPreview = () => {
                         setActiveTransportModal({ location: startRec.location, transports: startTransports })
                       }
                     >
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        You can book a vehicle if you wish. Your driver will be available throughout your entire trip.
+                      </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaCar className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Transport ({startTransports.length})
@@ -1271,12 +1273,18 @@ const TourPreview = () => {
 
         <button
           onClick={handleStartTour}
-          disabled={startingTour || totalCartItems === 0}
+          disabled={startingTour}
           className="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FaPlay size={12} />
-          {startingTour ? "Starting Tour..." : "Start Tour"}
+          {startingTour ? "Starting Tour..." : totalCartItems === 0 ? "Start Tour (no bookings)" : "Start Tour"}
         </button>
+
+        {totalCartItems === 0 && !startingTour && (
+          <p className="text-xs text-gray-500 mt-2">
+            No guide, hotel or vehicle added yet — that's fine, you can start the tour and add these anytime later.
+          </p>
+        )}
 
         {activeGuideModal && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-9999 px-4" onClick={closeModal}>
