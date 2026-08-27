@@ -323,9 +323,9 @@ const TourPreview = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 mb-4 flex-1">
+                  <div className="flex flex-col gap-1.5 mb-4 flex-1 max-h-40 overflow-y-auto">
                     {option.destinations.map((d, i) => (
-                      <div key={d._id || i} className="text-xs text-gray-300 whitespace-normal break-words leading-5">
+                      <div key={d._id || i} className="text-xs text-gray-300 truncate">
                         {i + 1}. {d.name}
                       </div>
                     ))}
@@ -1027,15 +1027,17 @@ const TourPreview = () => {
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3">Trip Order</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-2">
             {destinations.map((dest, index) => (
-              <div
-                key={dest.id || `stop-${index}`}
-                className="bg-[#253745] rounded-lg px-4 py-3 flex items-center"
-              >
-                <span className="text-sm sm:text-base text-white font-medium">
-                  {index + 1}. {dest.name}
+              <div key={dest.id || `stop-${index}`} className="bg-[#253745] rounded-lg px-4 py-3 flex justify-between items-center">
+                <span>
+                  {index + 1}. {dest.name} {dest.location && `(${dest.location})`}
                 </span>
+                {index === 0 && (
+                  <span className="text-sm text-gray-400">
+                    Total : {route.distanceKm} km
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -1591,12 +1593,11 @@ const TourPreview = () => {
                             className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
-                            <span className="truncate">{r.roomType} · Room {r.roomNumber}</span>
-                            {bookedRoomIds.has(r._id) && (
-                              <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
-                            )}
-                          </h4>
+                            <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
+                            <div className="flex items-center gap-1 text-gray-400 text-[11px] mt-[4px]">
+                            <FaMapMarkerAlt className="text-[#00C896] text-[12px]" />
+                            <span className="truncate">{h.location}</span>
+                            </div>
                         </div>
                         <button
                             onClick={() => {
