@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../../../config/api";
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../../config/api";
 import Navbar from "../../../components/Navbar";
 import DestinationGallery from "./DestinationGallery";
 import DestinationInfo from "./DestinationInfo";
@@ -13,10 +13,12 @@ const DestinationDetailsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+
     axios
       .get(`${API_BASE_URL}/api/destination/single/${id}`)
       .then((res) => setDestination(res.data))
-      .catch((err) => console.log("Failed to load destination", err))
+      .catch(() => setDestination(null))
       .finally(() => setLoading(false));
   }, [id]);
 

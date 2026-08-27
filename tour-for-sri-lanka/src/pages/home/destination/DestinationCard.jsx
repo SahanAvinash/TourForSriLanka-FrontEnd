@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-const DestinationCard = ({ destination, delay = 0 }) => {
+const DestinationCard = ({ destination }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -20,7 +20,9 @@ const DestinationCard = ({ destination, delay = 0 }) => {
       }
     );
 
-    if (cardRef.current) observer.observe(cardRef.current);
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
 
     return () => observer.disconnect();
   }, []);
@@ -31,10 +33,9 @@ const DestinationCard = ({ destination, delay = 0 }) => {
       className={`bg-[var(--color-primary-2)] rounded-2xl overflow-hidden shadow-lg hover:-translate-y-2 transition duration-300 destination-card-anim ${
         isVisible ? "in-view" : ""
       }`}
-      style={{ animationDelay: isVisible ? `${delay}s` : "0s" }}
     >
       <img
-        src={destination.images?.[0]}
+        src={destination.images?.[0] || "/destination_placeholder.jpg"}
         alt={destination.name}
         className="w-full h-60 object-cover"
       />

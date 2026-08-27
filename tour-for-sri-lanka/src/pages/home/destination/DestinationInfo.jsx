@@ -48,6 +48,7 @@ const DestinationInfo = ({ destination }) => {
         </Link>
 
         <button
+          type="button"
           onClick={handleAddToTrip}
           className={`inline-block duration-300 px-8 py-4 rounded-full font-semibold border-2 cursor-pointer ${
             inTrip
