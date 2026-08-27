@@ -67,6 +67,19 @@ const formatDuration = (minutes) => {
   return `${h}h ${m}m`;
 };
 
+const toRad = (deg) => (deg * Math.PI) / 180;
+
+const haversineKm = (lat1, lng1, lat2, lng2) => {
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const ROUTE_OPTION_META = {
   shortestDistance: {
     icon: FaRulerHorizontal,
@@ -364,6 +377,15 @@ const TourPreview = () => {
   const polylinePositions = route.geometry || [];
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
+
+  const startCoord = polylinePositions.length > 0 ? polylinePositions[0] : null;
+  const legDistances = destinations.map((dest, index) => {
+    const prevCoord = index === 0
+      ? startCoord
+      : [destinations[index - 1].latitude, destinations[index - 1].longitude];
+    if (!prevCoord || dest.latitude == null || dest.longitude == null) return null;
+    return haversineKm(prevCoord[0], prevCoord[1], dest.latitude, dest.longitude);
+  });
 
   const centerLat = allMapPositions.length > 0
     ? allMapPositions.reduce((sum, p) => sum + p[0], 0) / allMapPositions.length
@@ -1142,52 +1164,59 @@ const TourPreview = () => {
               const dayIndex = dayInfo.dayNumber;
               const destRec = getRecommendationForLocation(dest.location);
               const destHotels = destRec?.hotels || [];
+              const legDistance = legDistances[index];
               return (
-                <div
-                  key={dest.id || `stop-${index}`}
-                  className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center"
-                >
-                  <div>
-                    <span className="font-medium flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
-                        {index + 1}
-                      </span>
-                      {dest.name}
+                <React.Fragment key={dest.id || `stop-${index}`}>
+                  <div className="flex flex-col items-center">
+                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
+                    <span className="text-[10px] text-[#00C896] font-medium bg-[#11212D] px-2 py-0.5 rounded-full border border-[#00C896]/30 my-0.5 whitespace-nowrap">
+                      {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
                     </span>
-                    <p className="text-[11px] text-gray-500 mt-1 ml-8">
-                      Day {dayInfo.dayNumber}
-                      {dayInfo.timeSlot ? ` · ${dayInfo.timeSlot}` : ""}
-                    </p>
+                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
                   </div>
-
-                  {dayInfo.isDayEnd ? (
-                    <div
-                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                      onClick={() =>
-                        destRec &&
-                        setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
-                      }
-                    >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
-                        <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
-                        Hotels ({destHotels.length})
-                        {hotelStayDates[dayIndex] && (
-                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                        )}
+                  <div className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+                    <div>
+                      <span className="font-medium flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
+                          {index + 1}
+                        </span>
+                        {dest.name}
+                      </span>
+                      <p className="text-[11px] text-gray-500 mt-1 ml-8">
+                        Day {dayInfo.dayNumber}
+                        {dayInfo.timeSlot ? ` · ${dayInfo.timeSlot}` : ""}
                       </p>
-                      {destHotels.slice(0, 2).map((h) => (
-                        <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
-                      ))}
-                      {destHotels.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
-                      )}
                     </div>
-                  ) : (
-                    <p className="text-xs text-gray-500 italic md:text-right">
-                      Same-day stop — continuing to the next destination
-                    </p>
-                  )}
-                </div>
+
+                    {dayInfo.isDayEnd ? (
+                      <div
+                        className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                        onClick={() =>
+                          destRec &&
+                          setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
+                        }
+                      >
+                        <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                          <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
+                          Hotels ({destHotels.length})
+                          {hotelStayDates[dayIndex] && (
+                            <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                          )}
+                        </p>
+                        {destHotels.slice(0, 2).map((h) => (
+                          <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
+                        ))}
+                        {destHotels.length > 2 && (
+                          <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500 italic md:text-right">
+                        Same-day stop — continuing to the next destination
+                      </p>
+                    )}
+                  </div>
+                </React.Fragment>
               );
             })}
           </div>
