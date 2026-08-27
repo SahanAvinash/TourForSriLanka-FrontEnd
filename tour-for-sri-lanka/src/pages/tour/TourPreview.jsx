@@ -280,7 +280,7 @@ const TourPreview = () => {
               const Icon = meta.icon;
 
               return (
-                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col">
+                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col h-full">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className="text-[#00C896]" size={18} />
                     <h3 className="text-[#00C896] font-semibold">{option.label}</h3>
@@ -323,7 +323,7 @@ const TourPreview = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 mb-4 flex-1 min-h-0 max-h-40 overflow-y-auto">
+                  <div className="flex flex-col gap-1.5 mb-4 flex-1 min-h-0 overflow-y-auto">
                     {option.destinations.map((d, i) => (
                       <div key={d._id || i} className="text-xs text-gray-300 truncate flex-shrink-0 leading-5">
                         {i + 1}. {d.name}
