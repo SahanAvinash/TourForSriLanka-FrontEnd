@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar } from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -1032,7 +1032,10 @@ const TourPreview = () => {
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-3">Trip Order</h2>
+          <h2 className="text-xl font-semibold mb-1">Trip Order</h2>
+          <p className="text-xs text-gray-400 mb-3">
+            Tap Guides, Hotels or Transport on any stop to add a booking to your cart.
+          </p>
           <div className="flex flex-col gap-3">
             {(() => {
               const startRec = getRecommendationForLocation(startDistrict);
@@ -1059,7 +1062,8 @@ const TourPreview = () => {
                         startRec && setActiveGuideModal({ location: startRec.location, guides: startGuides })
                       }
                     >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaUserTie className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Guides ({startGuides.length})
                         {startGuides.some((g) => bookedGuideIds.has(g._id)) && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
@@ -1079,7 +1083,8 @@ const TourPreview = () => {
                         setActiveHotelModal({ location: startRec.location, hotels: startHotels, dayIndex: 0 })
                       }
                     >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Hotels ({startHotels.length})
                         {hotelStayDates[0] && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
@@ -1099,7 +1104,8 @@ const TourPreview = () => {
                         setActiveTransportModal({ location: startRec.location, transports: startTransports })
                       }
                     >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaCar className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Transport ({startTransports.length})
                         {startTransports.some((t) => bookedTransportIds.has(t._id)) && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
@@ -1126,8 +1132,11 @@ const TourPreview = () => {
                   key={dest.id || `stop-${index}`}
                   className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center"
                 >
-                  <span>
-                    {index + 1}. {dest.name}
+                  <span className="font-medium flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
+                      {index + 1}
+                    </span>
+                    {dest.name}
                   </span>
                   <div
                     className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
@@ -1136,7 +1145,8 @@ const TourPreview = () => {
                       setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
                     }
                   >
-                    <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                    <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                      <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
                       Hotels ({destHotels.length})
                       {hotelStayDates[dayIndex] && (
                         <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
@@ -1153,83 +1163,6 @@ const TourPreview = () => {
               );
             })}
           </div>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Available Nearby</h2>
-          {recommendations.map((rec) => {
-            const isStartLocation =
-              rec.location?.toLowerCase().trim() === startDistrict?.toLowerCase().trim();
-
-            return (
-              <div key={rec.location} className="mb-6">
-                <h3 className="text-[#00C896] font-semibold mb-2">{rec.location}</h3>
-                <div className={`grid grid-cols-1 ${isStartLocation ? "md:grid-cols-3" : "md:grid-cols-1"} gap-4`}>
-                  {isStartLocation && (
-                    <div
-                      className="bg-[#253745] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                      onClick={() => setActiveGuideModal({ location: rec.location, guides: rec.guides })}
-                    >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
-                        Guides ({rec.guides.length})
-                        {rec.guides.some((g) => bookedGuideIds.has(g._id)) && (
-                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                        )}
-                      </p>
-                      {rec.guides.slice(0, 2).map((g) => (
-                        <p key={g._id} className="text-xs text-gray-400">{g.firstName} {g.lastName}</p>
-                      ))}
-                      {rec.guides.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{rec.guides.length - 2} more · click to view</p>
-                      )}
-                    </div>
-                  )}
-                  <div
-                    className="bg-[#253745] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                    onClick={() =>
-                      setActiveHotelModal({
-                        location: rec.location,
-                        hotels: rec.hotels,
-                        dayIndex: getDestinationDayIndex(rec.location),
-                      })
-                    }
-                  >
-                    <p className="text-sm font-medium mb-1 flex items-center gap-1">
-                      Hotels ({rec.hotels.length})
-                      {hotelStayDates[getDestinationDayIndex(rec.location)] && (
-                        <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                      )}
-                    </p>
-                    {rec.hotels.slice(0, 2).map((h) => (
-                      <p key={h._id} className="text-xs text-gray-400">{h.hotelName}</p>
-                    ))}
-                    {rec.hotels.length > 2 && (
-                      <p className="text-xs text-[#00C896] mt-1">+{rec.hotels.length - 2} more · click to view</p>
-                    )}
-                  </div>
-                  {isStartLocation && (
-                    <div
-                      className="bg-[#253745] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                      onClick={() => setActiveTransportModal({ location: rec.location, transports: rec.transports })}
-                    >
-                      <p className="text-sm font-medium mb-1 flex items-center gap-1">
-                        Transport ({rec.transports.length})
-                        {rec.transports.some((t) => bookedTransportIds.has(t._id)) && (
-                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                        )}
-                      </p>
-                      {rec.transports.slice(0, 2).map((t) => (
-                        <p key={t._id} className="text-xs text-gray-400">{t.vehicleBrand} {t.vehicleModel}</p>
-                      ))}
-                      {rec.transports.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{rec.transports.length - 2} more · click to view</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
         </div>
 
         {totalCartItems > 0 && (
