@@ -41,6 +41,38 @@ const createNumberedIcon = (number) => {
   });
 };
 
+const createStartIcon = () => {
+  return L.divIcon({
+    className: "custom-start-marker",
+    html: `<div style="
+      background-color: #FFB020;
+      color: #11212D;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      font-weight: bold;
+      font-size: 12px;
+    ">S</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -17],
+  });
+};
+
+const getCoordFromStop = (stop) => {
+  if (!stop) return null;
+  if (Array.isArray(stop) && stop.length >= 2) return [stop[0], stop[1]];
+  if (stop.lat != null && stop.lng != null) return [stop.lat, stop.lng];
+  if (stop.latitude != null && stop.longitude != null) return [stop.latitude, stop.longitude];
+  if (stop.location?.lat != null && stop.location?.lng != null) return [stop.location.lat, stop.location.lng];
+  return null;
+};
+
 const SRI_LANKA_BOUNDS = [
   [5.6, 79.3],
   [10.1, 82.1],
@@ -378,7 +410,15 @@ const TourPreview = () => {
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
 
-  const startCoord = polylinePositions.length > 0 ? polylinePositions[0] : null;
+  const startCoord =
+    getCoordFromStop(routableStops[0]) ||
+    (polylinePositions.length > 0 ? polylinePositions[0] : null);
+
+  if (!getCoordFromStop(routableStops[0])) {
+    console.warn(
+      "TourPreview: couldn't read a start coordinate from route.routableStops[0] — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point. Check the shape of routableStops in the API response."
+    );
+  }
   const legDistances = destinations.map((dest, index) => {
     const prevCoord = index === 0
       ? startCoord
@@ -1026,6 +1066,13 @@ const TourPreview = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {startCoord && (
+              <Marker position={startCoord} icon={createStartIcon()}>
+                <Popup>
+                  <strong>Start — {startDistrict}</strong>
+                </Popup>
+              </Marker>
+            )}
             {destinations.map((stop, index) => (
               <Marker
                 key={stop.id || `stop-${index}`}
