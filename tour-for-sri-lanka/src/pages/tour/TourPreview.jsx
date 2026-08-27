@@ -1028,16 +1028,22 @@ const TourPreview = () => {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3">Trip Order</h2>
           <div className="flex flex-col gap-2">
-            {destinations.map((dest, index) => (
-              <div key={dest.id || `stop-${index}`} className="bg-[#253745] rounded-lg px-4 py-3 flex justify-between items-center">
-                <span>
-                  {index + 1}. {dest.name} {dest.location && `(${dest.location})`}
+            <div className="bg-[#253745] rounded-lg px-4 py-3 flex justify-between items-center">
+              <span className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                  Start
                 </span>
-                {index === 0 && (
-                  <span className="text-sm text-gray-400">
-                    Total : {route.distanceKm} km
-                  </span>
-                )}
+                {startDistrict}
+              </span>
+              <span className="text-sm text-gray-400">
+                Total : {route.distanceKm} km
+              </span>
+            </div>
+            {destinations.map((dest, index) => (
+              <div key={dest.id || `stop-${index}`} className="bg-[#253745] rounded-lg px-4 py-3 flex items-center">
+                <span>
+                  {index + 1}. {dest.name}
+                </span>
               </div>
             ))}
           </div>
