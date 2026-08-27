@@ -359,7 +359,7 @@ const TourPreview = () => {
     );
   }
 
-  const { destinations, route, recommendations } = tripData || {};
+  const { destinations, route, recommendations, itinerary } = tripData || {};
   const routableStops = route?.routableStops || [];
   const polylinePositions = route.geometry || [];
   const returnPolylinePositions = route.returnGeometry || [];
@@ -372,17 +372,29 @@ const TourPreview = () => {
     ? allMapPositions.reduce((sum, p) => sum + p[1], 0) / allMapPositions.length
     : 80.7718;
 
-  const getDestinationDayIndex = (location) => {
-    const idx = destinations.findIndex(
-      (d) => d.location?.toLowerCase().trim() === location?.toLowerCase().trim()
-    );
-    return idx >= 0 ? idx : 0;
-  };
-
   const getRecommendationForLocation = (location) => {
     return recommendations.find(
       (rec) => rec.location?.toLowerCase().trim() === location?.toLowerCase().trim()
     );
+  };
+
+  const destinationDayInfo = new Map();
+  (itinerary || []).forEach((day) => {
+    day.destinations.forEach((d, idxInDay) => {
+      destinationDayInfo.set(String(d._id), {
+        dayNumber: day.dayNumber,
+        timeSlot: d.timeSlot,
+        isDayEnd: idxInDay === day.destinations.length - 1,
+      });
+    });
+  });
+
+  const getDayInfoForDestination = (dest, index) => {
+    const info = destinationDayInfo.get(String(dest._id || dest.id));
+    if (info) return info;
+    // No itinerary data for this route option — fall back to one stop per day
+    // so the page still works, but hotel booking won't be limited correctly.
+    return { dayNumber: index + 1, timeSlot: null, isDayEnd: true };
   };
 
   const getMinCheckInDate = (dayIndex) => {
@@ -1124,41 +1136,55 @@ const TourPreview = () => {
             })()}
 
             {destinations.map((dest, index) => {
+              const dayInfo = getDayInfoForDestination(dest, index);
+              const dayIndex = dayInfo.dayNumber;
               const destRec = getRecommendationForLocation(dest.location);
               const destHotels = destRec?.hotels || [];
-              const dayIndex = getDestinationDayIndex(dest.location);
               return (
                 <div
                   key={dest.id || `stop-${index}`}
                   className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center"
                 >
-                  <span className="font-medium flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
-                      {index + 1}
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      {dest.name}
                     </span>
-                    {dest.name}
-                  </span>
-                  <div
-                    className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                    onClick={() =>
-                      destRec &&
-                      setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
-                    }
-                  >
-                    <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
-                      <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
-                      Hotels ({destHotels.length})
-                      {hotelStayDates[dayIndex] && (
-                        <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                      )}
+                    <p className="text-[11px] text-gray-500 mt-1 ml-8">
+                      Day {dayInfo.dayNumber}
+                      {dayInfo.timeSlot ? ` · ${dayInfo.timeSlot}` : ""}
                     </p>
-                    {destHotels.slice(0, 2).map((h) => (
-                      <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
-                    ))}
-                    {destHotels.length > 2 && (
-                      <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
-                    )}
                   </div>
+
+                  {dayInfo.isDayEnd ? (
+                    <div
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      onClick={() =>
+                        destRec &&
+                        setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
+                      }
+                    >
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
+                        Hotels ({destHotels.length})
+                        {hotelStayDates[dayIndex] && (
+                          <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
+                        )}
+                      </p>
+                      {destHotels.slice(0, 2).map((h) => (
+                        <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
+                      ))}
+                      {destHotels.length > 2 && (
+                        <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 italic md:text-right">
+                      Same-day stop — continuing to the next destination
+                    </p>
+                  )}
                 </div>
               );
             })}
