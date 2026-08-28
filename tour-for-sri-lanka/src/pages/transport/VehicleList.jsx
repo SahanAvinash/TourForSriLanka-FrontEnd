@@ -2,6 +2,7 @@ import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Briefcase, MapPin, Users } from "lucide-react";
+import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
@@ -67,6 +68,40 @@ export default function VehicleList() {
 
     fetchVehicles();
   }, [type, passengers, pickupLocation, bags]);
+
+  const handleBookNow = (vehicle) => {
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
+
+    if (!storedUser) {
+      toast.error("Book karanna, kalin traveler kenek widihata login wenna oona");
+      return;
+    }
+
+    let user;
+    try {
+      user = JSON.parse(storedUser);
+    } catch (e) {
+      toast.error("Book karanna, kalin traveler kenek widihata login wenna oona");
+      return;
+    }
+
+    if (user.role !== "Traveler") {
+      toast.error("Vehicle book karanna puluwan traveler ekaunt ekakin witharai");
+      return;
+    }
+
+    navigate(`/transport/book/${vehicle._id}`, {
+      state: {
+        vehicle,
+        searchContext: {
+          pickupDate,
+          numberOfPassengers: passengers ? Number(passengers) : "",
+          bags: bags ? Number(bags) : "",
+        },
+      },
+    });
+  };
 
   return (
     <main className="min-h-screen bg-[#071923] text-white flex flex-col">
@@ -179,20 +214,7 @@ export default function VehicleList() {
 
                   <button
                     className="w-full sm:w-auto px-5 py-2 rounded-full bg-[#00C896] text-white text-sm font-medium hover:bg-[#00b383] transition"
-                    onClick={() =>
-                      navigate(`/transport/book/${vehicle._id}`, {
-                        state: {
-                          vehicle,
-                          searchContext: {
-                            pickupDate,
-                            numberOfPassengers: passengers
-                              ? Number(passengers)
-                              : "",
-                            bags: bags ? Number(bags) : "",
-                          },
-                        },
-                      })
-                    }
+                    onClick={() => handleBookNow(vehicle)}
                   >
                     Book Now
                   </button>
