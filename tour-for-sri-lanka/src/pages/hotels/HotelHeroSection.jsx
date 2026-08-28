@@ -121,7 +121,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
   const [destination, setDestination] = useState(null);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(2);
+  const [guests, setGuests] = useState(1);
 
   const today = new Date().toISOString().split("T")[0];
 
