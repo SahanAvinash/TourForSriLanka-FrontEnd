@@ -175,7 +175,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
         </div>
 
         <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
-          <div className="bg-[#455766]/70 sm:bg-[#455766]/75 lg:bg-[#455766]/90 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
+          <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <FaMapMarkerAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
@@ -224,7 +224,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
                       setCheckOut("");
                     }
                   }}
-                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0"
+                  className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0"
                 />
               </div>
             </div>
@@ -246,7 +246,7 @@ const HotelHeroSection = ({ onFilterChange }) => {
                   min={checkIn ? checkIn : today}
                   disabled={!checkIn}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full bg-transparent text-white outline-none mt-1 text-sm sm:text-base min-w-0 disabled:opacity-50"
+                  className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0 disabled:opacity-50"
                 />
               </div>
             </div>
