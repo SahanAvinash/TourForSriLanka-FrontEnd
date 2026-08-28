@@ -34,6 +34,7 @@ export default function VehicleTypeCard({
   return (
     <button
       ref={cardRef}
+      type="button"
       onClick={onClick}
       style={{
         animationDelay: inView

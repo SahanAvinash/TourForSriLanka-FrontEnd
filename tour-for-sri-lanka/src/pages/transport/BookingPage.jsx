@@ -1,20 +1,22 @@
 import { API_BASE_URL } from "../../config/api";
-import { useState, useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { Users, Briefcase, MapPin, Phone, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Briefcase, Mail, MapPin, Phone, Users } from "lucide-react";
 import Select from "react-select";
+import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import toast from "react-hot-toast";
 import TransportReviews from "./TransportReviews";
 import MapPickerModal from "../../components/MapPickerModal";
 
-const passengerOptions = Array.from({ length: 15 }, (_, i) => i + 1).map(
-  (num) => ({
-    value: num,
-    label: `${num} ${num === 1 ? "Passenger" : "Passengers"}`,
-  })
-);
+const passengerOptions = Array.from({ length: 15 }, (_, index) => {
+  const value = index + 1;
+
+  return {
+    value,
+    label: `${value} ${value === 1 ? "Passenger" : "Passengers"}`,
+  };
+});
 
 const luggageByVehicle = {
   car: [
@@ -37,12 +39,10 @@ const selectStyles = {
     ...base,
     zIndex: 9999,
   }),
-
   container: (base) => ({
     ...base,
     width: "100%",
   }),
-
   control: (base) => ({
     ...base,
     minHeight: "42px",
@@ -53,28 +53,24 @@ const selectStyles = {
     boxShadow: "none",
     width: "100%",
   }),
-
   valueContainer: (base) => ({
     ...base,
     padding: "0 12px",
     minWidth: 0,
     overflow: "hidden",
   }),
-
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
     color: "#CCD0CF",
     cursor: "pointer",
   }),
-
   menu: (base) => ({
     ...base,
     backgroundColor: "#4A5C6A",
     borderRadius: "10px",
     overflow: "hidden",
   }),
-
   singleValue: (base) => ({
     ...base,
     color: "#CCD0CF",
@@ -82,7 +78,6 @@ const selectStyles = {
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   }),
-
   placeholder: (base) => ({
     ...base,
     color: "#CCD0CF",
@@ -91,30 +86,13 @@ const selectStyles = {
     overflow: "hidden",
     textOverflow: "ellipsis",
   }),
-
   input: (base) => ({
     ...base,
     color: "#CCD0CF",
   }),
-
   indicatorsContainer: (base) => ({
     ...base,
     flexShrink: 0,
-  }),
-};
-
-const passengerSelectStyles = {
-  ...selectStyles,
-
-  control: (base) => ({
-    ...base,
-    minHeight: "42px",
-    height: "42px",
-    borderRadius: "12px",
-    backgroundColor: "#4A5C6A80",
-    border: "none",
-    boxShadow: "none",
-    width: "100%",
   }),
 };
 
@@ -126,9 +104,6 @@ export default function BookingPage() {
   const vehicle = location.state?.vehicle;
   const searchContext = location.state?.searchContext;
 
-  const luggageOptions =
-    luggageByVehicle[vehicle?.vehicleType?.toLowerCase()] || [];
-
   const storedUser = JSON.parse(
     localStorage.getItem("user") ||
       sessionStorage.getItem("user") ||
@@ -136,6 +111,9 @@ export default function BookingPage() {
   );
 
   const travelerId = storedUser?._id;
+
+  const luggageOptions =
+    luggageByVehicle[vehicle?.vehicleType?.toLowerCase()] || [];
 
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [dropoffCoordinates, setDropoffCoordinates] = useState(null);
@@ -154,7 +132,6 @@ export default function BookingPage() {
   const [estimate, setEstimate] = useState(null);
   const [estimating, setEstimating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
@@ -168,7 +145,6 @@ export default function BookingPage() {
   const handleConfirmLocation = (picked) => {
     if (mapPickerTarget === "pickup") {
       updateForm("pickupLocation", picked.address);
-
       setPickupCoordinates({
         lat: picked.lat,
         lng: picked.lng,
@@ -177,7 +153,6 @@ export default function BookingPage() {
 
     if (mapPickerTarget === "dropoff") {
       updateForm("dropoffLocation", picked.address);
-
       setDropoffCoordinates({
         lat: picked.lat,
         lng: picked.lng,
@@ -213,7 +188,7 @@ export default function BookingPage() {
           pickupLng: pickupCoordinates.lng,
           dropoffLat: dropoffCoordinates.lat,
           dropoffLng: dropoffCoordinates.lng,
-          isReturnTrip: isReturnTrip,
+          isReturnTrip,
         });
 
         const res = await fetch(
@@ -229,8 +204,8 @@ export default function BookingPage() {
         }
 
         setEstimate(data);
-      } catch (err) {
-        toast.error(err.message);
+      } catch (error) {
+        toast.error(error.message);
         setEstimate(null);
       } finally {
         setEstimating(false);
@@ -239,19 +214,21 @@ export default function BookingPage() {
 
     fetchEstimate();
   }, [
+    vehicleId,
     form.pickupLocation,
-    pickupCoordinates,
     form.dropoffLocation,
-    dropoffCoordinates,
     form.pickupDate,
     form.returnDate,
     form.numberOfPassengers,
     form.bags,
+    pickupCoordinates,
+    dropoffCoordinates,
     isReturnTrip,
-    vehicleId,
   ]);
 
   useEffect(() => {
+    if (!vehicleId) return;
+
     const fetchReviews = async () => {
       setLoadingReviews(true);
 
@@ -262,21 +239,24 @@ export default function BookingPage() {
 
         const data = await res.json();
 
-        setReviews(data);
-      } catch (err) {
-        console.log(err);
+        if (!res.ok) {
+          throw new Error("Failed to load reviews");
+        }
+
+        setReviews(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.log(error);
+        setReviews([]);
       } finally {
         setLoadingReviews(false);
       }
     };
 
-    if (vehicleId) {
-      fetchReviews();
-    }
+    fetchReviews();
   }, [vehicleId]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!travelerId) {
       toast.error("Please log in to book a vehicle");
@@ -284,16 +264,17 @@ export default function BookingPage() {
       return;
     }
 
-    if (
-      !form.pickupLocation ||
-      !pickupCoordinates ||
-      !form.dropoffLocation ||
-      !dropoffCoordinates ||
-      !form.pickupDate ||
-      (isReturnTrip && !form.returnDate) ||
-      !form.numberOfPassengers ||
-      !form.bags
-    ) {
+    const isValid =
+      form.pickupLocation &&
+      pickupCoordinates &&
+      form.dropoffLocation &&
+      dropoffCoordinates &&
+      form.pickupDate &&
+      (!isReturnTrip || form.returnDate) &&
+      form.numberOfPassengers &&
+      form.bags;
+
+    if (!isValid) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -327,11 +308,8 @@ export default function BookingPage() {
         throw new Error(data.message || "Booking failed");
       }
 
-      toast.success(
-        "Booking request sent to the vehicle owner!"
-      );
+      toast.success("Booking request sent to the vehicle owner");
 
-      // Reset all booking fields
       setForm({
         pickupLocation: "",
         dropoffLocation: "",
@@ -341,17 +319,12 @@ export default function BookingPage() {
         bags: "",
       });
 
-      // Reset map locations
       setPickupCoordinates(null);
       setDropoffCoordinates(null);
-
-      // Reset trip type
       setIsReturnTrip(false);
-
-      // Clear estimate
       setEstimate(null);
-    } catch (err) {
-      toast.error(err.message);
+    } catch (error) {
+      toast.error(error.message);
     } finally {
       setSubmitting(false);
     }
@@ -394,11 +367,7 @@ export default function BookingPage() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-5 sm:gap-6 lg:gap-8">
-
-          {/* LEFT SIDE */}
           <div className="space-y-5 sm:space-y-6">
-
-            {/* Vehicle */}
             <div className="booking-vehicle-anim bg-[#1B2B34] rounded-[20px] p-3 sm:p-4 border border-white/10">
               <img
                 src={vehicle.addVehiclePhotos?.[0]}
@@ -434,7 +403,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Owner */}
             <div className="booking-owner-anim bg-[#1B2B34] rounded-[20px] p-4 border border-white/10">
               <h3 className="text-sm font-semibold text-[#d5dde2] mb-3">
                 Vehicle Owner
@@ -456,14 +424,14 @@ export default function BookingPage() {
 
                   {vehicle.mobile && (
                     <p className="text-xs text-[#d5dde2] flex items-center gap-1 mt-1 break-all">
-                      <Phone size={12} className="shrink-0" />
+                      <Phone size={12} />
                       {vehicle.mobile}
                     </p>
                   )}
 
                   {vehicle.email && (
                     <p className="text-xs text-[#d5dde2] flex items-center gap-1 break-all">
-                      <Mail size={12} className="shrink-0" />
+                      <Mail size={12} />
                       {vehicle.email}
                     </p>
                   )}
@@ -472,12 +440,10 @@ export default function BookingPage() {
             </div>
           </div>
 
-          {/* BOOKING FORM */}
           <form
             onSubmit={handleSubmit}
             className="booking-form-anim bg-[#1B2B34] rounded-[20px] p-4 sm:p-5 lg:p-6 border border-white/10 space-y-4 h-fit min-w-0"
           >
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h2 className="text-lg font-bold">
                 Book this vehicle
@@ -513,7 +479,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Pickup */}
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">
                 Pickup Location
@@ -537,7 +502,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Dropoff */}
             <div>
               <label className="block text-sm text-[#d5dde2] mb-1">
                 Drop-off Location
@@ -561,7 +525,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Dates */}
             <div
               className={`grid gap-4 ${
                 isReturnTrip
@@ -569,7 +532,6 @@ export default function BookingPage() {
                   : "grid-cols-1"
               }`}
             >
-              {/* Pickup Date */}
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Pickup Date
@@ -579,17 +541,14 @@ export default function BookingPage() {
                   type="date"
                   value={form.pickupDate}
                   min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    updateForm("pickupDate", e.target.value)
+                  onChange={(event) =>
+                    updateForm("pickupDate", event.target.value)
                   }
-                  style={{
-                    colorScheme: "dark",
-                  }}
+                  style={{ colorScheme: "dark" }}
                   className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
                 />
               </div>
 
-              {/* Return Date */}
               {isReturnTrip && (
                 <div className="min-w-0">
                   <label className="block text-sm text-[#d5dde2] mb-1">
@@ -603,22 +562,17 @@ export default function BookingPage() {
                       form.pickupDate ||
                       new Date().toISOString().split("T")[0]
                     }
-                    onChange={(e) =>
-                      updateForm("returnDate", e.target.value)
+                    onChange={(event) =>
+                      updateForm("returnDate", event.target.value)
                     }
-                    style={{
-                      colorScheme: "dark",
-                    }}
+                    style={{ colorScheme: "dark" }}
                     className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
                   />
                 </div>
               )}
             </div>
 
-            {/* Passengers + Bags */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-              {/* Passengers */}
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Passengers
@@ -628,8 +582,8 @@ export default function BookingPage() {
                   options={passengerOptions}
                   value={
                     passengerOptions.find(
-                      (o) =>
-                        o.value === form.numberOfPassengers
+                      (option) =>
+                        option.value === form.numberOfPassengers
                     ) || null
                   }
                   onChange={(selected) =>
@@ -642,11 +596,10 @@ export default function BookingPage() {
                   isSearchable={false}
                   menuPosition="fixed"
                   menuPortalTarget={document.body}
-                  styles={passengerSelectStyles}
+                  styles={selectStyles}
                 />
               </div>
 
-              {/* Bags */}
               <div className="min-w-0">
                 <label className="block text-sm text-[#d5dde2] mb-1">
                   Bags
@@ -656,7 +609,7 @@ export default function BookingPage() {
                   options={luggageOptions}
                   value={
                     luggageOptions.find(
-                      (o) => o.value === form.bags
+                      (option) => option.value === form.bags
                     ) || null
                   }
                   onChange={(selected) =>
@@ -674,21 +627,17 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Estimate Loading */}
             {estimating && (
               <p className="text-sm text-[#d5dde2]">
                 Calculating distance & price...
               </p>
             )}
 
-            {/* Estimate */}
             {estimate && !estimating && (
               <div className="bg-[#4A5C6A80] rounded-[12px] p-4 space-y-2">
                 <div className="flex justify-between gap-4 text-sm text-[#d5dde2]">
                   <span>Distance</span>
-                  <span>
-                    {estimate.distanceKm} km
-                  </span>
+                  <span>{estimate.distanceKm} km</span>
                 </div>
 
                 <div className="flex justify-between gap-4 font-semibold text-[#00C896]">
@@ -700,20 +649,16 @@ export default function BookingPage() {
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={submitting || !estimate}
               className="w-full min-h-[48px] rounded-full bg-[#00C896] hover:bg-[#00b383] disabled:opacity-50 text-white font-semibold transition text-sm sm:text-base"
             >
-              {submitting
-                ? "Booking..."
-                : "Request Booking"}
+              {submitting ? "Booking..." : "Request Booking"}
             </button>
           </form>
         </div>
 
-        {/* REVIEWS */}
         <section className="booking-reviews-anim mt-8 sm:mt-10">
           {loadingReviews ? (
             <p className="text-sm text-[#d5dde2]">
@@ -726,19 +671,17 @@ export default function BookingPage() {
               onReviewAdded={(review, isUpdate) => {
                 setReviews((prev) =>
                   isUpdate
-                    ? prev.map((r) =>
-                        r._id === review._id
-                          ? review
-                          : r
+                    ? prev.map((item) =>
+                        item._id === review._id ? review : item
                       )
                     : [review, ...prev]
                 );
               }}
-              onReviewDeleted={(id) =>
+              onReviewDeleted={(id) => {
                 setReviews((prev) =>
-                  prev.filter((r) => r._id !== id)
-                )
-              }
+                  prev.filter((item) => item._id !== id)
+                );
+              }}
             />
           )}
         </section>
@@ -746,7 +689,6 @@ export default function BookingPage() {
 
       <Footer />
 
-      {/* MAP */}
       {mapPickerTarget && (
         <MapPickerModal
           initialPosition={

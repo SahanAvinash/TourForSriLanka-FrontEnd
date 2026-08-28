@@ -1,12 +1,12 @@
 import { API_BASE_URL } from "../../config/api";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import Footer from "../../components/Footer";
+import Navbar from "../../components/Navbar";
 import TransportHeroSection from "./TransportHeroSection";
 import VehicleTypeCard from "./VehicleTypeCard";
 import { vehicleTypes } from "../../data/vehicles";
-import Navbar from "../../components/Navbar";
-import toast from "react-hot-toast";
 
 const statusStyles = {
   pending: "bg-yellow-500/20 text-yellow-400",
@@ -20,7 +20,7 @@ export default function TransportPage() {
   const navigate = useNavigate();
   const vehicleTypeSectionRef = useRef(null);
 
-  const [service, setService] = useState("airport-pickup");
+  const [service] = useState("airport-pickup");
 
   const [form, setForm] = useState({
     pickupLocation: "",
@@ -57,11 +57,14 @@ export default function TransportPage() {
 
         const data = await res.json();
 
-        if (res.ok) {
-          setBookings(data);
+        if (!res.ok) {
+          throw new Error("Failed to load bookings");
         }
-      } catch (err) {
-        console.log(err);
+
+        setBookings(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.log(error);
+        setBookings([]);
       } finally {
         setLoadingBookings(false);
       }
@@ -126,8 +129,8 @@ export default function TransportPage() {
       );
 
       toast.success("Booking cancelled");
-    } catch (err) {
-      toast.error(err.message);
+    } catch (error) {
+      toast.error(error.message);
     } finally {
       setCancellingId(null);
     }
@@ -142,8 +145,6 @@ export default function TransportPage() {
       <Navbar />
 
       <TransportHeroSection
-        service={service}
-        setService={setService}
         form={form}
         updateForm={updateForm}
         onSearch={handleSearch}
@@ -167,7 +168,7 @@ export default function TransportPage() {
             </p>
           )}
 
-          {activeBookings.length > 0 && (
+          {!loadingBookings && activeBookings.length > 0 && (
             <div className="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
               {activeBookings.map((booking) => (
                 <div
@@ -207,12 +208,13 @@ export default function TransportPage() {
                         booking.pickupDate
                       ).toLocaleDateString()}
 
-                      {new Date(
-                        booking.returnDate
-                      ).toDateString() !==
+                      {booking.returnDate &&
                         new Date(
-                          booking.pickupDate
-                        ).toDateString() &&
+                          booking.returnDate
+                        ).toDateString() !==
+                          new Date(
+                            booking.pickupDate
+                          ).toDateString() &&
                         ` – ${new Date(
                           booking.returnDate
                         ).toLocaleDateString()}`}
