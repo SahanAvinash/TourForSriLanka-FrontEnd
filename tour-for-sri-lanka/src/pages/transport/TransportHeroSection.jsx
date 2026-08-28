@@ -136,8 +136,9 @@ export default function TransportHeroSection({
 }) {
   return (
     <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
-      <div className="relative min-h-[640px] sm:min-h-[600px] lg:h-[560px] lg:min-h-0 mx-2 sm:mx-4">
-        <div className="absolute inset-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
+      {/* Hotels page eke wage exact min-h/height classes dala thiyenne */}
+      <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
+        <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
             src={heroBg}
             alt="Transport"
@@ -147,9 +148,11 @@ export default function TransportHeroSection({
           <div className="absolute inset-0 bg-black/45" />
 
           <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#11212D]/70 to-[#11212D]" />
+
+          <div className="absolute inset-x-0 bottom-0 h-[100px] sm:h-[90px] lg:h-[70px] bg-gradient-to-b from-transparent to-[#11212D]" />
         </div>
 
-        <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 top-10 sm:top-16 z-10">
+        <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-10 sm:top-16 z-10">
           <h1 className="hero-title-anim text-white text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
@@ -161,7 +164,8 @@ export default function TransportHeroSection({
           </p>
         </div>
 
-        <div className="absolute bottom-6 sm:bottom-8 left-3 right-3 sm:left-8 sm:right-8 lg:left-12 lg:right-12 z-20">
+        {/* Hotels page eke wage lg:-bottom-12 position eka meyata aniwa thiyenna oona */}
+        <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
           <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
@@ -320,6 +324,8 @@ export default function TransportHeroSection({
         </div>
       </div>
 
+      {/* Hotels page eke thiyena widihata exact spacer div eka mehema thiyenna oona */}
+      <div className="h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D]" />
     </section>
   );
 }

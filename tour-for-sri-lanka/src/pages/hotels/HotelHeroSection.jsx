@@ -1,54 +1,42 @@
-import { Briefcase, Calendar, MapPin, Users } from "lucide-react";
+import { useState } from "react";
 import Select from "react-select";
-import heroBg from "../../assets/transport/transport-bg.jpg";
+import hotel_bg from "../../assets/hotels/hotel_bg.jpg";
+import Navbar from "../../components/Navbar";
+import {
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaUsers,
+  FaSearch,
+  FaChevronUp,
+  FaChevronDown,
+} from "react-icons/fa";
 
-const districts = [
+const DISTRICT_OPTIONS = [
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
   "Colombo",
-  "Gampaha",
-  "Kalutara",
-  "Kandy",
-  "Matale",
-  "Nuwara Eliya",
   "Galle",
-  "Matara",
+  "Gampaha",
   "Hambantota",
   "Jaffna",
-  "Kilinochchi",
-  "Mannar",
-  "Vavuniya",
-  "Mullaitivu",
-  "Batticaloa",
-  "Ampara",
-  "Trincomalee",
-  "Kurunegala",
-  "Puttalam",
-  "Anuradhapura",
-  "Polonnaruwa",
-  "Badulla",
-  "Monaragala",
-  "Ratnapura",
+  "Kalutara",
+  "Kandy",
   "Kegalle",
-];
-
-const districtOptions = districts.map((district) => ({
-  value: district,
-  label: district,
-}));
-
-const passengerOptions = Array.from({ length: 15 }, (_, index) => {
-  const value = index + 1;
-
-  return {
-    value,
-    label: `${value} ${value === 1 ? "Passenger" : "Passengers"}`,
-  };
-});
-
-const bagsOptions = [
-  { value: 1, label: "Small (1–2 bags)" },
-  { value: 2, label: "Medium (2–4 bags)" },
-  { value: 3, label: "Large (5–8 bags)" },
-  { value: 4, label: "Extra Large / Storage" },
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya",
 ];
 
 const selectStyles = {
@@ -129,19 +117,41 @@ const selectStyles = {
   }),
 };
 
-export default function TransportHeroSection({
-  form,
-  updateForm,
-  onSearch,
-}) {
+const HotelHeroSection = ({ onFilterChange }) => {
+  const [destination, setDestination] = useState(null);
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(2);
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const districtOptions = DISTRICT_OPTIONS.map((district) => ({
+    label: district,
+    value: district,
+  }));
+
+  const handleSearch = () => {
+    if (checkIn && checkOut && checkOut <= checkIn) {
+      return;
+    }
+
+    onFilterChange?.({
+      destination: destination?.value || "",
+      checkIn,
+      checkOut,
+      guests,
+    });
+  };
+
   return (
     <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
-      {/* Hotels page eke wage exact min-h/height classes dala thiyenne */}
+      <Navbar />
+
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
-            src={heroBg}
-            alt="Transport"
+            src={hotel_bg}
+            alt="Hotel"
             className="absolute inset-0 w-full h-full object-cover"
           />
 
@@ -156,23 +166,18 @@ export default function TransportHeroSection({
           <h1 className="hero-title-anim text-white text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
-            Ride
+            Hotel Stay
           </h1>
 
           <p className="hero-desc-anim text-gray-300 text-sm sm:text-lg mt-3 sm:mt-5 max-w-md">
-            Discover and book the best vehicles with professional drivers
+            Discover and book amazing hotels across Sri Lanka.
           </p>
         </div>
 
-        {/* Hotels page eke wage lg:-bottom-12 position eka meyata aniwa thiyenna oona */}
         <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
           <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
-
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <MapPin
-                size={22}
-                className="text-[#00C896] shrink-0"
-              />
+              <FaMapMarkerAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
@@ -181,19 +186,9 @@ export default function TransportHeroSection({
 
                 <Select
                   options={districtOptions}
-                  value={
-                    districtOptions.find(
-                      (option) =>
-                        option.value === form.pickupLocation
-                    ) || null
-                  }
-                  onChange={(selected) =>
-                    updateForm(
-                      "pickupLocation",
-                      selected ? selected.value : ""
-                    )
-                  }
-                  placeholder="Pick Up Location"
+                  value={destination}
+                  onChange={setDestination}
+                  placeholder="Stay"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
@@ -210,23 +205,25 @@ export default function TransportHeroSection({
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Calendar
-                size={22}
-                className="text-[#00C896] shrink-0"
-              />
+              <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
               <div className="w-full min-w-0">
                 <label className="text-sm text-gray-300">
-                  Pick Up Date
+                  Check In
                 </label>
 
                 <input
                   type="date"
-                  value={form.pickupDate}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    updateForm("pickupDate", e.target.value)
-                  }
+                  value={checkIn}
+                  min={today}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setCheckIn(value);
+
+                    if (checkOut && checkOut <= value) {
+                      setCheckOut("");
+                    }
+                  }}
                   className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0"
                 />
               </div>
@@ -236,39 +233,20 @@ export default function TransportHeroSection({
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Users
-                size={22}
-                className="text-[#00C896] shrink-0"
-              />
+              <FaCalendarAlt className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
               <div className="w-full min-w-0">
-                <label className="block text-sm text-gray-300 mb-0.5">
-                  Passengers
+                <label className="text-sm text-gray-300">
+                  Check Out
                 </label>
 
-                <Select
-                  options={passengerOptions}
-                  value={
-                    passengerOptions.find(
-                      (option) =>
-                        option.value === form.passengers
-                    ) || null
-                  }
-                  onChange={(selected) =>
-                    updateForm(
-                      "passengers",
-                      selected ? selected.value : ""
-                    )
-                  }
-                  placeholder="Select"
-                  styles={selectStyles}
-                  menuShouldScrollIntoView={false}
-                  menuPortalTarget={
-                    typeof document !== "undefined"
-                      ? document.body
-                      : null
-                  }
-                  className="mt-1"
+                <input
+                  type="date"
+                  value={checkOut}
+                  min={checkIn ? checkIn : today}
+                  disabled={!checkIn}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -277,55 +255,70 @@ export default function TransportHeroSection({
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Briefcase
-                size={22}
-                className="text-[#00C896] shrink-0"
-              />
+              <FaUsers className="text-[#00C896] text-xl sm:text-2xl shrink-0" />
 
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
-                  Bags
+                  Guests
                 </label>
 
-                <Select
-                  options={bagsOptions}
-                  value={
-                    bagsOptions.find(
-                      (option) => option.value === form.bags
-                    ) || null
-                  }
-                  onChange={(selected) =>
-                    updateForm(
-                      "bags",
-                      selected ? selected.value : ""
-                    )
-                  }
-                  placeholder="Select"
-                  styles={selectStyles}
-                  menuShouldScrollIntoView={false}
-                  menuPortalTarget={
-                    typeof document !== "undefined"
-                      ? document.body
-                      : null
-                  }
-                  className="mt-1"
-                />
+                <div className="flex items-center justify-between">
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={guests}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+
+                      if (value >= 1 && value <= 20) {
+                        setGuests(value);
+                      }
+                    }}
+                    className="w-full bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+
+                  <div className="flex flex-col ml-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setGuests((g) => Math.min(20, g + 1))
+                      }
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none transition-all duration-300"
+                    >
+                      <FaChevronUp size={10} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setGuests((g) => Math.max(1, g - 1))
+                      }
+                      className="text-[#CCD0CF] hover:text-[#00C896] leading-none mt-1 transition-all duration-300"
+                    >
+                      <FaChevronDown size={10} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={onSearch}
-              className="mt-4 lg:mt-0 lg:ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-6 sm:px-8 py-3.5 rounded-full flex items-center justify-center gap-2 font-semibold w-full lg:w-auto whitespace-nowrap text-sm sm:text-base"
+              onClick={handleSearch}
+              disabled={checkIn && checkOut && checkOut <= checkIn}
+              className="mt-4 lg:mt-0 lg:ml-6 bg-[#00C896] hover:bg-[#00b383] duration-300 text-white px-6 sm:px-8 py-3.5 rounded-full flex items-center justify-center gap-2 font-semibold w-full lg:w-auto whitespace-nowrap text-sm sm:text-base disabled:opacity-50"
             >
-              Search Vehicle
+              <FaSearch />
+              Search Hotels
             </button>
           </div>
         </div>
       </div>
 
-      {/* Hotels page eke thiyena widihata exact spacer div eka mehema thiyenna oona */}
       <div className="h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D]" />
     </section>
   );
-}
+};
+
+export default HotelHeroSection;
