@@ -51,7 +51,6 @@ const bagsOptions = [
   { value: 4, label: "Extra Large / Storage" },
 ];
 
-// Same select styling as HotelHeroSection, so both cards look identical
 const selectStyles = {
   control: (base) => ({
     ...base,
@@ -132,7 +131,7 @@ const selectStyles = {
 
 export default function TransportHeroSection({ form, updateForm, onSearch }) {
   return (
-    <section className="relative pt-20 bg-[#11212D]">
+    <section className="relative pt-20">
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
