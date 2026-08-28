@@ -60,7 +60,7 @@ const DestinationCard = ({ destination }) => {
 
         <Link
           to={`/destinations/${destination.category}/${destination._id}`}
-          className="inline-block mt-6 bg-[var(--color-primary-green)] px-6 py-3 rounded-xl text-white font-semibold hover:bg-[#00b383] transition duration-300 text-center"
+          className="inline-block mt-6 bg-[var(--color-primary-green)] px-6 py-3 rounded-[20px] text-white font-semibold hover:bg-[#00b383] transition duration-300 text-center"
         >
           View Destination
         </Link>
