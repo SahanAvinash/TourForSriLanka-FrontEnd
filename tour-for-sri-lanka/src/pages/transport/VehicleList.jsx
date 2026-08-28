@@ -74,7 +74,7 @@ export default function VehicleList() {
       localStorage.getItem("user") || sessionStorage.getItem("user");
 
     if (!storedUser) {
-      toast.error("Book karanna, kalin traveler kenek widihata login wenna oona");
+      toast.error("Please login and try again.");
       return;
     }
 
@@ -82,12 +82,12 @@ export default function VehicleList() {
     try {
       user = JSON.parse(storedUser);
     } catch (e) {
-      toast.error("Book karanna, kalin traveler kenek widihata login wenna oona");
+      toast.error("Please login and try again.");
       return;
     }
 
     if (user.role !== "Traveler") {
-      toast.error("Vehicle book karanna puluwan traveler ekaunt ekakin witharai");
+      toast.error("please login as a traveler.");
       return;
     }
 
