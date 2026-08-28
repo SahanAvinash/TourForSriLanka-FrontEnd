@@ -688,8 +688,6 @@ const TourPage = () => {
               }}
               placeholder="Select number of guests..."
               styles={selectStyles}
-              menuShouldScrollIntoView={false}
-              menuPortalTarget={document.body}
             />
 
             {error && (
