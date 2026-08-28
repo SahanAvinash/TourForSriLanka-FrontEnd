@@ -185,7 +185,7 @@ export default function TransportHeroSection({
                   passengerOptions.find(
                     (option) => option.value === form.passengers
                   ) || null
-                }
+                } 
                 onChange={(selected) =>
                   updateForm(
                     "passengers",
