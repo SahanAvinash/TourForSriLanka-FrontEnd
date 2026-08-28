@@ -135,7 +135,7 @@ export default function TransportHeroSection({
   onSearch,
 }) {
   return (
-    <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
+    <section className="relative pt-24 sm:pt-28 bg-red">
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
