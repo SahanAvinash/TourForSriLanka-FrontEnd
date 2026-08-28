@@ -137,7 +137,6 @@ export default function TransportHeroSection({
   return (
     <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
-        {/* Hotels page eke wage exact inset-x values saha rounded corners damma */}
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
             src={heroBg}
@@ -147,10 +146,9 @@ export default function TransportHeroSection({
 
           <div className="absolute inset-0 bg-black/45" />
 
-          {/* Ara red line eka cover karanna gradients merge wenna haduwa */}
-          <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#11212D]/90 to-[#11212D]" />
+          <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#11212D]/80 to-[#11212D]" />
 
-          <div className="absolute inset-x-0 bottom-0 h-[120px] sm:h-[100px] lg:h-[80px] bg-gradient-to-b from-transparent to-[#11212D]" />
+          <div className="absolute inset-x-0 bottom-0 h-[100px] sm:h-[90px] lg:h-[70px] bg-gradient-to-b from-transparent to-[#11212D]" />
         </div>
 
         <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-10 sm:top-16 z-10">
@@ -324,7 +322,8 @@ export default function TransportHeroSection({
         </div>
       </div>
 
-      <div className="h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D]" />
+      {/* Me spacer div eke negative margin ekak (-mt-2) dila a line eka complete hide kala */}
+      <div className="-mt-2 h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D] relative z-10" />
     </section>
   );
 }
