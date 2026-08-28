@@ -131,7 +131,7 @@ const selectStyles = {
 
 export default function TransportHeroSection({ form, updateForm, onSearch }) {
   return (
-    <section className="relative pt-20">
+    <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
         <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
@@ -161,12 +161,13 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
 
         <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
           <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
+            
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <MapPin size={22} className="text-[#00C896] shrink-0" />
 
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
-                  Pick Up Location
+                  Choose your
                 </label>
 
                 <Select
@@ -177,13 +178,18 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
                     ) || null
                   }
                   onChange={(selected) =>
-                    updateForm("pickupLocation", selected ? selected.value : "")
+                    updateForm(
+                      "pickupLocation",
+                      selected ? selected.value : ""
+                    )
                   }
-                  placeholder="Select District"
+                  placeholder="Pick Up Location"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
@@ -197,13 +203,17 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
               <Calendar size={22} className="text-[#00C896] shrink-0" />
 
               <div className="w-full min-w-0">
-                <label className="text-sm text-gray-300">Pick Up Date</label>
+                <label className="text-sm text-gray-300">
+                  Pick Up Date
+                </label>
 
                 <input
                   type="date"
                   value={form.pickupDate}
                   min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => updateForm("pickupDate", e.target.value)}
+                  onChange={(e) =>
+                    updateForm("pickupDate", e.target.value)
+                  }
                   className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0"
                 />
               </div>
@@ -228,13 +238,18 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
                     ) || null
                   }
                   onChange={(selected) =>
-                    updateForm("passengers", selected ? selected.value : "")
+                    updateForm(
+                      "passengers",
+                      selected ? selected.value : ""
+                    )
                   }
                   placeholder="Select"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
@@ -255,8 +270,9 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
                 <Select
                   options={bagsOptions}
                   value={
-                    bagsOptions.find((option) => option.value === form.bags) ||
-                    null
+                    bagsOptions.find(
+                      (option) => option.value === form.bags
+                    ) || null
                   }
                   onChange={(selected) =>
                     updateForm("bags", selected ? selected.value : "")
@@ -265,7 +281,9 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
