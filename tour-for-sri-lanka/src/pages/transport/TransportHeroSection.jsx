@@ -164,7 +164,7 @@ export default function TransportHeroSection({
         </div>
 
         <div className="animate-box absolute top-[205px] sm:top-[235px] lg:-bottom-12 lg:top-auto left-3 right-3 sm:left-8 sm:right-8 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 w-auto lg:w-full lg:max-w-[1100px] z-20">
-          <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px]  shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
+          <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
               <MapPin
@@ -325,7 +325,8 @@ export default function TransportHeroSection({
         </div>
       </div>
 
-      <div className="h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D]" />
+      {/* Height eka adu kala */}
+      <div className="h-[20px] sm:h-[30px] lg:h-[10px] bg-[#11212D]" />
     </section>
   );
 }
