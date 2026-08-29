@@ -324,7 +324,7 @@ export default function BookingPage() {
       setIsReturnTrip(false);
       setEstimate(null);
 
-      navigate("transport")
+      navigate("/transport")
     } catch (error) {
       toast.error(error.message);
     } finally {
