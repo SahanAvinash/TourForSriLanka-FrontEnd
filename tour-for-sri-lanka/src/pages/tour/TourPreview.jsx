@@ -136,7 +136,6 @@ const TourPreview = () => {
   const [routeOptions, setRouteOptions] = useState(null);
 
   const [startDistrict, setStartDistrict] = useState(null);
-  // ★ NEW — the exact pinned start location (lat/lng/address) chosen on the map in TourPage.jsx
   const [startCoords, setStartCoords] = useState(null);
 
   const [tripStartDate, setTripStartDate] = useState("");
@@ -210,7 +209,6 @@ const TourPreview = () => {
     return date.toISOString().split("T")[0];
   };
 
-  // ★ CHANGED — now accepts startCoordsOverride and forwards lat/lng to the backend
   const buildRoute = async (destinationIds, district, tripDurationDaysOverride, startCoordsOverride) => {
     setPhase("building-route");
     setError(null);
@@ -219,8 +217,6 @@ const TourPreview = () => {
         destinationIds,
         startDistrict: district,
         tripDurationDays: tripDurationDaysOverride,
-        // ★ NEW — exact pinned coordinates so the backend can route from the real start point
-        // instead of guessing a coordinate from the district name.
         startLat: startCoordsOverride?.lat,
         startLng: startCoordsOverride?.lng,
       });
@@ -253,7 +249,6 @@ const TourPreview = () => {
       const savedGuestCount = sessionStorage.getItem("tourNumberOfGuests");
       if (savedGuestCount) setTripGuestCount(Number(savedGuestCount));
 
-      // ★ NEW — read the exact pinned start location saved by TourPage.jsx's map picker
       const savedStartLat = sessionStorage.getItem("tourStartLat");
       const savedStartLng = sessionStorage.getItem("tourStartLng");
       const savedStartAddress = sessionStorage.getItem("tourStartAddress");
@@ -279,7 +274,6 @@ const TourPreview = () => {
 
       setTripDurationDays(initialDays);
 
-      // ★ CHANGED — pass the pinned coords through to buildRoute
       await buildRoute(destinationIds, district, initialDays, startCoordsForRoute);
     };
 
@@ -432,10 +426,6 @@ const TourPreview = () => {
   const returnPolylinePositions = route.returnGeometry || [];
   const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
 
-  // ★ FIXED — the real pinned start location (from the map picker in TourPage.jsx) now takes
-  // priority over anything the backend derived from the district name. This is the actual bug fix:
-  // previously this always fell through to routableStops[0]/geometry[0], which could resolve to
-  // the 1st destination instead of the user's real starting point.
   const startCoord =
     (startCoords && startCoords.lat != null && startCoords.lng != null
       ? [startCoords.lat, startCoords.lng]
@@ -632,85 +622,84 @@ const TourPreview = () => {
   };
 
   const handleAddTransportToCart = async () => {
-  setTransportBookingError("");
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-  const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
-  const travelerId = storedUser?._id;
+    setTransportBookingError("");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
+    const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+    const travelerId = storedUser?._id;
 
-  if (!token || !travelerId) {
-    setTransportBookingError("Please login as a traveler to book a vehicle");
-    return;
-  }
-  if (!transportBookingForm.pickupDate || !transportBookingForm.returnDate) {
-    setTransportBookingError("Please select pickup and return dates");
-    return;
-  }
-  if (transportBookingForm.numberOfGuests > selectedTransport.passengerCapacity) {
-    setTransportBookingError("Exceeds vehicle's passenger capacity");
-    return;
-  }
+    if (!token || !travelerId) {
+      setTransportBookingError("Please login as a traveler to book a vehicle");
+      return;
+    }
+    if (!transportBookingForm.pickupDate || !transportBookingForm.returnDate) {
+      setTransportBookingError("Please select pickup and return dates");
+      return;
+    }
+    if (transportBookingForm.numberOfGuests > selectedTransport.passengerCapacity) {
+      setTransportBookingError("Exceeds vehicle's passenger capacity");
+      return;
+    }
 
-  const requestedStart = new Date(transportBookingForm.pickupDate);
-  const requestedEnd = new Date(transportBookingForm.returnDate);
+    const requestedStart = new Date(transportBookingForm.pickupDate);
+    const requestedEnd = new Date(transportBookingForm.returnDate);
 
-  const cartConflict = cart.transports.some((item) => {
-    if (item.vehicleId !== selectedTransport._id) return false;
-    const iStart = new Date(item.pickupDate);
-    const iEnd = new Date(item.returnDate);
-    return requestedStart <= iEnd && iStart <= requestedEnd;
-  });
-  if (cartConflict) {
-    setTransportBookingError("You've already added this vehicle to your cart for overlapping dates");
-    return;
-  }
+    const cartConflict = cart.transports.some((item) => {
+      if (item.vehicleId !== selectedTransport._id) return false;
+      const iStart = new Date(item.pickupDate);
+      const iEnd = new Date(item.returnDate);
+      return requestedStart <= iEnd && iStart <= requestedEnd;
+    });
+    if (cartConflict) {
+      setTransportBookingError("You've already added this vehicle to your cart for overlapping dates");
+      return;
+    }
 
-  setEstimateLoading(true);
-  try {
-    const availRes = await axios.get(
-      `${API_BASE_URL}/api/transport/check-availability/${selectedTransport._id}`,
-      { params: { pickupDate: transportBookingForm.pickupDate, returnDate: transportBookingForm.returnDate, isReturnTrip: true } }
-    );
-    if (!availRes.data.available) {
-      setTransportBookingError("This vehicle is already booked for the selected dates");
+    setEstimateLoading(true);
+    try {
+      const availRes = await axios.get(
+        `${API_BASE_URL}/api/transport/check-availability/${selectedTransport._id}`,
+        { params: { pickupDate: transportBookingForm.pickupDate, returnDate: transportBookingForm.returnDate, isReturnTrip: true } }
+      );
+      if (!availRes.data.available) {
+        setTransportBookingError("This vehicle is already booked for the selected dates");
+        setEstimateLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      setTransportBookingError("Could not verify availability, please try again");
       setEstimateLoading(false);
       return;
     }
-  } catch (err) {
-    console.error(err);
-    setTransportBookingError("Could not verify availability, please try again");
     setEstimateLoading(false);
-    return;
-  }
-  setEstimateLoading(false);
 
-  const cartItem = {
-    cartId: `transport-${selectedTransport._id}-${Date.now()}`,
-    vehicleId: selectedTransport._id,
-    pickupLocation: startDistrict,
-    dropoffLocation: activeTransportModal.location,
-    // ★ FIXED — use the real pinned start location for pickup coordinates instead of
-    // always defaulting to the 1st destination's coordinates.
-    pickup: startCoords
-      ? { lat: startCoords.lat, lng: startCoords.lng }
-      : { lat: destinations[0].latitude, lng: destinations[0].longitude },
-    destination: {
-      lat: destinations[destinations.length - 1].latitude,
-      lng: destinations[destinations.length - 1].longitude,
-    },
-    pickupDate: transportBookingForm.pickupDate,
-    returnDate: transportBookingForm.returnDate,
-    numberOfGuests: transportBookingForm.numberOfGuests,
-    bags: transportBookingForm.bags,
-    totalPrice: estimatedPrice || 0,
-    displayName: `${selectedTransport.vehicleBrand} ${selectedTransport.vehicleModel}`,
+    const cartItem = {
+      cartId: `transport-${selectedTransport._id}-${Date.now()}`,
+      vehicleId: selectedTransport._id,
+      pickupLocation: startDistrict,
+      dropoffLocation: activeTransportModal.location,
+      pickup: startCoords
+        ? { lat: startCoords.lat, lng: startCoords.lng }
+        : { lat: destinations[0].latitude, lng: destinations[0].longitude },
+      destination: {
+        lat: destinations[destinations.length - 1].latitude,
+        lng: destinations[destinations.length - 1].longitude,
+      },
+      pickupDate: transportBookingForm.pickupDate,
+      returnDate: transportBookingForm.returnDate,
+      numberOfGuests: transportBookingForm.numberOfGuests,
+      bags: transportBookingForm.bags,
+      totalPrice: estimatedPrice || 0,
+      displayName: `${selectedTransport.vehicleBrand} ${selectedTransport.vehicleModel}`,
+    };
+
+    setCart((prev) => ({ ...prev, transports: [...prev.transports, cartItem] }));
+    setBookedTransportIds((prev) => new Set(prev).add(selectedTransport._id));
+    setTransportBudget((prev) => prev + (estimatedPrice || 0));
+    closeTransportModal();
   };
 
-  setCart((prev) => ({ ...prev, transports: [...prev.transports, cartItem] }));
-  setBookedTransportIds((prev) => new Set(prev).add(selectedTransport._id));
-  setTransportBudget((prev) => prev + (estimatedPrice || 0));
-  closeTransportModal();
-};
   const removeTransportFromCart = (cartId) => {
     setCart((prev) => {
       const item = prev.transports.find((t) => t.cartId === cartId);
@@ -1062,27 +1051,27 @@ const TourPreview = () => {
       <Navbar />
       <div className="px-6 py-10">
         <div className="tour-preview-title-anim">
-        <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
-        <p className="text-gray-400 mb-2">
-          Total distance (round trip):{" "}
-          <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
-          {typeof route.durationMin === "number" && (
-            <>
-              {" "}· Driving time:{" "}
-              <span className="text-[#00C896] font-semibold">{formatDuration(route.durationMin)}</span>
-            </>
-          )}
-        </p>
-        <div className="flex gap-5 mb-6 text-sm text-gray-400">
-          <span className="flex items-center gap-2">
-            <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#00C896" }}></span>
-            Outbound ({route.outboundDistanceKm} km)
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#FFB020" }}></span>
-            Return to start ({route.returnDistanceKm} km)
-          </span>
-        </div>
+          <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
+          <p className="text-gray-400 mb-2">
+            Total distance (round trip):{" "}
+            <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
+            {typeof route.durationMin === "number" && (
+              <>
+                {" "}· Driving time:{" "}
+                <span className="text-[#00C896] font-semibold">{formatDuration(route.durationMin)}</span>
+              </>
+            )}
+          </p>
+          <div className="flex gap-5 mb-6 text-sm text-gray-400">
+            <span className="flex items-center gap-2">
+              <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#00C896" }}></span>
+              Outbound ({route.outboundDistanceKm} km)
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#FFB020" }}></span>
+              Return to start ({route.returnDistanceKm} km)
+            </span>
+          </div>
         </div>
 
         <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
@@ -1102,7 +1091,6 @@ const TourPreview = () => {
             {startCoord && (
               <Marker position={startCoord} icon={createStartIcon()}>
                 <Popup>
-                  {/* ★ FIXED — shows the pinned address when available, falls back to district name */}
                   <strong>Start — {startCoords?.address || startDistrict}</strong>
                 </Popup>
               </Marker>
@@ -1139,7 +1127,7 @@ const TourPreview = () => {
           </MapContainer>
         </div>
 
-        <div className="mb-8">
+        <div className="tour-preview-order-anim mb-8">
           <h2 className="text-xl font-semibold mb-1">Trip Order</h2>
           <p className="text-xs text-gray-400 mb-3">
             Tap Guides, Hotels or Transport on any stop to add a booking to your cart.
@@ -1371,30 +1359,31 @@ const TourPreview = () => {
             </div>
           </div>
         </div>
-        <div className="tour-preview-cat-anim">
-        {startTourError && (
-          <p className="text-sm text-red-400 mt-3">{startTourError}</p>
-        )}
-        {startTourSuccess && (
-          <p className="text-sm text-[#00C896] mt-3">
-            Tour started! Booking requests were sent to all guides, hotels and vehicle owners in your cart.
-          </p>
-        )}
 
-        <button
-          onClick={handleStartTour}
-          disabled={startingTour}
-          className="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <FaPlay size={12} />
-          {startingTour ? "Starting Tour..." : totalCartItems === 0 ? "Start Tour (no bookings)" : "Start Tour"}
-        </button>
+        <div className="tour-preview-cta-anim">
+          {startTourError && (
+            <p className="text-sm text-red-400 mt-3">{startTourError}</p>
+          )}
+          {startTourSuccess && (
+            <p className="text-sm text-[#00C896] mt-3">
+              Tour started! Booking requests were sent to all guides, hotels and vehicle owners in your cart.
+            </p>
+          )}
 
-        {totalCartItems === 0 && !startingTour && (
-          <p className="text-xs text-gray-500 mt-2">
-            No guide, hotel or vehicle added yet — that's fine, you can start the tour and add these anytime later.
-          </p>
-        )}
+          <button
+            onClick={handleStartTour}
+            disabled={startingTour}
+            className="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FaPlay size={12} />
+            {startingTour ? "Starting Tour..." : totalCartItems === 0 ? "Start Tour (no bookings)" : "Start Tour"}
+          </button>
+
+          {totalCartItems === 0 && !startingTour && (
+            <p className="text-xs text-gray-500 mt-2">
+              No guide, hotel or vehicle added yet — that's fine, you can start the tour and add these anytime later.
+            </p>
+          )}
         </div>
 
         {activeGuideModal && (
@@ -1955,4 +1944,4 @@ const TourPreview = () => {
   );
 };
 
-export default TourPreview;3
+export default TourPreview;
