@@ -1007,3 +1007,55 @@
         opacity: 1;
     }
 }
+@keyframes tourPreviewSectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tour-preview-title-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.1s forwards;
+}
+
+.tour-preview-map-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.3s forwards;
+}
+
+.tour-preview-order-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.5s forwards;
+}
+
+.tour-preview-cart-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.65s forwards;
+}
+
+.tour-preview-budget-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.8s forwards;
+}
+
+.tour-preview-cta-anim {
+    opacity: 0;
+    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.95s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tour-preview-title-anim,
+    .tour-preview-map-anim,
+    .tour-preview-order-anim,
+    .tour-preview-cart-anim,
+    .tour-preview-budget-anim,
+    .tour-preview-cta-anim {
+        animation: none;
+        opacity: 1;
+    }
+}

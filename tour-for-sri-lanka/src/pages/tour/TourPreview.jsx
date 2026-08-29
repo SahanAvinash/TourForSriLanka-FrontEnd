@@ -1061,6 +1061,7 @@ const TourPreview = () => {
     <div className="min-h-screen bg-[#11212D] text-white">
       <Navbar />
       <div className="px-6 py-10">
+        <div className="tour-preview-title-anim">
         <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
         <p className="text-gray-400 mb-2">
           Total distance (round trip):{" "}
@@ -1082,8 +1083,9 @@ const TourPreview = () => {
             Return to start ({route.returnDistanceKm} km)
           </span>
         </div>
+        </div>
 
-        <div className="relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
+        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
           <MapContainer
             center={[centerLat, centerLng]}
             zoom={8}
@@ -1302,7 +1304,7 @@ const TourPreview = () => {
         </div>
 
         {totalCartItems > 0 && (
-          <div className="mt-10 bg-[#253745] rounded-xl p-5">
+          <div className="tour-preview-cart-anim mt-10 bg-[#253745] rounded-xl p-5">
             <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-3">
               <FaShoppingCart className="text-[#00C896]" /> Your Cart
             </h3>
@@ -1353,7 +1355,7 @@ const TourPreview = () => {
           </div>
         )}
 
-        <div className="mt-6 bg-[#253745] rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="tour-preview-budget-anim mt-6 bg-[#253745] rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h3 className="text-lg font-semibold text-white">Estimated Trip Budget</h3>
             <p className="text-xs text-gray-400 mt-1">Based on items in your cart</p>
@@ -1369,7 +1371,7 @@ const TourPreview = () => {
             </div>
           </div>
         </div>
-
+        <div className="tour-preview-cat-anim">
         {startTourError && (
           <p className="text-sm text-red-400 mt-3">{startTourError}</p>
         )}
@@ -1393,6 +1395,7 @@ const TourPreview = () => {
             No guide, hotel or vehicle added yet — that's fine, you can start the tour and add these anytime later.
           </p>
         )}
+        </div>
 
         {activeGuideModal && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-9999 px-4" onClick={closeModal}>
