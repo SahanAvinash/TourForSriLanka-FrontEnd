@@ -323,6 +323,8 @@ export default function BookingPage() {
       setDropoffCoordinates(null);
       setIsReturnTrip(false);
       setEstimate(null);
+
+      navigate("transport")
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -545,7 +547,7 @@ export default function BookingPage() {
                     updateForm("pickupDate", event.target.value)
                   }
                   style={{ colorScheme: "dark" }}
-                  className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
+                  className="flex items-center w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
                 />
               </div>
 
@@ -566,7 +568,7 @@ export default function BookingPage() {
                       updateForm("returnDate", event.target.value)
                     }
                     style={{ colorScheme: "dark" }}
-                    className="block w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
+                    className="flex items-center w-full max-w-full h-[42px] bg-[#4A5C6A80] rounded-[12px] px-3 sm:px-4 outline-none text-sm text-white appearance-none"
                   />
                 </div>
               )}
