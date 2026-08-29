@@ -141,6 +141,11 @@ const HotelHeroSection = ({ onFilterChange }) => {
       checkOut,
       guests,
     });
+    requestAnimationFrame(() => {
+      document
+        .getElementById("hotel-results")
+        ?.scrollIntoView({behavior: "smooth", block: "start"})
+    })
   };
 
   return (
