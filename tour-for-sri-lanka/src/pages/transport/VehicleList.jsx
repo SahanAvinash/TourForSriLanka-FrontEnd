@@ -86,7 +86,7 @@ export default function VehicleList() {
       return;
     }
 
-    if (user.role !== "Traveler") {
+    if (user.role !== "traveler") {
       toast.error("please login as a traveler.");
       return;
     }
