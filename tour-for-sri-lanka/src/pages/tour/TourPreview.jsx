@@ -9,6 +9,7 @@ import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useTrip } from "../../context/TripContext";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -129,6 +130,7 @@ const ROUTE_OPTION_META = {
 
 const TourPreview = () => {
   const navigate = useNavigate();
+  const { clearTrip } = useTrip();
 
   const [phase, setPhase] = useState("checking");
   const [error, setError] = useState(null);
@@ -895,6 +897,7 @@ const TourPreview = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       tourId = tourRes.data._id;
+      clearTrip();
     } catch (err) {
       console.error("Failed to create tour:", err.response?.data);
       setStartTourError("Failed to start your tour, please try again");
