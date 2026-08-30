@@ -164,7 +164,7 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Average Rating</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                        <p className="text-[#CCD0CF] text-[20px] font-bold">
                             {loadingStats
                                 ? "..."
                                 : reviewCount > 0
