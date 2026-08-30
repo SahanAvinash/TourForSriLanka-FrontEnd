@@ -26,7 +26,7 @@ export default function Reviews() {
 
     function fetchReviews() {
         setLoadingReviews(true);
-        axios.get(`${API_BASE_URL}/api/reviews/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/review/hotel/${hotelId}`)
             .then((res) => {
                 setReviews(res.data);
             }).catch((error) => {
