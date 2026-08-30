@@ -18,6 +18,9 @@ export default function Overview(){
     const [todayBookings, setTodayBookings] = useState(0)
     const [pendingBookings, setPendingBookings] = useState(0)
 
+    const [averageRating, setAverageRating] = useState(0)
+    const [reviewCount, setReviewCount] = useState(0)
+
     const today = new Date().toLocaleDateString("en-US",{
         weekday: "long",
         year: "numeric",
@@ -38,10 +41,8 @@ export default function Overview(){
             .then((res) => {
                 setIsApproved(res.data.isApproved || false)
             }).catch((error) => {
-                console.log(Error)
+                console.log(error)
             })
-        axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
-        console.log("isApproved value:", user.isApproved)
 
         axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
@@ -62,6 +63,18 @@ export default function Overview(){
 
                 setPendingBookings(bookings.filter(b => b.status === "pending").length)
                 setTodayBookings(bookings.filter(b => new Date(b.checkInDate).toDateString() === todayStr).length)
+            }).catch((error) => {
+                console.log(error)
+            })
+
+        axios.get(`${API_BASE_URL}/api/review/hotel/${hotelId}`)
+            .then((res) => {
+                const reviews = res.data
+                if (reviews.length > 0) {
+                    const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+                    setAverageRating(avg)
+                    setReviewCount(reviews.length)
+                }
             }).catch((error) => {
                 console.log(error)
             })
@@ -151,7 +164,13 @@ export default function Overview(){
                     </div>
                     <div>
                         <p className="text-[#CCD0CF]/60 text-[12px]">Average Rating</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
+                        <p className="text-[#CCD0CF] text-[22px] font-bold">
+                            {loadingStats
+                                ? "..."
+                                : reviewCount > 0
+                                    ? <>{averageRating.toFixed(1)}<span className="text-[#FFC107]">★</span></>
+                                    : "No reviews yet"}
+                        </p>
                     </div>
                 </div>
             </div>
