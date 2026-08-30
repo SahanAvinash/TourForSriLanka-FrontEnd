@@ -1231,11 +1231,21 @@ const TourPreview = () => {
             {destinations.map((dest, index) => {
               const dayInfo = getDayInfoForDestination(dest, index);
               const dayIndex = dayInfo.dayNumber;
+              const prevDayInfo = index > 0 ? getDayInfoForDestination(destinations[index - 1], index - 1) : null;
+              const isNewDay = index === 0 || prevDayInfo?.dayNumber !== dayInfo.dayNumber;
               const destRec = getRecommendationForLocation(dest.location);
               const destHotels = destRec?.hotels || [];
               const legDistance = legDistances[index];
               return (
                 <React.Fragment key={dest.id || `stop-${index}`}>
+                  {isNewDay && (
+                    <div className="flex items-center gap-3 mt-5 mb-1">
+                      <span className="text-xs font-bold uppercase tracking-wide text-[#11212D] bg-[#00C896] px-4 py-1.5 rounded-full whitespace-nowrap shadow-md">
+                        Day {String(dayIndex).padStart(2, "0")}
+                      </span>
+                      <div className="flex-1 h-px bg-[#00C896]/30" />
+                    </div>
+                  )}
                   <div className="flex flex-col items-center">
                     <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
                     <span className="text-[10px] text-[#00C896] font-medium bg-[#11212D] px-2 py-0.5 rounded-full border border-[#00C896]/30 my-0.5 whitespace-nowrap">
@@ -1251,10 +1261,9 @@ const TourPreview = () => {
                         </span>
                         {dest.name}
                       </span>
-                      <p className="text-[11px] text-gray-500 mt-1 ml-8">
-                        Day {dayInfo.dayNumber}
-                        {dayInfo.timeSlot ? ` · ${dayInfo.timeSlot}` : ""}
-                      </p>
+                      {dayInfo.timeSlot && (
+                        <p className="text-[11px] text-gray-500 mt-1 ml-8">{dayInfo.timeSlot}</p>
+                      )}
                     </div>
 
                     {dayInfo.isDayEnd ? (
