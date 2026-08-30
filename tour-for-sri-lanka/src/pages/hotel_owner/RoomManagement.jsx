@@ -50,7 +50,7 @@ const EMPTY_FACILITIES = {
 const selectStyles = {
     control: (base) => ({
         ...base,
-        width: "465px",
+        width: "100%",
         height: "50px",
         borderRadius: "20px",
         backgroundColor: "#4A5C6A80",
