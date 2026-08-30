@@ -1826,6 +1826,7 @@ const TourPreview = () => {
                         <div key={r._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
                           <img
                             src={r.image || "/room_placeholder.jpg"}
+                            src={r.images?.[0] || "room_placeholder.jpg"}
                             alt={r.roomType}
                             className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                           />
@@ -1870,6 +1871,7 @@ const TourPreview = () => {
 
                   <div className="flex items-center gap-3 mb-4">
                     <img src={selectedRoom.image} className="w-12 h-12 rounded-lg object-cover" />
+                    <img src={selectedRoom.images?.[0] || "/room_placeholder.jpg"} className="w-12 h-12 rounded-lg object-cover"/>
                     <div>
                       <p className="font-medium">{selectedRoom.roomType} · Room {selectedRoom.roomNumber}</p>
                       <p className="text-xs text-gray-400">{selectedHotel?.hotelName}</p>
