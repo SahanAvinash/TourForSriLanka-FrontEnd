@@ -153,15 +153,16 @@ export default function GuideDetailsPage() {
       <Navbar />
 
       {/* Hero */}
-      <div className="guide-hero-anim relative h-[300px] sm:h-[360px] lg:h-[420px] px-3 sm:px-4">
+      <div className="guide-hero-anim relative h-[160px] sm:h-[200px] lg:h-[230px] px-3 sm:px-4">
         <div className="relative h-full rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
             src={guide.profilePic || "/guide_placeholder.jpg"}
-            alt={`${guide.firstName} ${guide.lastName}`}
-            className="w-full h-full object-cover object-[center_20%]"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-center scale-110 blur-2xl brightness-75"
           />
 
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/45" />
         </div>
       </div>
 
@@ -172,34 +173,42 @@ export default function GuideDetailsPage() {
         <div className="guide-info-anim bg-[#253745] rounded-[16px] sm:rounded-[20px] p-4 sm:p-6 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-white font-bold text-[22px] sm:text-[26px] break-words">
-                  {guide.firstName} {guide.lastName}
-                </h1>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4 min-w-0">
+              <img
+                src={guide.profilePic || "/guide_placeholder.jpg"}
+                alt={`${guide.firstName} ${guide.lastName}`}
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#253745] shadow-lg -mt-16 sm:-mt-14 mx-auto sm:mx-0 shrink-0"
+              />
 
-                <FaCheckCircle
-                  className="text-[#00C896] text-[17px] shrink-0"
-                  title="Licensed Guide"
-                />
-              </div>
+              <div className="min-w-0 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                  <h1 className="text-white font-bold text-[22px] sm:text-[26px] break-words">
+                    {guide.firstName} {guide.lastName}
+                  </h1>
 
-              <div className="flex items-start gap-2 mt-2 text-gray-400 text-[13px] sm:text-[14px]">
-                <FaMapMarkerAlt className="text-[#00C896] mt-0.5 shrink-0" />
-                <span>
-                  {guide.district}, {guide.province}
-                </span>
-              </div>
+                  <FaCheckCircle
+                    className="text-[#00C896] text-[17px] shrink-0"
+                    title="Licensed Guide"
+                  />
+                </div>
 
-              <div className="flex items-start gap-2 mt-2 text-gray-400 text-[13px] sm:text-[14px]">
-                <FaClock className="text-[#00C896] mt-0.5 shrink-0" />
-                <span>
-                  {guide.yearsOfExperience}+ years experience
-                </span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 text-gray-400 text-[13px] sm:text-[14px]">
+                  <FaMapMarkerAlt className="text-[#00C896] shrink-0" />
+                  <span>
+                    {guide.district}, {guide.province}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 text-gray-400 text-[13px] sm:text-[14px]">
+                  <FaClock className="text-[#00C896] shrink-0" />
+                  <span>
+                    {guide.yearsOfExperience}+ years experience
+                  </span>
+                </div>
               </div>
             </div>
 
-            <span className="self-start text-[11px] sm:text-[12px] text-[#00C896] bg-[#00C896]/10 px-3 py-1 rounded-full break-all">
+            <span className="self-center sm:self-start text-[11px] sm:text-[12px] text-[#00C896] bg-[#00C896]/10 px-3 py-1 rounded-full break-all">
               License #{guide.GuideLicenseNumber}
             </span>
           </div>
