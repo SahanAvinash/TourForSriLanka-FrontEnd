@@ -1869,15 +1869,6 @@ const TourPreview = () => {
                     ← Back to rooms
                   </button>
 
-                  <div className="flex items-center gap-3 mb-4">
-                    <img src={selectedRoom.image} className="w-12 h-12 rounded-lg object-cover" />
-                    <img src={selectedRoom.images?.[0] || "/room_placeholder.jpg"} className="w-12 h-12 rounded-lg object-cover"/>
-                    <div>
-                      <p className="font-medium">{selectedRoom.roomType} · Room {selectedRoom.roomNumber}</p>
-                      <p className="text-xs text-gray-400">{selectedHotel?.hotelName}</p>
-                    </div>
-                  </div>
-
                   <div className="flex flex-col gap-3">
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Check-in Date</label>
