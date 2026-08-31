@@ -153,73 +153,76 @@ export default function Overview() {
   ];
 
   return (
-    <section
-      id="overview"
-      className="w-full flex flex-col items-center px-4 sm:px-6 lg:px-0"
-    >
-      {!isApproved && !loadingStats && (
-        <div className="w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
-          <MdPending className="text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0" />
+  <section
+    id="overview"
+    className="w-full max-w-full flex flex-col items-center px-3 sm:px-5 md:px-6 lg:px-0 overflow-x-hidden"
+  >
+    {!isApproved && !loadingStats && (
+      <div className="w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3 overview-alert-anim">
+        <MdPending className="text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0" />
 
-          <div>
-            <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-semibold">
-              Verification Pending
+        <div>
+          <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-semibold">
+            Verification Pending
+          </p>
+
+          <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">
+            Your hotel is under review. Some features may be limited until
+            approval.
+          </p>
+        </div>
+      </div>
+    )}
+
+    <div className="w-full max-w-[1100px] flex flex-col items-center md:flex-row md:justify-between md:items-center gap-2 mb-1 overview-header-anim">
+      <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold text-center md:text-left">
+        Overview
+      </h1>
+
+      <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[15px] md:text-[16px] text-center">
+        {today}
+      </span>
+    </div>
+
+    <div className="w-full max-w-[1100px] flex items-center justify-center md:justify-start">
+      <p className="text-[#CCD0CF] text-[14px] mb-6 text-center md:text-left">
+        {hotelName}
+      </p>
+
+      {isApproved && (
+        <MdVerified className="text-[#00C896]/80 ml-[10px] text-[20px] mb-6" />
+      )}
+    </div>
+
+    <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+      {stats.map((stat, index) => (
+        <div
+          key={stat.label}
+          className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1"
+          style={{
+            animationDelay: `${0.05 + index * 0.05}s`,
+          }}
+        >
+          <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
+            {stat.icon}
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-[#CCD0CF]/60 text-[12px]">
+              {stat.label}
             </p>
 
-            <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">
-              Your hotel is under review. Some features may be limited until
-              approval.
+            <p
+              className={`text-[#CCD0CF] font-bold ${
+                stat.rating ? "text-[20px]" : "text-[22px]"
+              }`}
+            >
+              {loadingStats ? "..." : stat.value}
             </p>
           </div>
         </div>
-      )}
-
-      <div className="w-full max-w-[1100px] flex flex-col items-center sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
-        <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold text-center sm:text-left">
-          Overview
-        </h1>
-
-        <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[16px] text-center">
-          {today}
-        </span>
-      </div>
-
-      <div className="w-full max-w-[1100px] flex items-center justify-center sm:justify-start">
-        <p className="text-[#CCD0CF] text-[14px] mb-6 text-center sm:text-left">
-          {hotelName}
-        </p>
-
-        {isApproved && (
-          <MdVerified className="text-[#00C896]/80 ml-[10px] text-[20px] mb-6" />
-        )}
-      </div>
-
-      <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px]"
-          >
-            <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-              {stat.icon}
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-[#CCD0CF]/60 text-[12px]">
-                {stat.label}
-              </p>
-
-              <p
-                className={`text-[#CCD0CF] font-bold ${
-                  stat.rating ? "text-[20px]" : "text-[22px]"
-                }`}
-              >
-                {loadingStats ? "..." : stat.value}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+      ))}
+    </div>
+  </section>
+);
 }

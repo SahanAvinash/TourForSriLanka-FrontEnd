@@ -1495,3 +1495,18 @@
         opacity: 1;
     }
 }
+.overview-stat-card-anim {
+    opacity: 0;
+    animation: overviewStatCardFadeIn 0.6s ease-out forwards;
+}
+
+.overview-stat-card-anim:hover {
+    transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .overview-stat-card-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
