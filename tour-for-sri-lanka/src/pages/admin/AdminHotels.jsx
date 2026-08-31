@@ -136,15 +136,18 @@ export default function AdminHotels() {
                     doc.url && (
                       <div key={idx} className="bg-black/30 p-3 rounded-lg flex items-center justify-between">
                         <span className="text-xs text-white">📄 {doc.label}</span>
+                        <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => {
+                            const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(doc.url)}&embedded=true`
                             window.open(doc.url, "_blank");
                           }}
                           className="text-xs bg-[#00C896]/20 text-[#00C896] px-3 py-1.5 rounded hover:bg-[#00C896] hover:text-white transition-all cursor-pointer font-semibold"
                         >
                           View PDF
                         </button>
+                        </div>
                       </div>
                     )
                   ))}
