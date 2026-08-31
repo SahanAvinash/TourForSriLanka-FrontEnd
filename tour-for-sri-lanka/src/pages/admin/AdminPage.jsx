@@ -8,6 +8,7 @@ import AdminGuides from "./AdminGuides";
 import AdminTours from "./AdminTours";
 import AdminCategories from "./AdminCategories";
 import AdminCategoryDestinations from "./AdminCategoryDestinations";
+import logo from "../../assets/logo.png";
 
 export default function AdminPage() {
   const location = useLocation();
@@ -61,7 +62,7 @@ export default function AdminPage() {
         {/* Scrollable nav section */}
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
           <div className="h-[70px] md:h-[80px] flex items-center justify-between px-6 shrink-0">
-            <span className="text-[#00C896] font-bold text-lg">Admin</span>
+            <img src={logo} alt="Tours For Sri Lanka" className="h-10 md:h-12 object-contain"/>
             <button
               onClick={() => setSidebarOpen(false)}
               className="md:hidden text-[#CCD0CF] text-2xl active:scale-90 transition-transform duration-150"
