@@ -24,7 +24,7 @@ export default function AdminPage() {
   ];
 
   function getLinkClass(isActive) {
-    return `admin-nav-item-anim w-[220px] h-[45px] text-[15px] flex items-center rounded-[20px] relative transition-all duration-300 ${
+    return `admin-nav-item-anim w-[220px] h-[45px] text-[15px] flex items-center rounded-[20px] relative transition-all duration-300 shrink-0 ${
       isActive
         ? "bg-[#00C896]/20 text-[#00C896]"
         : "text-[#CCD0CF] hover:bg-[#4A5C6A]"
@@ -40,7 +40,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="w-full h-screen bg-gradient-to-r from-[#06141B] to-[#253745] overflow-hidden">
+    <div className="w-full h-dvh bg-gradient-to-r from-[#06141B] to-[#253745] overflow-hidden">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -51,12 +51,13 @@ export default function AdminPage() {
 
       {/* Sidebar */}
       <div
-        className={`admin-sidebar-anim w-[260px] md:w-[300px] h-screen bg-[#253745] md:opacity-[80%] fixed md:absolute left-0 top-0 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
+        className={`admin-sidebar-anim w-[260px] md:w-[300px] h-dvh bg-[#253745] md:opacity-[80%] fixed md:absolute left-0 top-0 z-50 flex flex-col transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <div>
-          <div className="h-[70px] md:h-[80px] flex items-center justify-between px-6">
+        {/* Scrollable nav section */}
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+          <div className="h-[70px] md:h-[80px] flex items-center justify-between px-6 shrink-0">
             <span className="text-[#00C896] font-bold text-lg">Admin</span>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -66,7 +67,7 @@ export default function AdminPage() {
             </button>
           </div>
 
-          <div className="flex flex-col items-center gap-4 mt-[30px]">
+          <div className="flex flex-col items-center gap-4 mt-[30px] pb-4">
             {navItems.map((item) => {
               const isActive = item.match(location.pathname);
               const Icon = item.icon;
@@ -85,8 +86,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Logout Button */}
-        <div className="p-6 border-t border-[#4A5C6A]">
+        {/* Logout Button - always pinned to bottom, never clipped */}
+        <div className="shrink-0 p-6 border-t border-[#4A5C6A]">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 text-red-400 hover:text-red-300 active:scale-95 font-medium transition-all duration-200 w-full px-4"
@@ -111,7 +112,7 @@ export default function AdminPage() {
       </div>
 
       {/* Main Content */}
-      <div className="admin-content-anim md:ml-[300px] w-full md:w-[calc(100vw-300px)] h-[calc(100vh-70px)] md:h-[calc(100vh-80px)] p-4 md:p-8 overflow-y-auto">
+      <div className="admin-content-anim md:ml-[300px] w-full md:w-[calc(100vw-300px)] h-[calc(100dvh-70px)] md:h-[calc(100dvh-80px)] p-4 md:p-8 overflow-y-auto">
         <Routes path="/*">
           <Route path="/tours" element={<AdminTours />} />
           <Route path="/categories" element={<AdminCategories />} />
