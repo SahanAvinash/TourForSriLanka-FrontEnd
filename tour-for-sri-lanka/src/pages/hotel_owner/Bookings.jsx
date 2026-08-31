@@ -189,7 +189,7 @@ export default function Bookings() {
                                                 {openMenuId === booking._id && (
                                                     <>
                                                         <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)}></div>
-                                                        <div className="absolute right-0 top-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-20 w-[180px] shadow-lg">
+                                                        <div className="absolute right-0 bottom-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-20 w-[180px] shadow-lg">
                                                             {booking.status === "pending" && (
                                                                 <>
                                                                     <button
