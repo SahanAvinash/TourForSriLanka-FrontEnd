@@ -7,7 +7,7 @@ import { useTrip } from "../context/TripContext";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { tripCount } = useTrip();
+  const { tripCount, clearTrip } = useTrip();
   const isProfileActive = location.pathname.startsWith("/profile");
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -55,6 +55,7 @@ const Navbar = () => {
     localStorage.removeItem("user");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
+    clearTrip()
     setUser(null);
     setIsProfileOpen(false);
     setIsOpen(false);
