@@ -82,18 +82,18 @@ export default function Overview(){
     return(
         <section id="overview">
             {!isApproved && !loadingStats && (
-                <div className="bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-6 py-4 mb-6 flex items-center gap-3">
-                    <MdPending className="text-[#00C896] text-[22px] flex-shrink-0"/>
+                <div className="overview-alert-anim bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+                    <MdPending className="text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0"/>
                     <div>
-                        <p className="text-[#CCD0CF] text-[14px] font-semibold">Verification Pending</p>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Your hotel is under review. Some features may be limited until approval.</p>
+                        <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-semibold">Verification Pending</p>
+                        <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">Your hotel is under review. Some features may be limited until approval.</p>
                     </div>
                 </div>
             )}
 
-            <div className="flex justify-between items-center mb-1">
-                <h1 className="text-[#CCD0CF] text-[24px] font-bold">Overview</h1>
-                <span className="text-[#CCD0CF]/60 text-[16px]">{today}</span>
+            <div className="overview-header-anim flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mb-1">
+                <h1 className="text-[#CCD0CF] text-[20px] sm:text-[24px] font-bold">Overview</h1>
+                <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[16px]">{today}</span>
             </div>
             <div className="flex">
                 <p className="text-[#CCD0CF] text-[14px] mb-6">{hotelName}</p>
@@ -102,9 +102,9 @@ export default function Overview(){
                 )}
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mt-[20px]">
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-[20px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaBed/>
                     </div>
                     <div>
@@ -114,8 +114,8 @@ export default function Overview(){
                         </p>
                     </div>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <MdEventAvailable/>
                     </div>
                     <div>
@@ -125,8 +125,8 @@ export default function Overview(){
                         </p>
                     </div>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaCalendarCheck/>
                     </div>
                     <div>
@@ -136,8 +136,8 @@ export default function Overview(){
                         </p>
                     </div>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <MdPending/>
                     </div>
                     <div>
@@ -147,8 +147,8 @@ export default function Overview(){
                         </p>
                     </div>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <GrVmMaintenance/>
                     </div>
                     <div>
@@ -158,8 +158,8 @@ export default function Overview(){
                         </p>
                     </div>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaStar/>
                     </div>
                     <div>
