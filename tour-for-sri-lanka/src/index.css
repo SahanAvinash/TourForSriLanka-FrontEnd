@@ -1120,3 +1120,77 @@
         opacity: 1;
     }
 }
+@keyframes adminSidebarSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (min-width: 768px) {
+    .admin-sidebar-anim {
+        opacity: 0;
+        animation: adminSidebarSlideIn 0.6s ease-out forwards;
+    }
+}
+
+@keyframes adminNavItemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.admin-nav-item-anim {
+    opacity: 0;
+    animation: adminNavItemFadeIn 0.5s ease-out forwards;
+}
+.admin-nav-item-anim:nth-child(1) { animation-delay: 0.05s; }
+.admin-nav-item-anim:nth-child(2) { animation-delay: 0.1s; }
+.admin-nav-item-anim:nth-child(3) { animation-delay: 0.15s; }
+.admin-nav-item-anim:nth-child(4) { animation-delay: 0.2s; }
+.admin-nav-item-anim:nth-child(5) { animation-delay: 0.25s; }
+.admin-nav-item-anim:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes adminContentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-content-anim {
+    opacity: 0;
+    animation: adminContentFadeIn 0.5s ease-out 0.15s forwards;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+    .admin-sidebar-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-nav-item-anim,
+    .admin-content-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+.admin-navbar-anim {
+    opacity: 0;
+    animation: navbarFadeIn 0.6s ease-out forwards;
+}
