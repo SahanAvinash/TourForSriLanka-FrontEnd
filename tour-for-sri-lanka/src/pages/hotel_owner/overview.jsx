@@ -155,12 +155,18 @@ export default function Overview() {
   return (
     <section
       id="overview"
-      className="w-full max-w-full flex flex-col items-center px-3 sm:px-5 md:px-6 lg:px-0 pt-6 overflow-x-hidden"
+      className="w-full max-w-full flex flex-col items-center px-3 sm:px-5 md:px-6 lg:px-0 pt-24 sm:pt-28 overflow-x-hidden"
     >
       <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-center gap-2 mb-2">
-        <h1 className="text-[#CCD0CF] text-2xl sm:text-3xl font-extrabold tracking-wide">
-          Overview
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-[#CCD0CF] text-2xl sm:text-3xl font-extrabold tracking-wide">
+            Overview
+          </h1>
+
+          {isApproved && (
+            <MdVerified className="text-[#00C896] text-2xl sm:text-3xl" />
+          )}
+        </div>
 
         <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">
           {today}
@@ -171,10 +177,6 @@ export default function Overview() {
         <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
           {hotelName}
         </p>
-
-        {isApproved && (
-          <MdVerified className="text-[#00C896] ml-2 text-xl" />
-        )}
       </div>
 
       {!isApproved && !loadingStats && (
