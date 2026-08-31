@@ -8,7 +8,9 @@ import {
 } from "react-icons/fa";
 
 function getAuthHeader() {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const localToken = localStorage.getItem("token")
+    const sessionToken = sessionStorage.getItem("token")
+    const token = (localToken && localToken !== "undefined") ? localToken : sessionToken
     return { Authorization: `Bearer ${token}` };
 }
 
@@ -26,6 +28,7 @@ export default function Bookings() {
     const [loadingBookings, setLoadingBookings] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
@@ -122,7 +125,7 @@ export default function Bookings() {
                             <tbody>
                                 {filteredBookings.map((booking) => {
                                     const status = STATUS_META[booking.status] || STATUS_META.pending;
-                                    const photoUrl = booking.travelerId?.image;
+                                    const photoUrl = booking.travelerId?.profileImage;
                                     return (
                                         <tr key={booking._id} className="border-t border-[#4A5C6A]/40">
                                             <td className="py-4 pr-4">
@@ -181,15 +184,37 @@ export default function Bookings() {
                                             </td>
                                             <td className="py-4 relative">
                                                 <button
-                                                    onClick={() => setOpenMenuId(openMenuId === booking._id ? null : booking._id)}
+                                                    onClick={(e) => {
+                                                        if (openMenuId === booking._id) {
+                                                            setOpenMenuId(null);
+                                                            return;
+                                                        }
+                                                        const rect = e.currentTarget.getBoundingClientRect();
+
+                                                        setMenuPosition({
+                                                            top: rect.bottom + 6,
+                                                            left: rect.right - 180
+                                                        });
+                                                        setOpenMenuId(booking._id);
+                                                    }}
                                                     className="text-[#CCD0CF]/60 hover:text-[#CCD0CF] cursor-pointer p-2"
                                                 >
                                                     <FaEllipsisV />
                                                 </button>
                                                 {openMenuId === booking._id && (
                                                     <>
-                                                        <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)}></div>
-                                                        <div className="absolute right-0 bottom-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-20 w-[180px] shadow-lg">
+                                                        <div
+                                                            className="fixed inset-0 z-[9998]"
+                                                            onClick={() => setOpenMenuId(null)}
+                                                        />
+
+                                                        <div
+                                                            className="fixed bg-[#4A5C6A] rounded-[12px] overflow-hidden z-[9999] w-[180px] shadow-lg"
+                                                            style={{
+                                                                top: `${menuPosition.top}px`,
+                                                                left: `${menuPosition.left}px`
+                                                            }}
+                                                        >
                                                             {booking.status === "pending" && (
                                                                 <>
                                                                     <button
