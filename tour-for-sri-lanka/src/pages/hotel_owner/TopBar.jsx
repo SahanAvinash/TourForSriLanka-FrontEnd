@@ -6,27 +6,39 @@ const roleLabels = {
     vehicle_owner: "Vehicle Owner",
     guide: "Guide",
     traveler: "Traveler"
-}
+};
 
-export default function TopBar(){
+export default function TopBar() {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
-        if(storedUser){
-            const parsedUser = JSON.parse(storedUser)
-            setUser(parsedUser)
+        const storedUser =
+            localStorage.getItem("user") ||
+            sessionStorage.getItem("user");
+
+        if (storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setUser(parsedUser);
+            } catch (error) {
+                console.error("Failed to parse user data");
+            }
         }
     }, []);
 
-    return(
-        <div className="w-full h-[80px] bg-[#253745] flex items-center justify-end px-8">
+    return (
+        <div className="hidden md:flex w-full h-[80px] bg-[#253745] items-center justify-end px-8">
             <div className="flex items-center gap-3">
-                <span className="text-[#CCD0CF] font-bold">{roleLabels[user?.role] || "User"}<br/> {user?.firstName}</span>
+                <span className="text-[#CCD0CF] font-bold text-right">
+                    {roleLabels[user?.role] || "User"}
+                    <br />
+                    {user?.firstName}
+                </span>
+
                 {user?.profilePhoto ? (
-                    <img 
-                        src={user.profilePhoto} 
-                        alt="profile" 
+                    <img
+                        src={user.profilePhoto}
+                        alt="profile"
                         className="w-10 h-10 rounded-full object-cover"
                     />
                 ) : (
@@ -34,5 +46,5 @@ export default function TopBar(){
                 )}
             </div>
         </div>
-    )
+    );
 }
