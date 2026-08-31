@@ -71,7 +71,7 @@ const HotelCard = ({ hotel }) => {
       <div className="p-[13px] xs:p-[15px] sm:p-[18px]">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-white font-bold text-[14px] xs:text-[15px] sm:text-[16px] truncate min-w-0 leading-5">
-            {hotel?.hotelName || "Hotel"}
+            {hotel?.name || "Hotel"}
           </h3>
 
           {hotel?.hotelType && (
