@@ -102,6 +102,94 @@ const formatDate = (date) => {
   });
 };
 
+// Draws a simple, branded "route map" diagram directly on the PDF using each
+// destination's lat/lng — numbered stops connected in visiting order, with a
+// dashed return leg back to the first stop (matching the same visual language
+// used on the live trip map). No external tile images are used, so this never
+// depends on network access, CORS, or load timing when the PDF is generated.
+const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) => {
+  const points = (destinations || []).filter(
+    (destination) =>
+      typeof destination.lat === "number" && typeof destination.lng === "number"
+  );
+
+  if (points.length < 2) return false;
+
+  const lats = points.map((point) => point.lat);
+  const lngs = points.map((point) => point.lng);
+
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+
+  const latSpan = maxLat - minLat || 0.01;
+  const lngSpan = maxLng - minLng || 0.01;
+
+  const padding = 16;
+  const innerWidth = boxWidth - padding * 2;
+  const innerHeight = boxHeight - padding * 2;
+
+  const project = (lat, lng) => {
+    const px = boxX + padding + ((lng - minLng) / lngSpan) * innerWidth;
+    // Flip latitude so north stays toward the top of the box
+    const py = boxY + padding + (1 - (lat - minLat) / latSpan) * innerHeight;
+    return [px, py];
+  };
+
+  // Panel background
+  doc.setFillColor(37, 55, 69); // #253745
+  doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 3, 3, "F");
+
+  const coords = points.map((point) => project(point.lat, point.lng));
+
+  // Solid lines in visiting order
+  doc.setDrawColor(0, 200, 150); // #00C896
+  doc.setLineWidth(0.7);
+  doc.setLineDashPattern([], 0);
+
+  for (let i = 0; i < coords.length - 1; i++) {
+    doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
+  }
+
+  // Dashed return leg back to the start
+  doc.setLineDashPattern([2, 1.5], 0);
+  doc.line(
+    coords[coords.length - 1][0],
+    coords[coords.length - 1][1],
+    coords[0][0],
+    coords[0][1]
+  );
+  doc.setLineDashPattern([], 0);
+
+  // Numbered markers + short labels
+  points.forEach((point, index) => {
+    const [px, py] = coords[index];
+
+    doc.setFillColor(0, 200, 150);
+    doc.circle(px, py, 3.4, "F");
+
+    doc.setTextColor(17, 33, 45);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${index + 1}`, px, py + 1.1, { align: "center" });
+
+    const label =
+      point.name && point.name.length > 16
+        ? `${point.name.slice(0, 15)}…`
+        : point.name || "";
+
+    const labelY = py + 7 > boxY + boxHeight - 3 ? py - 5 : py + 7;
+
+    doc.setTextColor(225, 230, 235);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.text(label, px, labelY, { align: "center" });
+  });
+
+  return true;
+};
+
 const FeatureCard = ({ icon, title, description, delay = 0 }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -326,6 +414,13 @@ const TourPage = () => {
     const dark = [17, 33, 45];
     let y = 0;
 
+    const tripReference = `TSL-${
+      activeTour._id || activeTour.tourId || Date.now()
+    }`
+      .toString()
+      .slice(0, 18)
+      .toUpperCase();
+
     doc.setFillColor(...accent);
     doc.rect(0, 0, pageWidth, 32, "F");
 
@@ -342,17 +437,60 @@ const TourPage = () => {
 
     doc.setTextColor(120, 120, 120);
     doc.setFontSize(9);
+    doc.text(`Trip Reference: ${tripReference}`, 14, y);
     doc.text(
       `Generated on ${new Date().toLocaleDateString("en-GB", {
         day: "numeric",
         month: "long",
         year: "numeric",
       })}`,
-      14,
-      y
+      pageWidth - 14,
+      y,
+      { align: "right" }
     );
 
     y += 10;
+
+    // Trip overview panel — the "who / when / how many" a receipt needs
+    // up front, before the itemised bookings below.
+    const overviewHeight = 30;
+
+    doc.setFillColor(37, 55, 69); // #253745
+    doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
+
+    const overviewRows = [
+      ["Starting Point", activeTour.startAddress || "-"],
+      [
+        "Trip Start Date",
+        activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-",
+      ],
+      [
+        "Duration",
+        activeTour.tripDuration ? `${activeTour.tripDuration} day(s)` : "-",
+      ],
+      [
+        "Guests",
+        activeTour.numberOfGuests ? `${activeTour.numberOfGuests}` : "-",
+      ],
+    ];
+
+    const columnWidth = (pageWidth - 28 - 24) / overviewRows.length;
+
+    overviewRows.forEach(([label, value], index) => {
+      const columnX = 20 + index * columnWidth;
+
+      doc.setTextColor(160, 170, 180);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(label, columnX, y + 11);
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10.5);
+      doc.setFont("helvetica", "bold");
+      doc.text(value, columnX, y + 21, { maxWidth: columnWidth - 4 });
+    });
+
+    y += overviewHeight + 12;
 
     doc.setTextColor(...dark);
     doc.setFontSize(13);
@@ -388,6 +526,33 @@ const TourPage = () => {
     });
 
     y = doc.lastAutoTable.finalY + 12;
+
+    // Route map — a schematic diagram of the stops in visiting order.
+    const hasRouteCoords =
+      (activeTour.destinations || []).filter(
+        (destination) =>
+          typeof destination.lat === "number" &&
+          typeof destination.lng === "number"
+      ).length >= 2;
+
+    if (hasRouteCoords) {
+      if (y > 210) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setTextColor(...dark);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.text("Route Map", 14, y);
+
+      y += 4;
+
+      const mapHeight = 70;
+      drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, activeTour.destinations);
+
+      y += mapHeight + 12;
+    }
 
     if (activeTour.guideBookings?.length > 0) {
       if (y > 250) {
