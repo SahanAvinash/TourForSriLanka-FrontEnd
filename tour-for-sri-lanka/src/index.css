@@ -1081,3 +1081,42 @@
         opacity: 1;
     }
 }
+@keyframes adminTableFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-table-anim {
+    opacity: 0;
+    animation: adminTableFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes adminRowFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-row-anim {
+    opacity: 0;
+    animation: adminRowFadeIn 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-table-anim,
+    .admin-row-anim {
+        animation: none;
+        opacity: 1;
+    }
+}

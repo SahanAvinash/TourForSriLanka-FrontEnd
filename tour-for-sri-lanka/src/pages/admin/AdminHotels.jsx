@@ -70,7 +70,7 @@ export default function AdminHotels() {
               <button
                 type="button"
                 onClick={() => setSelectedHotel(null)}
-                className="shrink-0 text-gray-400 hover:text-white text-xl font-bold cursor-pointer transition-transform duration-200 hover:rotate-90"
+                className="shrink-0 text-gray-400 hover:text-white text-xl font-bold cursor-pointer"
               >
                 ✕
               </button>
