@@ -23,6 +23,9 @@ export default function AdminPage() {
     { path: "/admin/categories", label: "Categories", icon: MdDashboard, match: (p) => p.startsWith("/admin/categories") },
   ];
 
+  const activeNavItem = navItems.find((item) => item.match(location.pathname));
+  const pageTitle = activeNavItem ? activeNavItem.label : "Dashboard";
+
   function getLinkClass(isActive) {
     return `admin-nav-item-anim w-[220px] h-[45px] text-[15px] flex items-center rounded-[20px] relative transition-all duration-300 shrink-0 ${
       isActive
@@ -106,8 +109,8 @@ export default function AdminPage() {
         >
           <MdMenu />
         </button>
-        <span className="text-[#CCD0CF] text-base md:text-[20px] font-bold truncate">
-          Dashboard Overview
+        <span key={pageTitle} className="admin-title-anim text-[#CCD0CF] text-base md:text-[20px] font-bold truncate">
+          {pageTitle}
         </span>
       </div>
 
