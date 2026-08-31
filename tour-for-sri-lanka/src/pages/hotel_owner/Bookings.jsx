@@ -122,7 +122,7 @@ export default function Bookings() {
                             <tbody>
                                 {filteredBookings.map((booking) => {
                                     const status = STATUS_META[booking.status] || STATUS_META.pending;
-                                    const photoUrl = booking.travelerId?.profileImage;
+                                    const photoUrl = booking.travelerId?.image;
                                     return (
                                         <tr key={booking._id} className="border-t border-[#4A5C6A]/40">
                                             <td className="py-4 pr-4">
