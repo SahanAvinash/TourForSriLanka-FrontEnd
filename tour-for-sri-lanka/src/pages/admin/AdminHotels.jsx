@@ -141,7 +141,7 @@ export default function AdminHotels() {
                           type="button"
                           onClick={() => {
                             const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(doc.url)}&embedded=true`
-                            window.open(doc.url, "_blank");
+                            window.open(viewerUrl, "_blank");
                           }}
                           className="text-xs bg-[#00C896]/20 text-[#00C896] px-3 py-1.5 rounded hover:bg-[#00C896] hover:text-white transition-all cursor-pointer font-semibold"
                         >
