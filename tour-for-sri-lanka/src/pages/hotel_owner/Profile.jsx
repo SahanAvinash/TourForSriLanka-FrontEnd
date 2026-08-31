@@ -177,16 +177,14 @@ export default function Profile() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <DetailRow label="Owner Name" value={`${hotel?.firstName || ""} ${hotel?.lastName || ""}`} />
           <DetailRow label="Email" value={hotel?.email} />
-          <DetailRow label="NIC" value={hotel?.NIC} />
-          <DetailRow label="Mobile" value={hotel?.mobile} />
-          <DetailRow label="Country" value={hotel?.country} />
-          <DetailRow label="Hotel Name" value={hotel?.hotelName} />
+          <DetailRow label="NIC / Passport" value={hotel?.nicOrPassport} />
+          <DetailRow label="Mobile" value={hotel?.ownerMobile} />
+          <DetailRow label="Hotel Name" value={hotel?.name} />
           <DetailRow label="Hotel Type" value={hotel?.hotelType} />
           <DetailRow label="Phone 1" value={hotel?.phone1} />
           <DetailRow label="Phone 2" value={hotel?.phone2} />
-          <DetailRow label="Province" value={hotel?.province} />
           <DetailRow label="District" value={hotel?.district} />
-          <DetailRow label="Location" value={hotel?.location} />
+          <DetailRow label="Address" value={hotel?.address} />
           <DetailRow label="BR Number" value={hotel?.BRnumber} />
           <DetailRow label="License Number" value={hotel?.licenseNumber} />
           <DetailRow
