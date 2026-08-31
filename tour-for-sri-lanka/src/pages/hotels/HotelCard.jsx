@@ -60,7 +60,7 @@ const HotelCard = ({ hotel }) => {
       <div className="w-full h-[165px] xs:h-[180px] sm:h-[200px] md:h-[210px] overflow-hidden">
         <img
           src={image}
-          alt={hotel?.hotelName || "Hotel"}
+          alt={hotel?.name || "Hotel"}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
             e.currentTarget.src = "/hotel_placeholder.jpg";
