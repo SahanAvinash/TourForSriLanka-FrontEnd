@@ -26,6 +26,8 @@ export default function TopBar() {
         }
     }, []);
 
+    const hotelImage = user?.images?.[0] || "";
+
     return (
         <div className="hidden md:flex w-full h-[80px] bg-[#253745] items-center justify-end px-8">
             <div className="flex items-center gap-3">
@@ -35,10 +37,10 @@ export default function TopBar() {
                     {user?.firstName}
                 </span>
 
-                {user?.images[0] ? (
+                {hotelImage ? (
                     <img
-                        src={user.image[0]}
-                        alt="profile"
+                        src={hotelImage}
+                        alt="Hotel profile"
                         className="w-10 h-10 rounded-full object-cover"
                     />
                 ) : (
