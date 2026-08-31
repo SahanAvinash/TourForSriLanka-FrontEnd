@@ -122,45 +122,34 @@ export default function AdminHotels() {
               </div>
 
               {/* Uploaded Documents & PDFs */}
-<div>
-  <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
-    Uploaded Documents & Verification Files
-  </h3>
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
-    {[
-      { label: "BR Certificate", url: selectedHotel.brCertificate },
-      { label: "Hotel License", url: selectedHotel.hotelLicenseFile },
-      { label: "Owner ID / Passport", url: selectedHotel.ownerIdFile },
-      { label: "Address Proof", url: selectedHotel.addressProofFile },
-    ].map((doc, idx) => (
-      doc.url && (
-        <div key={idx} className="bg-black/30 p-3 rounded-lg flex items-center justify-between">
-          <span className="text-xs text-white">📄 {doc.label}</span>
-          <div className="flex gap-2">
-            {/* Direct view / Google Viewer link */}
-            <a 
-              href={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-xs bg-[#00C896]/20 text-[#00C896] px-2.5 py-1 rounded hover:bg-[#00C896] hover:text-white transition-all"
-            >
-              Preview
-            </a>
-            {/* Direct download/open link */}
-            <a 
-              href={doc.url} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-xs bg-gray-700 text-gray-300 px-2.5 py-1 rounded hover:bg-gray-600 transition-all"
-            >
-              Download
-            </a>
-          </div>
-        </div>
-      )
-    ))}
-  </div>
-</div>
+              <div>
+                <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
+                  Uploaded Documents & Verification Files
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
+                  {[
+                    { label: "BR Certificate", url: selectedHotel.brCertificate },
+                    { label: "Hotel License", url: selectedHotel.hotelLicenseFile },
+                    { label: "Owner ID / Passport", url: selectedHotel.ownerIdFile },
+                    { label: "Address Proof", url: selectedHotel.addressProofFile },
+                  ].map((doc, idx) => (
+                    doc.url && (
+                      <div key={idx} className="bg-black/30 p-3 rounded-lg flex items-center justify-between">
+                        <span className="text-xs text-white">📄 {doc.label}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(doc.url, "_blank");
+                          }}
+                          className="text-xs bg-[#00C896]/20 text-[#00C896] px-3 py-1.5 rounded hover:bg-[#00C896] hover:text-white transition-all cursor-pointer font-semibold"
+                        >
+                          View PDF
+                        </button>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </div>
 
               {/* Images Preview */}
               {selectedHotel.images?.length > 0 && (
