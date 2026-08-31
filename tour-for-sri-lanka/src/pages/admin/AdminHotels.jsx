@@ -158,7 +158,7 @@ export default function AdminHotels() {
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-black/20 p-4 rounded-xl">
                     {selectedHotel.images.map((imgUrl, index) => (
-                      
+                      <a
                         key={index}
                         href={imgUrl}
                         target="_blank"
