@@ -40,7 +40,9 @@ export default function Bookings() {
 
     function fetchBookings() {
         setLoadingBookings(true);
-        axios.get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
+        axios.get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`, {
+            headers: getAuthHeader()
+        })
             .then((res) => {
                 setBookings(res.data);
             }).catch((error) => {
@@ -120,12 +122,27 @@ export default function Bookings() {
                             <tbody>
                                 {filteredBookings.map((booking) => {
                                     const status = STATUS_META[booking.status] || STATUS_META.pending;
+                                    const photoUrl = booking.travelerId?.profileImage;
                                     return (
                                         <tr key={booking._id} className="border-t border-[#4A5C6A]/40">
                                             <td className="py-4 pr-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-[45px] h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0">
-                                                        <FaUser className="text-[#4A5C6A] text-[16px]" />
+                                                    <div className="w-[45px] h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                        {photoUrl ? (
+                                                            <img
+                                                                src={photoUrl}
+                                                                alt={booking.travelerId?.firstName || "Traveler"}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = "none";
+                                                                    e.target.nextSibling.style.display = "flex";
+                                                                }}
+                                                            />
+                                                        ) : null}
+                                                        <FaUser
+                                                            className="text-[#4A5C6A] text-[16px]"
+                                                            style={{ display: photoUrl ? "none" : "flex" }}
+                                                        />
                                                     </div>
                                                     <div>
                                                         <p className="text-[#CCD0CF] font-bold text-[14px]">
