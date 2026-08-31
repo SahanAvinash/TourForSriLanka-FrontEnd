@@ -11,32 +11,59 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
-export default function Sidebar() {
-  const [activeSection, setActiveSection] = useState("overview");
+export const hotelOwnerMenu = [
+  {
+    name: "Overview",
+    icon: <FaHome />,
+    id: "overview",
+  },
+  {
+    name: "Room Management",
+    icon: <FaBed />,
+    id: "rooms",
+  },
+  {
+    name: "Bookings",
+    icon: <SiBookingdotcom />,
+    id: "bookings",
+  },
+  {
+    name: "Reviews",
+    icon: <FaStar />,
+    id: "reviews",
+  },
+  {
+    name: "Profile",
+    icon: <FaCog />,
+    id: "profile",
+  },
+];
+
+export default function Sidebar({
+  activeSection,
+  setActiveSection,
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-
-  const menu = [
-    { name: "Overview", icon: <FaHome />, id: "overview" },
-    { name: "Room Management", icon: <FaBed />, id: "rooms" },
-    { name: "Bookings", icon: <SiBookingdotcom />, id: "bookings" },
-    { name: "Reviews", icon: <FaStar />, id: "reviews" },
-    { name: "Profile", icon: <FaCog />, id: "profile" },
-  ];
 
   useEffect(() => {
     const sections = document.querySelectorAll("section[id]");
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
+        const visibleSections = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              a.boundingClientRect.top - b.boundingClientRect.top
+          );
+
+        if (visibleSections.length > 0) {
+          setActiveSection(visibleSections[0].target.id);
+        }
       },
       {
-        rootMargin: "-40% 0px -55% 0px",
+        rootMargin: "-20% 0px -65% 0px",
         threshold: 0,
       }
     );
@@ -44,14 +71,26 @@ export default function Sidebar() {
     sections.forEach((section) => observer.observe(section));
 
     return () => observer.disconnect();
-  }, []);
+  }, [setActiveSection]);
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    const section = document.getElementById(id);
 
+    if (section) {
+      const offset = window.innerWidth < 768 ? 80 : 20;
+
+      const sectionTop =
+        section.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
+
+      window.scrollTo({
+        top: sectionTop,
+        behavior: "smooth",
+      });
+    }
+
+    setActiveSection(id);
     setSidebarOpen(false);
   };
 
@@ -89,7 +128,11 @@ export default function Sidebar() {
       <aside
         className={`w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col overflow-y-auto z-50
         transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        ${
+          sidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full"
+        }
         md:translate-x-0`}
       >
         <div className="h-[60px] md:h-auto md:py-8 flex items-center justify-center relative border-b border-[#4A5C6A]/40 md:border-0">
@@ -109,12 +152,11 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex-1 px-4 sm:px-5 pt-5 md:pt-0">
-          {menu.map((item) => (
+          {hotelOwnerMenu.map((item) => (
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-3 transition-all duration-300
-              ${
+              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-3 transition-all duration-300 ${
                 activeSection === item.id
                   ? "bg-[#00C896] text-white"
                   : "text-gray-300 hover:bg-[#2F4156]"
