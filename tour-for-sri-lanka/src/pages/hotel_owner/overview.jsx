@@ -155,9 +155,9 @@ export default function Overview() {
   return (
     <section
       id="overview"
-      className="w-full max-w-full flex flex-col items-center px-3 sm:px-5 md:px-6 lg:px-0 pt-24 sm:pt-28 overflow-x-hidden"
+      className="w-full max-w-[1100px] mx-auto flex flex-col items-start px-3 sm:px-5 md:px-6 lg:px-0 pt-16 sm:pt-20 overflow-x-hidden"
     >
-      <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-center gap-2 mb-2">
+      <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2 mb-2">
         <div className="flex items-center gap-2">
           <h1 className="text-[#CCD0CF] text-2xl sm:text-3xl font-extrabold tracking-wide">
             Overview
@@ -173,14 +173,14 @@ export default function Overview() {
         </span>
       </div>
 
-      <div className="w-full max-w-[1100px] flex items-center justify-start mb-6">
+      <div className="w-full flex items-center justify-start mb-6">
         <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
           {hotelName}
         </p>
       </div>
 
       {!isApproved && !loadingStats && (
-        <div className="w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+        <div className="w-full bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
           <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
 
           <div>
@@ -196,7 +196,7 @@ export default function Overview() {
         </div>
       )}
 
-      <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
         {stats.map((stat, index) => (
           <div
             key={stat.label}
