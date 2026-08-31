@@ -1,179 +1,225 @@
 import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
-import {FaBed, FaCalendarCheck, FaStar } from "react-icons/fa"
+import {
+  FaBed,
+  FaCalendarCheck,
+  FaStar,
+} from "react-icons/fa";
 import { GrVmMaintenance } from "react-icons/gr";
-import { MdVerified } from "react-icons/md";
-import { MdEventAvailable } from "react-icons/md";
-import { MdPending } from "react-icons/md";
+import {
+  MdVerified,
+  MdEventAvailable,
+  MdPending,
+} from "react-icons/md";
 import axios from "axios";
 
-export default function Overview(){
-    const [roomCount, setRoomCount] = useState(0)
-    const [loadingStats, setLoadingStats] = useState(true)
-    const [hotelName, setHotelName] = useState("")
-    const [isApproved, setIsApproved] = useState(false)
-    const [availableRooms, setAvailableRooms] = useState(0)
-    const [maintenanceRooms, setMaintenanceRooms] = useState(0)
+export default function Overview() {
+  const [roomCount, setRoomCount] = useState(0);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [hotelName, setHotelName] = useState("");
+  const [isApproved, setIsApproved] = useState(false);
+  const [availableRooms, setAvailableRooms] = useState(0);
+  const [maintenanceRooms, setMaintenanceRooms] = useState(0);
+  const [todayBookings, setTodayBookings] = useState(0);
+  const [pendingBookings, setPendingBookings] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
 
-    const [todayBookings, setTodayBookings] = useState(0)
-    const [pendingBookings, setPendingBookings] = useState(0)
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-    const [averageRating, setAverageRating] = useState(0)
-    const [reviewCount, setReviewCount] = useState(0)
+  useEffect(() => {
+    const storedUser =
+      localStorage.getItem("user") ||
+      sessionStorage.getItem("user");
 
-    const today = new Date().toLocaleDateString("en-US",{
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    })
+    if (!storedUser) {
+      setLoadingStats(false);
+      return;
+    }
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user")
-        if(!storedUser) return
+    const user = JSON.parse(storedUser);
+    const hotelId = user._id;
 
-        const user = JSON.parse(storedUser)
-        const hotelId = user._id
+    setHotelName(user.hotelName || "");
 
-        setHotelName(user.hotelName || "")
-        
-        axios.get(`${API_BASE_URL}/api/hotel/${hotelId}`)
-            .then((res) => {
-                setIsApproved(res.data.isApproved || false)
-            }).catch((error) => {
-                console.log(error)
-            })
+    axios
+      .get(`${API_BASE_URL}/api/hotel/${hotelId}`)
+      .then((res) => {
+        setIsApproved(res.data.isApproved || false);
+      })
+      .catch(() => {});
 
-        axios.get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
-            .then((res) => {
-                const rooms = res.data
-                setRoomCount(rooms.length)
-                setAvailableRooms(rooms.filter(r => r.status === "available").length)
-                setMaintenanceRooms(rooms.filter(r => r.status === "maintenance").length)
-            }).catch((error) => {
-                console.log(error)
-            }).finally(() => {
-                setLoadingStats(false)
-            })
+    axios
+      .get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
+      .then((res) => {
+        const rooms = res.data;
 
-        axios.get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
-            .then((res) => {
-                const bookings = res.data
-                const todayStr = new Date().toDateString()
+        setRoomCount(rooms.length);
 
-                setPendingBookings(bookings.filter(b => b.status === "pending").length)
-                setTodayBookings(bookings.filter(b => new Date(b.checkInDate).toDateString() === todayStr).length)
-            }).catch((error) => {
-                console.log(error)
-            })
+        setAvailableRooms(
+          rooms.filter((room) => room.status === "available").length
+        );
 
-        axios.get(`${API_BASE_URL}/api/review/hotel/${hotelId}`)
-            .then((res) => {
-                const reviews = res.data
-                if (reviews.length > 0) {
-                    const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-                    setAverageRating(avg)
-                    setReviewCount(reviews.length)
-                }
-            }).catch((error) => {
-                console.log(error)
-            })
-    },[])
-    return(
-        <section id="overview">
-            {!isApproved && !loadingStats && (
-                <div className="overview-alert-anim bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
-                    <MdPending className="text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0"/>
-                    <div>
-                        <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-semibold">Verification Pending</p>
-                        <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">Your hotel is under review. Some features may be limited until approval.</p>
-                    </div>
-                </div>
-            )}
+        setMaintenanceRooms(
+          rooms.filter((room) => room.status === "maintenance").length
+        );
+      })
+      .catch(() => {})
+      .finally(() => {
+        setLoadingStats(false);
+      });
 
-            <div className="overview-header-anim flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mb-1">
-                <h1 className="text-[#CCD0CF] text-[20px] sm:text-[24px] font-bold">Overview</h1>
-                <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[16px]">{today}</span>
+    axios
+      .get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
+      .then((res) => {
+        const bookings = res.data;
+        const todayStr = new Date().toDateString();
+
+        setPendingBookings(
+          bookings.filter((booking) => booking.status === "pending").length
+        );
+
+        setTodayBookings(
+          bookings.filter(
+            (booking) =>
+              new Date(booking.checkInDate).toDateString() === todayStr
+          ).length
+        );
+      })
+      .catch(() => {});
+
+    axios
+      .get(`${API_BASE_URL}/api/review/hotel/${hotelId}`)
+      .then((res) => {
+        const reviews = res.data;
+
+        if (reviews.length > 0) {
+          const avg =
+            reviews.reduce((sum, review) => sum + review.rating, 0) /
+            reviews.length;
+
+          setAverageRating(avg);
+          setReviewCount(reviews.length);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const stats = [
+    {
+      label: "Total Rooms",
+      value: roomCount,
+      icon: <FaBed />,
+    },
+    {
+      label: "Available Rooms",
+      value: availableRooms,
+      icon: <MdEventAvailable />,
+    },
+    {
+      label: "Today Bookings",
+      value: todayBookings,
+      icon: <FaCalendarCheck />,
+    },
+    {
+      label: "Pending Bookings",
+      value: pendingBookings,
+      icon: <MdPending />,
+    },
+    {
+      label: "Maintenance Rooms",
+      value: maintenanceRooms,
+      icon: <GrVmMaintenance />,
+    },
+    {
+      label: "Average Rating",
+      value:
+        reviewCount > 0 ? (
+          <>
+            {averageRating.toFixed(1)}
+            <span className="text-[#FFC107] ml-1">★</span>
+          </>
+        ) : (
+          "No reviews yet"
+        ),
+      icon: <FaStar />,
+      rating: true,
+    },
+  ];
+
+  return (
+    <section
+      id="overview"
+      className="w-full flex flex-col items-center px-4 sm:px-6 lg:px-0"
+    >
+      {!isApproved && !loadingStats && (
+        <div className="w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+          <MdPending className="text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0" />
+
+          <div>
+            <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-semibold">
+              Verification Pending
+            </p>
+
+            <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">
+              Your hotel is under review. Some features may be limited until
+              approval.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full max-w-[1100px] flex flex-col items-center sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
+        <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold text-center sm:text-left">
+          Overview
+        </h1>
+
+        <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[16px] text-center">
+          {today}
+        </span>
+      </div>
+
+      <div className="w-full max-w-[1100px] flex items-center justify-center sm:justify-start">
+        <p className="text-[#CCD0CF] text-[14px] mb-6 text-center sm:text-left">
+          {hotelName}
+        </p>
+
+        {isApproved && (
+          <MdVerified className="text-[#00C896]/80 ml-[10px] text-[20px] mb-6" />
+        )}
+      </div>
+
+      <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px]"
+          >
+            <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
+              {stat.icon}
             </div>
-            <div className="flex">
-                <p className="text-[#CCD0CF] text-[14px] mb-6">{hotelName}</p>
-                {isApproved && (
-                    <MdVerified className="text-[#00C896]/80 ml-[10px] text-[20px]"/>
-                )}
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-[20px]">
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaBed/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Total Rooms</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
-                            {loadingStats? "..." : roomCount}
-                        </p>
-                    </div>
-                </div>
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <MdEventAvailable/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Available Rooms</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
-                            {loadingStats? "..." : availableRooms}
-                        </p>
-                    </div>
-                </div>
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaCalendarCheck/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Today Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
-                            {loadingStats? "..." : todayBookings}
-                        </p>
-                    </div>
-                </div>
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <MdPending/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Pending Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
-                            {loadingStats? "..." : pendingBookings}
-                        </p>
-                    </div>
-                </div>
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <GrVmMaintenance/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Maintance Rooms</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">
-                            {loadingStats? "..." : maintenanceRooms}
-                        </p>
-                    </div>
-                </div>
-                <div className="overview-stat-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaStar/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Average Rating</p>
-                        <p className="text-[#CCD0CF] text-[20px] font-bold">
-                            {loadingStats
-                                ? "..."
-                                : reviewCount > 0
-                                    ? <>{averageRating.toFixed(1)}<span className="text-[#FFC107]">★</span></>
-                                    : "No reviews yet"}
-                        </p>
-                    </div>
-                </div>
+            <div className="min-w-0">
+              <p className="text-[#CCD0CF]/60 text-[12px]">
+                {stat.label}
+              </p>
+
+              <p
+                className={`text-[#CCD0CF] font-bold ${
+                  stat.rating ? "text-[20px]" : "text-[22px]"
+                }`}
+              >
+                {loadingStats ? "..." : stat.value}
+              </p>
             </div>
-        </section>
-    )
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
