@@ -1,50 +1,29 @@
 import {
   FaHome,
-  FaUser,
-  FaHotel,
   FaBed,
   FaStar,
-  FaEnvelope,
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { SiBookingdotcom } from "react-icons/si";
+import { MdMenu, MdClose } from "react-icons/md";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "../../assets/logo.png"
+import logo from "../../assets/logo.png";
 
 export default function Sidebar() {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const menu = [
-    {
-      name: "Overview",
-      icon: <FaHome />,
-      id: "overview",
-    },
-    {
-      name: "Room Management",
-      icon: <FaBed />,
-      id: "rooms",
-    },
-    {
-      name: "Bookings",
-      icon: <SiBookingdotcom />,
-      id: "bookings",
-    },
-    {
-      name: "Reviews",
-      icon: <FaStar />,
-      id: "reviews",
-    },
-    {
-      name: "Profile",
-      icon: <FaCog />,
-      id: "profile",
-    },
+    { name: "Overview", icon: <FaHome />, id: "overview" },
+    { name: "Room Management", icon: <FaBed />, id: "rooms" },
+    { name: "Bookings", icon: <SiBookingdotcom />, id: "bookings" },
+    { name: "Reviews", icon: <FaStar />, id: "reviews" },
+    { name: "Profile", icon: <FaCog />, id: "profile" },
   ];
 
   useEffect(() => {
@@ -74,6 +53,7 @@ export default function Sidebar() {
       behavior: "smooth",
       block: "start",
     });
+    setSidebarOpen(false);
   };
 
   const handleLogout = () => {
@@ -83,41 +63,73 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col owerflow-y-auto">
-      {/* Logo */}
-      <div className="py-8 flex justify-center">
-        <img src={logo} alt="logo" className="w-36" />
-      </div>
-
-      {/* Menu */}
-      <nav className="flex-1 px-5">
-        {menu.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => scrollToSection(item.id)}
-            className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-3 transition-all duration-300
-            ${
-              activeSection === item.id
-                ? "bg-[#00C896] text-white"
-                : "text-gray-300 hover:bg-[#2F4156]"
-            }`}
-          >
-            {item.icon}
-            <span>{item.name}</span>
-          </button>
-        ))}
-      </nav>
-
-      {/* Logout */}
-      <div className="p-5 border-t border-[#4A5C6A]">
+    <>
+      {/* Mobile top bar */}
+      <div className="hotel-sidebar-mobilebar-anim md:hidden fixed top-0 left-0 w-full h-[60px] bg-[#253745] flex items-center px-4 z-30">
         <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 text-red-400 hover:text-red-300"
+          onClick={() => setSidebarOpen(true)}
+          className="text-[#CCD0CF] text-2xl active:scale-90 transition-transform duration-150"
         >
-          <FaSignOutAlt />
-          Logout
+          <MdMenu />
         </button>
+        <img src={logo} alt="logo" className="h-8 object-contain ml-4" />
       </div>
-    </aside>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="modal-backdrop-anim fixed inset-0 bg-black/60 z-40 md:hidden"
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`hotel-sidebar-anim w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col overflow-y-auto z-50 transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        {/* Logo */}
+        <div className="hotel-sidebar-logo-anim py-8 flex items-center justify-center relative">
+          <img src={logo} alt="logo" className="w-36" />
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="md:hidden absolute right-5 text-[#CCD0CF] text-2xl active:scale-90 transition-transform duration-150"
+          >
+            <MdClose />
+          </button>
+        </div>
+
+        {/* Menu */}
+        <nav className="flex-1 px-5">
+          {menu.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              className={`hotel-sidebar-nav-item-anim w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-3 transition-all duration-300
+              ${
+                activeSection === item.id
+                  ? "bg-[#00C896] text-white"
+                  : "text-gray-300 hover:bg-[#2F4156]"
+              }`}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div className="p-5 border-t border-[#4A5C6A]">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 text-red-400 hover:text-red-300"
+          >
+            <FaSignOutAlt />
+            Logout
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

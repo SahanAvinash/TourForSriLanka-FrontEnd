@@ -1348,3 +1348,78 @@
         opacity: 1;
     }
 }
+@keyframes hotelSidebarSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (min-width: 768px) {
+    .hotel-sidebar-anim {
+        opacity: 0;
+        animation: hotelSidebarSlideIn 0.6s ease-out forwards;
+    }
+}
+
+@keyframes hotelSidebarLogoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hotel-sidebar-logo-anim {
+    opacity: 0;
+    animation: hotelSidebarLogoFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes hotelSidebarNavItemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.hotel-sidebar-nav-item-anim {
+    opacity: 0;
+    animation: hotelSidebarNavItemFadeIn 0.5s ease-out forwards;
+}
+.hotel-sidebar-nav-item-anim:nth-child(1) { animation-delay: 0.05s; }
+.hotel-sidebar-nav-item-anim:nth-child(2) { animation-delay: 0.1s; }
+.hotel-sidebar-nav-item-anim:nth-child(3) { animation-delay: 0.15s; }
+.hotel-sidebar-nav-item-anim:nth-child(4) { animation-delay: 0.2s; }
+.hotel-sidebar-nav-item-anim:nth-child(5) { animation-delay: 0.2s; }
+
+.hotel-sidebar-mobilebar-anim {
+    opacity: 0;
+    animation: navbarFadeIn 0.6s ease-out forwards;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+    .hotel-sidebar-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hotel-sidebar-logo-anim,
+    .hotel-sidebar-nav-item-anim,
+    .hotel-sidebar-mobilebar-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
