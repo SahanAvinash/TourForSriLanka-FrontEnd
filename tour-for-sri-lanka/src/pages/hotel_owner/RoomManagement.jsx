@@ -107,6 +107,7 @@ export default function RoomManagement() {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
     const [editingOriginalRoomNumber, setEditingOriginalRoomNumber] = useState(null);
 
     const [roomNumber, setRoomNumber] = useState("");
@@ -564,41 +565,67 @@ export default function RoomManagement() {
                                         </td>
                                         <td className="py-4 relative">
                                             <button
-                                                onClick={() => setOpenMenuId(openMenuId === room._id ? null : room._id)}
+                                                onClick={(e) => {
+                                                    if(openMenuId === room._id){
+                                                        setOpenMenuId(null)
+                                                        return
+                                                    }
+                                                    const rect = e.currentTarget.getBoundingClientRect()
+
+                                                    setMenuPosition({
+                                                        top: rect.bottom + 6,
+                                                        left: rect.right - 170
+                                                    })
+                                                    setOpenMenuId(room._id)
+                                                }}
                                                 className="text-[#CCD0CF]/60 hover:text-[#CCD0CF] cursor-pointer p-2"
                                             >
                                                 <FaEllipsisV />
                                             </button>
                                             {openMenuId === room._id && (
-                                                <>
-                                                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)}></div>
-                                                    <div className="absolute right-0 top-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-999999 w-[170px] shadow-lg">
-                                                        <button
-                                                            onClick={() => startEdit(room)}
-                                                            className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 cursor-pointer"
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleToggleStatus(room)}
-                                                            className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 cursor-pointer"
-                                                        >
-                                                            {room.status === "maintenance" ? "Mark as Available" : "Mark as Maintenance"}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                if (window.confirm(`Delete room ${room.roomNumber}?`)) {
-                                                                    handleDeleteRoom(room.roomNumber);
-                                                                }
-                                                                setOpenMenuId(null);
-                                                            }}
-                                                            className="w-full text-left px-4 py-3 text-[#CD2F31] text-[13px] hover:bg-[#CD2F31]/10 cursor-pointer"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            )}
+    <>
+        <div
+            className="fixed inset-0 z-[9998]"
+            onClick={() => setOpenMenuId(null)}
+        />
+
+        <div
+            className="fixed bg-[#4A5C6A] rounded-[12px] overflow-hidden z-[9999] w-[170px] shadow-lg"
+            style={{
+                top: `${menuPosition.top}px`,
+                left: `${menuPosition.left}px`
+            }}
+        >
+            <button
+                onClick={() => startEdit(room)}
+                className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 cursor-pointer"
+            >
+                Edit
+            </button>
+
+            <button
+                onClick={() => handleToggleStatus(room)}
+                className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 cursor-pointer"
+            >
+                {room.status === "maintenance"
+                    ? "Mark as Available"
+                    : "Mark as Maintenance"}
+            </button>
+
+            <button
+                onClick={() => {
+                    if (window.confirm(`Delete room ${room.roomNumber}?`)) {
+                        handleDeleteRoom(room.roomNumber);
+                    }
+                    setOpenMenuId(null);
+                }}
+                className="w-full text-left px-4 py-3 text-[#CD2F31] text-[13px] hover:bg-[#CD2F31]/10 cursor-pointer"
+            >
+                Delete
+            </button>
+        </div>
+    </>
+)}
                                         </td>
                                     </tr>
                                 ))}
