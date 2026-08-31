@@ -174,12 +174,12 @@ export default function Overview() {
       </div>
     )}
 
-    <div className="w-full max-w-[1100px] flex flex-col items-center md:flex-row md:justify-between md:items-center gap-2 mb-1 overview-header-anim">
-      <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold text-center md:text-left">
+    <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-center gap-2 mb-1 overview-header-anim">
+      <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold text-center sm:text-left">
         Overview
       </h1>
 
-      <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[15px] md:text-[16px] text-center">
+      <span className="text-[#CCD0CF]/60 text-[13px] sm:text-[15px] md:text-[16px] text-center sm:text-right">
         {today}
       </span>
     </div>
