@@ -572,7 +572,7 @@ export default function RoomManagement() {
                                             {openMenuId === room._id && (
                                                 <>
                                                     <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)}></div>
-                                                    <div className="absolute right-0 top-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-20 w-[170px] shadow-lg">
+                                                    <div className="absolute right-0 top-[36px] bg-[#4A5C6A] rounded-[12px] overflow-hidden z-999999 w-[170px] shadow-lg">
                                                         <button
                                                             onClick={() => startEdit(room)}
                                                             className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 cursor-pointer"
