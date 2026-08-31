@@ -426,7 +426,6 @@ const TourPreview = () => {
   const routableStops = route?.routableStops || [];
   const polylinePositions = route.geometry || [];
   const returnPolylinePositions = route.returnGeometry || [];
-  const allMapPositions = [...polylinePositions, ...returnPolylinePositions];
 
   const startCoord =
     (startCoords && startCoords.lat != null && startCoords.lng != null
@@ -440,6 +439,22 @@ const TourPreview = () => {
       "TourPreview: no pinned start location found in sessionStorage (tourStartLat/tourStartLng) and no routableStops[0] from the API — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point."
     );
   }
+  const START_MATCH_THRESHOLD_KM = 0.5
+  const geometryMatchesStart =
+    startCoord &&
+    polylinePositions.length > 0 &&
+    haversineKm(
+      startCoord[0],
+      startCoord[1],
+      polylinePositions[0][0],
+      polylinePositions[0][1]
+    ) <= START_MATCH_THRESHOLD_KM
+
+    const safePolylinePossitions = 
+      startCoord && !geometryMatchesStart
+        ? [startCoord, ...polylinePositions]
+        : polylinePositions
+    const allMapPositions = [...safePolylinePossitions, ...returnPolylinePositions]
 
   const legDistances = destinations.map((dest, index) => {
     const prevCoord = index === 0
@@ -1111,7 +1126,7 @@ const TourPreview = () => {
               </Marker>
             ))}
             <Polyline
-              positions={polylinePositions}
+              positions={safePolylinePossitions}
               pathOptions={{
                 color: "#00C896",
                 weight: 5,
