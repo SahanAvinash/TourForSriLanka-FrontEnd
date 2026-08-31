@@ -1423,3 +1423,75 @@
         opacity: 1;
     }
 }
+@keyframes roomManagementFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes roomManagementFormFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes roomManagementRowFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes roomManagementMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.room-management-anim {
+    opacity: 0;
+    animation: roomManagementFadeIn 0.6s ease-out forwards;
+}
+
+.room-management-form-anim {
+    opacity: 0;
+    animation: roomManagementFormFadeIn 0.4s ease-out forwards;
+}
+
+.room-management-row-anim {
+    opacity: 0;
+    animation: roomManagementRowFadeIn 0.4s ease-out forwards;
+}
+
+.room-management-menu-anim {
+    animation: roomManagementMenuFadeIn 0.15s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .room-management-anim,
+    .room-management-form-anim,
+    .room-management-row-anim,
+    .room-management-menu-anim {
+        animation: none;
+        opacity: 1;
+    }
+}
