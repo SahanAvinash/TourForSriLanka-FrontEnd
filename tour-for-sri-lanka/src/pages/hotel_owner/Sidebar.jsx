@@ -90,8 +90,8 @@ export default function Sidebar() {
         } md:translate-x-0`}
       >
         {/* Logo */}
-        <div className="hotel-sidebar-logo-anim py-8 flex items-center justify-center relative">
-          <img src={logo} alt="logo" className="w-36" />
+        <div className="hotel-sidebar-logo-anim h-[60px] md:h-auto md:py-8 flex items-center justify-center relative">
+          <img src={logo} alt="logo" className="w-28 md:w-36" />
           <button
             onClick={() => setSidebarOpen(false)}
             className="md:hidden absolute right-5 text-[#CCD0CF] text-2xl active:scale-90 transition-transform duration-150"
