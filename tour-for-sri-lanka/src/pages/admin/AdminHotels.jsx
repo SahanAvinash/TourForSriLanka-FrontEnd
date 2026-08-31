@@ -23,9 +23,24 @@ export default function AdminHotels() {
             </span>
           )
         },
+        { header: "Hotel Name", render: (item) => item.name },
+        { header: "Owner", render: (item) => `${item.firstName || ""} ${item.lastName || ""}` },
         { header: "Email", render: (item) => item.email },
+        { header: "Mobile", render: (item) => item.ownerMobile },
         { header: "District", render: (item) => item.district },
-        { header: "Description", render: (item) => item.shortDescription },
+        { 
+          header: "Documents & Details", 
+          render: (item) => (
+            <a 
+              href={`/hotel/${item._id}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#00C896] underline text-xs font-semibold hover:text-white"
+            >
+              View Full Info & PDFs
+            </a>
+          ) 
+        },
       ]}
     />
   );
