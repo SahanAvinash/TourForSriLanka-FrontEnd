@@ -35,9 +35,9 @@ export default function TopBar() {
                     {user?.firstName}
                 </span>
 
-                {user?.profilePhoto ? (
+                {user?.image ? (
                     <img
-                        src={user.profilePhoto}
+                        src={user.image}
                         alt="profile"
                         className="w-10 h-10 rounded-full object-cover"
                     />
