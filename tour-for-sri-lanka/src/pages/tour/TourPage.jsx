@@ -817,7 +817,7 @@ const TourPage = () => {
                 setStartDate(event.target.value);
                 setError("");
               }}
-              className="w-full bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[#00C896]"
+              className="w-full max-w-full box-border bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-[#00C896] [color-scheme:dark]"
             />
           </div>
 
