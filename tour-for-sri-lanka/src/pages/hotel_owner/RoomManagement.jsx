@@ -520,7 +520,7 @@ export default function RoomManagement() {
             rect.bottom + 6;
 
         if (
-            left <
+            left 
             padding
         ) {
             left = padding;
@@ -563,7 +563,7 @@ export default function RoomManagement() {
     return (
         <section
             id="rooms"
-            className="mt-8 md:mt-12 room-management-page-anim"
+            className="mt-6 md:mt-8 room-management-page-anim"
         >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 room-management-header-anim">
                 <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
