@@ -159,7 +159,7 @@ export default function Overview() {
     >
       <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <h1 className="text-[#CCD0CF] text-2xl sm:text-3xl font-extrabold tracking-wide">
+          <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
             Overview
           </h1>
 
