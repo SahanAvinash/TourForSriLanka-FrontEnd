@@ -3,11 +3,31 @@ import Select from "react-select";
 import heroBg from "../../assets/transport/transport-bg.jpg";
 
 const districts = [
-  "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya",
-  "Galle", "Matara", "Hambantota", "Jaffna", "Kilinochchi", "Mannar",
-  "Vavuniya", "Mullaitivu", "Batticaloa", "Ampara", "Trincomalee",
-  "Kurunegala", "Puttalam", "Anuradhapura", "Polonnaruwa", "Badulla",
-  "Monaragala", "Ratnapura", "Kegalle",
+  "Colombo",
+  "Gampaha",
+  "Kalutara",
+  "Kandy",
+  "Matale",
+  "Nuwara Eliya",
+  "Galle",
+  "Matara",
+  "Hambantota",
+  "Jaffna",
+  "Kilinochchi",
+  "Mannar",
+  "Vavuniya",
+  "Mullaitivu",
+  "Batticaloa",
+  "Ampara",
+  "Trincomalee",
+  "Kurunegala",
+  "Puttalam",
+  "Anuradhapura",
+  "Polonnaruwa",
+  "Badulla",
+  "Monaragala",
+  "Ratnapura",
+  "Kegalle",
 ];
 
 const districtOptions = districts.map((district) => ({
@@ -17,6 +37,7 @@ const districtOptions = districts.map((district) => ({
 
 const passengerOptions = Array.from({ length: 15 }, (_, index) => {
   const value = index + 1;
+
   return {
     value,
     label: `${value} ${value === 1 ? "Passenger" : "Passengers"}`,
@@ -40,9 +61,26 @@ const selectStyles = {
     boxShadow: "none",
     justifyContent: "flex-start",
   }),
-  valueContainer: (base) => ({ ...base, padding: "0", flex: "0 1 auto" }),
-  input: (base) => ({ ...base, color: "#CCD0CF", margin: 0, padding: 0 }),
-  singleValue: (base) => ({ ...base, color: "#CCD0CF", margin: 0 }),
+
+  valueContainer: (base) => ({
+    ...base,
+    padding: "0",
+    flex: "0 1 auto",
+  }),
+
+  input: (base) => ({
+    ...base,
+    color: "#CCD0CF",
+    margin: 0,
+    padding: 0,
+  }),
+
+  singleValue: (base) => ({
+    ...base,
+    color: "#CCD0CF",
+    margin: 0,
+  }),
+
   placeholder: (base) => ({
     ...base,
     color: "#CCD0CF",
@@ -50,12 +88,14 @@ const selectStyles = {
     fontSize: "14px",
     margin: 0,
   }),
+
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isFocused ? "#00C896" : "#4A5C6A",
     color: "#CCD0CF",
     cursor: "pointer",
   }),
+
   menu: (base) => ({
     ...base,
     backgroundColor: "#4A5C6A",
@@ -63,34 +103,56 @@ const selectStyles = {
     overflow: "hidden",
     marginTop: "8px",
   }),
-  indicatorSeparator: () => ({ display: "none" }),
+
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+
   dropdownIndicator: (base) => ({
     ...base,
     padding: 0,
     color: "#CCD0CF",
-    "&:hover": { color: "#00C896", opacity: 0.8 },
+    "&:hover": {
+      color: "#00C896",
+      opacity: 0.8,
+    },
   }),
-  indicatorsContainer: (base) => ({ ...base, marginLeft: "6px" }),
-  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+
+  indicatorsContainer: (base) => ({
+    ...base,
+    marginLeft: "6px",
+  }),
+
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
 };
 
-export default function TransportHeroSection({ form, updateForm, onSearch }) {
+export default function TransportHeroSection({
+  form,
+  updateForm,
+  onSearch,
+}) {
   return (
-    <section className="relative pt-24 sm:pt-28 bg-[#071923]">
+    <section className="relative pt-24 sm:pt-28 bg-[#11212D]">
       <div className="relative min-h-[720px] sm:min-h-[620px] lg:h-[430px] lg:min-h-0">
-        <div className="hero-bg-anim absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
+        <div className="absolute inset-x-2 sm:inset-x-4 top-0 bottom-0 rounded-[20px] sm:rounded-[30px] overflow-hidden">
           <img
             src={heroBg}
             alt="Transport"
             className="absolute inset-0 w-full h-full object-cover"
           />
+
           <div className="absolute inset-0 bg-black/45" />
-          <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#071923]/80 to-[#071923]" />
-          <div className="absolute inset-x-0 bottom-0 h-[100px] sm:h-[90px] lg:h-[70px] bg-gradient-to-b from-transparent to-[#071923]" />
+
+          <div className="absolute inset-x-0 bottom-0 h-[330px] sm:h-[280px] lg:h-[190px] bg-gradient-to-b from-transparent via-[#11212D]/80 to-[#11212D]" />
+
+          <div className="absolute inset-x-0 bottom-0 h-[100px] sm:h-[90px] lg:h-[70px] bg-gradient-to-b from-transparent to-[#11212D]" />
         </div>
 
         <div className="absolute left-5 right-5 sm:left-10 sm:right-10 lg:left-12 lg:right-auto top-10 sm:top-16 z-10">
-          <h1 className="hero-title-anim text-white text-[28px] xs:text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
+          <h1 className="hero-title-anim text-white text-[32px] sm:text-5xl lg:text-6xl font-bold leading-tight">
             Find your Perfect
             <br />
             Ride
@@ -105,26 +167,37 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
           <div className="bg-[#455766]/40 sm:bg-[#455766]/45 lg:bg-[#455766]/55 backdrop-blur-xl rounded-[20px] sm:rounded-[28px] border border-white/10 shadow-2xl p-4 sm:p-6 lg:p-0 lg:h-[100px] flex flex-col lg:flex-row lg:items-center lg:px-8">
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <MapPin size={22} className="text-[#00C896] shrink-0" />
+              <MapPin
+                size={22}
+                className="text-[#00C896] shrink-0"
+              />
+
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
                   Choose your
                 </label>
+
                 <Select
                   options={districtOptions}
                   value={
                     districtOptions.find(
-                      (option) => option.value === form.pickupLocation
+                      (option) =>
+                        option.value === form.pickupLocation
                     ) || null
                   }
                   onChange={(selected) =>
-                    updateForm("pickupLocation", selected ? selected.value : "")
+                    updateForm(
+                      "pickupLocation",
+                      selected ? selected.value : ""
+                    )
                   }
                   placeholder="Pick Up Location"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
@@ -135,14 +208,23 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Calendar size={22} className="text-[#00C896] shrink-0" />
+              <Calendar
+                size={22}
+                className="text-[#00C896] shrink-0"
+              />
+
               <div className="w-full min-w-0">
-                <label className="text-sm text-gray-300">Pick Up Date</label>
+                <label className="text-sm text-gray-300">
+                  Pick Up Date
+                </label>
+
                 <input
                   type="date"
                   value={form.pickupDate}
                   min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => updateForm("pickupDate", e.target.value)}
+                  onChange={(e) =>
+                    updateForm("pickupDate", e.target.value)
+                  }
                   className="w-full bg-transparent text-white [color-scheme:dark] outline-none mt-1 text-sm sm:text-base min-w-0"
                 />
               </div>
@@ -152,26 +234,37 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Users size={22} className="text-[#00C896] shrink-0" />
+              <Users
+                size={22}
+                className="text-[#00C896] shrink-0"
+              />
+
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
                   Passengers
                 </label>
+
                 <Select
                   options={passengerOptions}
                   value={
                     passengerOptions.find(
-                      (option) => option.value === form.passengers
+                      (option) =>
+                        option.value === form.passengers
                     ) || null
                   }
                   onChange={(selected) =>
-                    updateForm("passengers", selected ? selected.value : "")
+                    updateForm(
+                      "passengers",
+                      selected ? selected.value : ""
+                    )
                   }
                   placeholder="Select"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
@@ -182,25 +275,36 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
             <div className="lg:hidden h-px w-full bg-white/10 my-4" />
 
             <div className="flex items-center gap-3 w-full lg:flex-1 min-w-0">
-              <Briefcase size={22} className="text-[#00C896] shrink-0" />
+              <Briefcase
+                size={22}
+                className="text-[#00C896] shrink-0"
+              />
+
               <div className="w-full min-w-0">
                 <label className="block text-sm text-gray-300 mb-0.5">
                   Bags
                 </label>
+
                 <Select
                   options={bagsOptions}
                   value={
-                    bagsOptions.find((option) => option.value === form.bags) ||
-                    null
+                    bagsOptions.find(
+                      (option) => option.value === form.bags
+                    ) || null
                   }
                   onChange={(selected) =>
-                    updateForm("bags", selected ? selected.value : "")
+                    updateForm(
+                      "bags",
+                      selected ? selected.value : ""
+                    )
                   }
                   placeholder="Select"
                   styles={selectStyles}
                   menuShouldScrollIntoView={false}
                   menuPortalTarget={
-                    typeof document !== "undefined" ? document.body : null
+                    typeof document !== "undefined"
+                      ? document.body
+                      : null
                   }
                   className="mt-1"
                 />
@@ -218,7 +322,8 @@ export default function TransportHeroSection({ form, updateForm, onSearch }) {
         </div>
       </div>
 
-      <div className="-mt-2 h-[70px] sm:h-[80px] lg:h-[100px] bg-[#071923] relative z-10" />
+      {/* Me spacer div eke negative margin ekak (-mt-2) dila a line eka complete hide kala */}
+      <div className="-mt-2 h-[70px] sm:h-[80px] lg:h-[100px] bg-[#11212D] relative z-10" />
     </section>
   );
 }
