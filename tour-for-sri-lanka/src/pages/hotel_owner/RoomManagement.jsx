@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import {
     FaBed,
-    FaTrash,
     FaPlus,
     FaMinus,
     FaTimes,
@@ -189,7 +188,7 @@ export default function RoomManagement() {
             const user = JSON.parse(storedUser);
             setHotelId(user._id);
         } catch (error) {
-            console.log(error);
+            console.error("Failed to parse stored user:", error);
         }
     }, []);
 
@@ -208,7 +207,7 @@ export default function RoomManagement() {
                 setIsApproved(res.data.isApproved === true);
             })
             .catch((error) => {
-                console.log(error);
+                console.error("Failed to fetch hotel:", error);
             });
     }, [hotelId]);
 
@@ -227,15 +226,17 @@ export default function RoomManagement() {
     }, [openMenuId]);
 
     function fetchRooms() {
+        if (!hotelId) return;
+
         setLoadingRooms(true);
 
         axios
             .get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
-                setRooms(res.data);
+                setRooms(Array.isArray(res.data) ? res.data : []);
             })
             .catch((error) => {
-                console.log(error);
+                console.error("Failed to load rooms:", error);
                 toast.error("Failed to load rooms");
             })
             .finally(() => {
@@ -249,7 +250,7 @@ export default function RoomManagement() {
         setCapacity(null);
         setPricePerNight("");
         setShortDescription("");
-        setRoomFacility(EMPTY_FACILITIES);
+        setRoomFacility({ ...EMPTY_FACILITIES });
         setOtherFacility([]);
         setOtherFacilityInput("");
         setImages([]);
@@ -259,15 +260,15 @@ export default function RoomManagement() {
 
     function startEdit(room) {
         setEditingOriginalRoomNumber(room.roomNumber);
-        setRoomNumber(room.roomNumber);
-        setRoomType(room.roomType);
-        setCapacity(room.capacity);
-        setPricePerNight(room.pricePerNight);
-        setShortDescription(room.shortDescription);
+        setRoomNumber(room.roomNumber || "");
+        setRoomType(room.roomType || "");
+        setCapacity(room.capacity || null);
+        setPricePerNight(room.pricePerNight || "");
+        setShortDescription(room.shortDescription || "");
 
         setRoomFacility({
             ...EMPTY_FACILITIES,
-            ...room.roomFacility
+            ...(room.roomFacility || {})
         });
 
         setOtherFacility(room.otherFacility || []);
@@ -287,7 +288,7 @@ export default function RoomManagement() {
     }
 
     function handleImageUpload(e) {
-        const files = Array.from(e.target.files);
+        const files = Array.from(e.target.files || []);
 
         if (images.length + files.length > 5) {
             toast.error("Maximum 5 images allowed");
@@ -317,9 +318,9 @@ export default function RoomManagement() {
 
         Promise.all(uploadPromises)
             .then((responses) => {
-                const urls = responses.map(
-                    (res) => res.data.url
-                );
+                const urls = responses
+                    .map((res) => res.data?.url)
+                    .filter(Boolean);
 
                 setImages((prev) => [
                     ...prev,
@@ -327,7 +328,7 @@ export default function RoomManagement() {
                 ]);
             })
             .catch((error) => {
-                console.log(error);
+                console.error("Image upload failed:", error);
                 toast.error("Image upload failed");
             })
             .finally(() => {
@@ -380,9 +381,9 @@ export default function RoomManagement() {
         e.preventDefault();
 
         if (
-            !roomNumber ||
+            !roomNumber.trim() ||
             !pricePerNight ||
-            !shortDescription ||
+            !shortDescription.trim() ||
             !roomType ||
             !capacity
         ) {
@@ -390,15 +391,20 @@ export default function RoomManagement() {
             return;
         }
 
+        if (!hotelId) {
+            toast.error("Hotel information not found");
+            return;
+        }
+
         setSubmitting(true);
 
         const payload = {
             hotelId,
-            roomNumber,
+            roomNumber: roomNumber.trim(),
             roomType,
             capacity,
             pricePerNight,
-            shortDescription,
+            shortDescription: shortDescription.trim(),
             roomFacility,
             otherFacility,
             images
@@ -432,7 +438,7 @@ export default function RoomManagement() {
                 fetchRooms();
             })
             .catch((error) => {
-                console.log(error);
+                console.error("Room submission failed:", error);
 
                 toast.error(
                     error.response?.data?.error ||
@@ -445,6 +451,8 @@ export default function RoomManagement() {
     }
 
     function handleDeleteRoom(roomNumberToDelete) {
+        if (!hotelId) return;
+
         axios
             .delete(
                 `${API_BASE_URL}/api/addRoom/${hotelId}/${roomNumberToDelete}`,
@@ -457,7 +465,7 @@ export default function RoomManagement() {
                 fetchRooms();
             })
             .catch((error) => {
-                console.log(error);
+                console.error("Room removal failed:", error);
 
                 toast.error(
                     error.response?.data?.error ||
@@ -467,6 +475,8 @@ export default function RoomManagement() {
     }
 
     function handleToggleStatus(room) {
+        if (!hotelId) return;
+
         const newStatus =
             room.status === "maintenance"
                 ? "available"
@@ -491,7 +501,10 @@ export default function RoomManagement() {
                 setOpenMenuId(null);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(
+                    "Failed to update room status:",
+                    error
+                );
 
                 toast.error(
                     error.response?.data?.error ||
@@ -513,16 +526,10 @@ export default function RoomManagement() {
         const menuHeight = 150;
         const padding = 10;
 
-        let left =
-            rect.right - menuWidth;
+        let left = rect.right - menuWidth;
+        let top = rect.bottom + 6;
 
-        let top =
-            rect.bottom + 6;
-
-        if (
-            left 
-            padding
-        ) {
+        if (left < padding) {
             left = padding;
         }
 
@@ -544,6 +551,10 @@ export default function RoomManagement() {
                 rect.top -
                 menuHeight -
                 6;
+        }
+
+        if (top < padding) {
+            top = padding;
         }
 
         setMenuPosition({
@@ -571,6 +582,7 @@ export default function RoomManagement() {
                 </h1>
 
                 <button
+                    type="button"
                     onClick={() => {
                         if (showAddForm) {
                             resetForm();
@@ -598,15 +610,9 @@ export default function RoomManagement() {
                     }}
                     className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896]/80 hover:bg-[#00C896] active:scale-[0.98] transition-all duration-300 text-white px-5 py-2.5 rounded-[15px] text-[14px] font-semibold cursor-pointer"
                 >
-                    {showAddForm ? (
-                        <FaMinus />
-                    ) : (
-                        <FaPlus />
-                    )}
+                    {showAddForm ? <FaMinus /> : <FaPlus />}
 
-                    {showAddForm
-                        ? "Close"
-                        : "Add Room"}
+                    {showAddForm ? "Close" : "Add Room"}
                 </button>
             </div>
 
@@ -628,9 +634,7 @@ export default function RoomManagement() {
                             value={roomNumber}
                             placeholder="Room Number"
                             onChange={(e) =>
-                                setRoomNumber(
-                                    e.target.value
-                                )
+                                setRoomNumber(e.target.value)
                             }
                             className="w-full h-[45px] bg-[#4A5C6A80] rounded-[20px] outline-none px-4 text-[#CCD0CF] text-[12px]"
                         />
@@ -646,9 +650,7 @@ export default function RoomManagement() {
                                     value === "" ||
                                     Number(value) >= 0
                                 ) {
-                                    setPricePerNight(
-                                        value
-                                    );
+                                    setPricePerNight(value);
                                 }
                             }}
                             onKeyDown={(e) => {
@@ -701,8 +703,7 @@ export default function RoomManagement() {
                             }
                             onChange={(selected) =>
                                 setCapacity(
-                                    selected?.value ||
-                                        null
+                                    selected?.value || null
                                 )
                             }
                             placeholder="No of Guests"
@@ -731,32 +732,28 @@ export default function RoomManagement() {
                         </label>
 
                         <div className="flex flex-wrap gap-3">
-                            {images.map(
-                                (url, index) => (
-                                    <div
-                                        key={index}
-                                        className="relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] room-image-anim"
-                                    >
-                                        <img
-                                            src={url}
-                                            alt="room"
-                                            className="w-full h-full object-cover rounded-[10px]"
-                                        />
+                            {images.map((url, index) => (
+                                <div
+                                    key={`${url}-${index}`}
+                                    className="relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] room-image-anim"
+                                >
+                                    <img
+                                        src={url}
+                                        alt="room"
+                                        className="w-full h-full object-cover rounded-[10px]"
+                                    />
 
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                removeImage(
-                                                    index
-                                                )
-                                            }
-                                            className="absolute -top-2 -right-2 bg-[#CD2F31] rounded-full w-[20px] h-[20px] flex items-center justify-center text-white text-[10px] cursor-pointer hover:scale-110 transition-transform"
-                                        >
-                                            <FaTimes />
-                                        </button>
-                                    </div>
-                                )
-                            )}
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            removeImage(index)
+                                        }
+                                        className="absolute -top-2 -right-2 bg-[#CD2F31] rounded-full w-[20px] h-[20px] flex items-center justify-center text-white text-[10px] cursor-pointer hover:scale-110 transition-transform"
+                                    >
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                            ))}
 
                             {images.length < 5 && (
                                 <label className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-[10px] border-2 border-dashed border-[#4A5C6A] flex items-center justify-center cursor-pointer text-[#CCD0CF]/50 hover:text-[#00C896] hover:border-[#00C896] transition-all duration-300">
@@ -926,9 +923,7 @@ export default function RoomManagement() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) =>
-                                setSearchTerm(
-                                    e.target.value
-                                )
+                                setSearchTerm(e.target.value)
                             }
                             placeholder="Search room by room number"
                             className="w-full h-[42px] bg-[#4A5C6A]/50 rounded-[20px] pl-[16px] pr-[40px] text-[#CCD0CF] text-[13px] outline-none focus:ring-1 focus:ring-[#00C896]/50"
@@ -985,20 +980,17 @@ export default function RoomManagement() {
                                             className="border-t border-[#4A5C6A]/40 room-row-anim"
                                             style={{
                                                 animationDelay: `${
-                                                    index *
-                                                    0.06
+                                                    index * 0.06
                                                 }s`
                                             }}
                                         >
                                             <td className="py-4 pr-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-[55px] h-[55px] sm:w-[60px] sm:h-[60px] rounded-[10px] bg-[#1B2B34] flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                        {room
-                                                            .images?.[0] ? (
+                                                        {room.images?.[0] ? (
                                                             <img
                                                                 src={
-                                                                    room
-                                                                        .images[0]
+                                                                    room.images[0]
                                                                 }
                                                                 alt={
                                                                     room.roomNumber
@@ -1027,10 +1019,7 @@ export default function RoomManagement() {
                                             </td>
 
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
-                                                {
-                                                    room.capacity
-                                                }{" "}
-                                                Guests
+                                                {room.capacity} Guests
                                             </td>
 
                                             <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
@@ -1062,9 +1051,8 @@ export default function RoomManagement() {
 
                                             <td className="py-4 relative">
                                                 <button
-                                                    onClick={(
-                                                        e
-                                                    ) =>
+                                                    type="button"
+                                                    onClick={(e) =>
                                                         handleActionMenu(
                                                             e,
                                                             room._id
@@ -1101,22 +1089,19 @@ export default function RoomManagement() {
                         }}
                     >
                         {(() => {
-                            const room =
-                                rooms.find(
-                                    (item) =>
-                                        item._id ===
-                                        openMenuId
-                                );
+                            const room = rooms.find(
+                                (item) =>
+                                    item._id === openMenuId
+                            );
 
                             if (!room) return null;
 
                             return (
                                 <>
                                     <button
+                                        type="button"
                                         onClick={() =>
-                                            startEdit(
-                                                room
-                                            )
+                                            startEdit(room)
                                         }
                                         className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 active:bg-[#00C896]/30 transition-colors cursor-pointer"
                                     >
@@ -1124,6 +1109,7 @@ export default function RoomManagement() {
                                     </button>
 
                                     <button
+                                        type="button"
                                         onClick={() =>
                                             handleToggleStatus(
                                                 room
@@ -1138,6 +1124,7 @@ export default function RoomManagement() {
                                     </button>
 
                                     <button
+                                        type="button"
                                         onClick={() => {
                                             if (
                                                 window.confirm(
@@ -1149,9 +1136,7 @@ export default function RoomManagement() {
                                                 );
                                             }
 
-                                            setOpenMenuId(
-                                                null
-                                            );
+                                            setOpenMenuId(null);
                                         }}
                                         className="w-full text-left px-4 py-3 text-[#CD2F31] text-[13px] hover:bg-[#CD2F31]/10 active:bg-[#CD2F31]/20 transition-colors cursor-pointer"
                                     >
