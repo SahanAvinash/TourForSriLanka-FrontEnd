@@ -8,40 +8,31 @@ import Reviews from "./Reviews";
 import Profile from "./Profile";
 
 export default function HotelOwnerDashboard() {
-  const [activeSection, setActiveSection] = useState("overview");
+    const [activeSection, setActiveSection] =
+        useState("overview");
 
-  return (
-    <div className="flex flex-col md:flex-row bg-gradient-to-r from-[#06141B] to-[#253745] min-h-screen overflow-x-hidden">
-      <Sidebar
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-      />
+    return (
+        <div className="flex flex-col md:flex-row bg-gradient-to-r from-[#06141B] to-[#253745] min-h-screen overflow-x-hidden">
+            <Sidebar
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+            />
 
-      <div className="flex-1 flex flex-col min-w-0 md:ml-64 pt-[60px] md:pt-0">
-        <TopBar />
+            <div className="flex-1 flex flex-col min-w-0 md:ml-64 pt-[60px] md:pt-0">
+                <TopBar />
 
-        <main className="flex-1 w-full py-6 md:py-8">
-          <section id="overview" className="w-full">
-            <Overview />
-          </section>
+                <main className="flex-1 w-full py-6 md:py-8">
+                    <Overview />
 
-          <section id="rooms" className="w-full">
-            <RoomManagement />
-          </section>
+                    <RoomManagement />
 
-          <section id="bookings" className="w-full">
-            <Bookings />
-          </section>
+                    <Bookings />
 
-          <section id="reviews" className="w-full">
-            <Reviews />
-          </section>
+                    <Reviews />
 
-          <section id="profile" className="w-full">
-            <Profile />
-          </section>
-        </main>
-      </div>
-    </div>
-  );
+                    <Profile />
+                </main>
+            </div>
+        </div>
+    );
 }
