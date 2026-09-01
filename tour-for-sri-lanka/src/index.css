@@ -1430,8 +1430,38 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   -webkit-text-fill-color: #ffffff !important;
   opacity: 1 !important;
 }
+.tour-date-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 42px;
+  min-height: 42px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #3A4B58;
+  border-radius: 6px;
+  background-color: #253745;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 24px;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+.tour-date-input:focus {
+  outline: none;
+  border-color: #00C896;
+}
+
+.tour-date-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.tour-date-input::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 1;
+  cursor: pointer;
 }
