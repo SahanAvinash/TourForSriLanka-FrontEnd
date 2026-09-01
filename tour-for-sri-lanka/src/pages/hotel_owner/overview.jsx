@@ -42,34 +42,60 @@ export default function Overview() {
       return;
     }
 
-    const user = JSON.parse(storedUser);
+    let user;
+
+    try {
+      user = JSON.parse(storedUser);
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+      setLoadingStats(false);
+      return;
+    }
+
     const hotelId = user._id;
+
+    if (!hotelId) {
+      setLoadingStats(false);
+      return;
+    }
 
     setHotelName(user.hotelName || "");
 
     axios
       .get(`${API_BASE_URL}/api/hotel/${hotelId}`)
       .then((res) => {
-        setIsApproved(res.data.isApproved || false);
+        setIsApproved(res.data?.isApproved === true);
+
+        if (!user.hotelName && res.data?.hotelName) {
+          setHotelName(res.data.hotelName);
+        }
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error("Failed to load hotel:", error);
+      });
 
     axios
       .get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
       .then((res) => {
-        const rooms = res.data;
+        const rooms = Array.isArray(res.data) ? res.data : [];
 
         setRoomCount(rooms.length);
 
         setAvailableRooms(
-          rooms.filter((room) => room.status === "available").length
+          rooms.filter(
+            (room) => room.status === "available"
+          ).length
         );
 
         setMaintenanceRooms(
-          rooms.filter((room) => room.status === "maintenance").length
+          rooms.filter(
+            (room) => room.status === "maintenance"
+          ).length
         );
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.error("Failed to load rooms:", error);
+      })
       .finally(() => {
         setLoadingStats(false);
       });
@@ -77,37 +103,67 @@ export default function Overview() {
     axios
       .get(`${API_BASE_URL}/api/booking/hotel/${hotelId}`)
       .then((res) => {
-        const bookings = res.data;
+        const bookings = Array.isArray(res.data)
+          ? res.data
+          : [];
+
         const todayStr = new Date().toDateString();
 
         setPendingBookings(
-          bookings.filter((booking) => booking.status === "pending").length
+          bookings.filter(
+            (booking) => booking.status === "pending"
+          ).length
         );
 
         setTodayBookings(
-          bookings.filter(
-            (booking) =>
-              new Date(booking.checkInDate).toDateString() === todayStr
-          ).length
+          bookings.filter((booking) => {
+            if (!booking.checkInDate) return false;
+
+            const checkInDate = new Date(
+              booking.checkInDate
+            );
+
+            return (
+              !Number.isNaN(checkInDate.getTime()) &&
+              checkInDate.toDateString() === todayStr
+            );
+          }).length
         );
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error("Failed to load bookings:", error);
+      });
 
     axios
       .get(`${API_BASE_URL}/api/review/hotel/${hotelId}`)
       .then((res) => {
-        const reviews = res.data;
+        const reviews = Array.isArray(res.data)
+          ? res.data
+          : [];
 
         if (reviews.length > 0) {
-          const avg =
-            reviews.reduce((sum, review) => sum + review.rating, 0) /
-            reviews.length;
+          const validRatings = reviews
+            .map((review) => Number(review.rating))
+            .filter((rating) => !Number.isNaN(rating));
 
-          setAverageRating(avg);
-          setReviewCount(reviews.length);
+          if (validRatings.length > 0) {
+            const avg =
+              validRatings.reduce(
+                (sum, rating) => sum + rating,
+                0
+              ) / validRatings.length;
+
+            setAverageRating(avg);
+            setReviewCount(validRatings.length);
+          }
+        } else {
+          setAverageRating(0);
+          setReviewCount(0);
         }
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error("Failed to load reviews:", error);
+      });
   }, []);
 
   const stats = [
@@ -142,7 +198,9 @@ export default function Overview() {
         reviewCount > 0 ? (
           <>
             {averageRating.toFixed(1)}
-            <span className="text-[#FFC107] ml-1">★</span>
+            <span className="text-[#FFC107] ml-1">
+              ★
+            </span>
           </>
         ) : (
           "No reviews yet"
@@ -155,72 +213,76 @@ export default function Overview() {
   return (
     <section
       id="overview"
-      className="w-full flex flex-col  justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-6 sm:pt-8q overflow-x-hidden"
+      className="w-full flex flex-col justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10"
     >
-      <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-        <div className="flex items-center gap-2">
-          <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
-            Overview
-          </h1>
+      <div className="w-full max-w-[1100px] mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
+            <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
+              Overview
+            </h1>
 
-          {isApproved && (
-            <MdVerified className="text-[#00C896] text-2xl sm:text-3xl" />
-          )}
-        </div>
-
-        <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">
-          {today}
-        </span>
-      </div>
-
-      <div className="w-full max-w-[1100px] flex items-center justify-start mb-6">
-        <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
-          {hotelName}
-        </p>
-      </div>
-
-      {!isApproved && !loadingStats && (
-        <div className="w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
-          <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
-
-          <div>
-            <p className="text-[#CCD0CF] text-xs sm:text-sm font-semibold">
-              Verification Pending
-            </p>
-
-            <p className="text-[#CCD0CF]/60 text-[11px] sm:text-xs">
-              Your hotel is under review. Some features may be limited until
-              approval.
-            </p>
+            {isApproved && (
+              <MdVerified className="text-[#00C896] text-2xl sm:text-3xl" />
+            )}
           </div>
+
+          <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">
+            {today}
+          </span>
         </div>
-      )}
 
-      <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-        {stats.map((stat, index) => (
-          <div
-            key={stat.label}
-            className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1"
-          >
-            <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-              {stat.icon}
-            </div>
+        <div className="w-full flex items-center justify-start mb-6">
+          <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
+            {hotelName}
+          </p>
+        </div>
 
-            <div className="min-w-0">
-              <p className="text-[#CCD0CF]/60 text-xs">
-                {stat.label}
+        {!isApproved && !loadingStats && (
+          <div className="w-full bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+            <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
+
+            <div>
+              <p className="text-[#CCD0CF] text-xs sm:text-sm font-semibold">
+                Verification Pending
               </p>
 
-              <p
-                className={`text-[#CCD0CF] font-bold ${
-                  stat.rating ? "text-xl" : "text-2xl"
-                }`}
-              >
-                {loadingStats ? "..." : stat.value}
+              <p className="text-[#CCD0CF]/60 text-[11px] sm:text-xs">
+                Your hotel is under review. Some features may
+                be limited until approval.
               </p>
             </div>
           </div>
-        ))}
+        )}
+
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1"
+            >
+              <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
+                {stat.icon}
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-[#CCD0CF]/60 text-xs">
+                  {stat.label}
+                </p>
+
+                <p
+                  className={`text-[#CCD0CF] font-bold ${
+                    stat.rating
+                      ? "text-xl"
+                      : "text-2xl"
+                  }`}
+                >
+                  {loadingStats ? "..." : stat.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
