@@ -20,24 +20,24 @@ export default function HotelOwnerDashboard() {
       <div className="flex-1 flex flex-col min-w-0 md:ml-64 pt-[60px] md:pt-0">
         <TopBar />
 
-        <main className="flex-1 w-full px-3 sm:px-5 md:px-8 py-6 md:py-8">
-          <section id="overview">
+        <main className="flex-1 w-full py-6 md:py-8">
+          <section id="overview" className="w-full">
             <Overview />
           </section>
 
-          <section id="rooms">
+          <section id="rooms" className="w-full">
             <RoomManagement />
           </section>
 
-          <section id="bookings">
+          <section id="bookings" className="w-full">
             <Bookings />
           </section>
 
-          <section id="reviews">
+          <section id="reviews" className="w-full">
             <Reviews />
           </section>
 
-          <section id="profile">
+          <section id="profile" className="w-full">
             <Profile />
           </section>
         </main>

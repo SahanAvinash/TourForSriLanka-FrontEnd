@@ -233,7 +233,11 @@ export default function RoomManagement() {
         axios
             .get(`${API_BASE_URL}/api/addRoom/hotel/${hotelId}`)
             .then((res) => {
-                setRooms(Array.isArray(res.data) ? res.data : []);
+                setRooms(
+                    Array.isArray(res.data)
+                        ? res.data
+                        : []
+                );
             })
             .catch((error) => {
                 console.error("Failed to load rooms:", error);
@@ -310,7 +314,8 @@ export default function RoomManagement() {
                 formData,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data"
+                        "Content-Type":
+                            "multipart/form-data"
                     }
                 }
             );
@@ -328,7 +333,10 @@ export default function RoomManagement() {
                 ]);
             })
             .catch((error) => {
-                console.error("Image upload failed:", error);
+                console.error(
+                    "Image upload failed:",
+                    error
+                );
                 toast.error("Image upload failed");
             })
             .finally(() => {
@@ -404,7 +412,8 @@ export default function RoomManagement() {
             roomType,
             capacity,
             pricePerNight,
-            shortDescription: shortDescription.trim(),
+            shortDescription:
+                shortDescription.trim(),
             roomFacility,
             otherFacility,
             images
@@ -438,7 +447,10 @@ export default function RoomManagement() {
                 fetchRooms();
             })
             .catch((error) => {
-                console.error("Room submission failed:", error);
+                console.error(
+                    "Room submission failed:",
+                    error
+                );
 
                 toast.error(
                     error.response?.data?.error ||
@@ -461,11 +473,16 @@ export default function RoomManagement() {
                 }
             )
             .then(() => {
-                toast.success("Room removed successfully");
+                toast.success(
+                    "Room removed successfully"
+                );
                 fetchRooms();
             })
             .catch((error) => {
-                console.error("Room removal failed:", error);
+                console.error(
+                    "Room removal failed:",
+                    error
+                );
 
                 toast.error(
                     error.response?.data?.error ||
@@ -574,502 +591,541 @@ export default function RoomManagement() {
     return (
         <section
             id="rooms"
-            className="mt-6 md:mt-8 room-management-page-anim"
+            className="w-full flex flex-col justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 mt-6 md:mt-8 room-management-page-anim"
         >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 room-management-header-anim">
-                <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
-                    Room Management
-                </h1>
+            <div className="w-full max-w-[1100px]">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 room-management-header-anim">
+                    <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
+                        Room Management
+                    </h1>
 
-                <button
-                    type="button"
-                    onClick={() => {
-                        if (showAddForm) {
-                            resetForm();
-                            return;
-                        }
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (showAddForm) {
+                                resetForm();
+                                return;
+                            }
 
-                        if (!isApproved) {
-                            toast.error(
-                                "Your hotel is not verified yet. You cannot add rooms until an admin approves your hotel."
+                            if (!isApproved) {
+                                toast.error(
+                                    "Your hotel is not verified yet. You cannot add rooms until an admin approves your hotel."
+                                );
+                                return;
+                            }
+
+                            setEditingOriginalRoomNumber(
+                                null
                             );
-                            return;
-                        }
+                            setShowAddForm(true);
 
-                        setEditingOriginalRoomNumber(null);
-                        setShowAddForm(true);
+                            setTimeout(() => {
+                                document
+                                    .getElementById(
+                                        "room-form"
+                                    )
+                                    ?.scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "start"
+                                    });
+                            }, 100);
+                        }}
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896]/80 hover:bg-[#00C896] active:scale-[0.98] transition-all duration-300 text-white px-5 py-2.5 rounded-[15px] text-[14px] font-semibold cursor-pointer"
+                    >
+                        {showAddForm ? (
+                            <FaMinus />
+                        ) : (
+                            <FaPlus />
+                        )}
 
-                        setTimeout(() => {
-                            document
-                                .getElementById("room-form")
-                                ?.scrollIntoView({
-                                    behavior: "smooth",
-                                    block: "start"
-                                });
-                        }, 100);
-                    }}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896]/80 hover:bg-[#00C896] active:scale-[0.98] transition-all duration-300 text-white px-5 py-2.5 rounded-[15px] text-[14px] font-semibold cursor-pointer"
-                >
-                    {showAddForm ? <FaMinus /> : <FaPlus />}
+                        {showAddForm
+                            ? "Close"
+                            : "Add Room"}
+                    </button>
+                </div>
 
-                    {showAddForm ? "Close" : "Add Room"}
-                </button>
-            </div>
+                {showAddForm && (
+                    <form
+                        id="room-form"
+                        onSubmit={handleSubmit}
+                        className="bg-[#253745] rounded-[20px] p-4 sm:p-6 mb-8 room-form-anim"
+                    >
+                        <h3 className="text-[#CCD0CF] text-[16px] font-bold mb-5">
+                            {editingOriginalRoomNumber
+                                ? `Edit Room ${editingOriginalRoomNumber}`
+                                : "Add New Room"}
+                        </h3>
 
-            {showAddForm && (
-                <form
-                    id="room-form"
-                    onSubmit={handleSubmit}
-                    className="bg-[#253745] rounded-[20px] p-4 sm:p-6 mb-8 room-form-anim"
-                >
-                    <h3 className="text-[#CCD0CF] text-[16px] font-bold mb-5">
-                        {editingOriginalRoomNumber
-                            ? `Edit Room ${editingOriginalRoomNumber}`
-                            : "Add New Room"}
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input
-                            type="text"
-                            value={roomNumber}
-                            placeholder="Room Number"
-                            onChange={(e) =>
-                                setRoomNumber(e.target.value)
-                            }
-                            className="w-full h-[45px] bg-[#4A5C6A80] rounded-[20px] outline-none px-4 text-[#CCD0CF] text-[12px]"
-                        />
-
-                        <input
-                            type="number"
-                            value={pricePerNight}
-                            onChange={(e) => {
-                                const value =
-                                    e.target.value;
-
-                                if (
-                                    value === "" ||
-                                    Number(value) >= 0
-                                ) {
-                                    setPricePerNight(value);
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                value={roomNumber}
+                                placeholder="Room Number"
+                                onChange={(e) =>
+                                    setRoomNumber(
+                                        e.target.value
+                                    )
                                 }
-                            }}
-                            onKeyDown={(e) => {
-                                if (
-                                    e.key === "-" ||
-                                    e.key === "e" ||
-                                    e.key === "+"
-                                ) {
-                                    e.preventDefault();
+                                className="w-full h-[45px] bg-[#4A5C6A80] rounded-[20px] outline-none px-4 text-[#CCD0CF] text-[12px]"
+                            />
+
+                            <input
+                                type="number"
+                                value={pricePerNight}
+                                onChange={(e) => {
+                                    const value =
+                                        e.target.value;
+
+                                    if (
+                                        value === "" ||
+                                        Number(value) >= 0
+                                    ) {
+                                        setPricePerNight(
+                                            value
+                                        );
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (
+                                        e.key === "-" ||
+                                        e.key === "e" ||
+                                        e.key === "+"
+                                    ) {
+                                        e.preventDefault();
+                                    }
+                                }}
+                                onWheel={(e) =>
+                                    e.target.blur()
                                 }
-                            }}
-                            onWheel={(e) =>
-                                e.target.blur()
-                            }
-                            placeholder="Price Per Night (LKR)"
-                            style={{
-                                MozAppearance:
-                                    "textfield"
-                            }}
-                            className="w-full h-[45px] bg-[#4A5C6A80] rounded-[20px] px-4 text-[#CCD0CF] outline-none text-[12px] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
+                                placeholder="Price Per Night (LKR)"
+                                style={{
+                                    MozAppearance:
+                                        "textfield"
+                                }}
+                                className="w-full h-[45px] bg-[#4A5C6A80] rounded-[20px] px-4 text-[#CCD0CF] outline-none text-[12px] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            />
 
-                        <Select
-                            options={ROOM_TYPES}
-                            value={
-                                ROOM_TYPES.find(
-                                    (option) =>
-                                        option.value ===
-                                        roomType
-                                ) || null
-                            }
-                            onChange={(selected) =>
-                                setRoomType(
-                                    selected?.value || ""
-                                )
-                            }
-                            placeholder="Room Type"
-                            menuPosition="fixed"
-                            styles={selectStyles}
-                        />
-
-                        <Select
-                            options={CAPACITY_OPTIONS}
-                            value={
-                                CAPACITY_OPTIONS.find(
-                                    (option) =>
-                                        option.value ===
-                                        capacity
-                                ) || null
-                            }
-                            onChange={(selected) =>
-                                setCapacity(
-                                    selected?.value || null
-                                )
-                            }
-                            placeholder="No of Guests"
-                            menuPosition="fixed"
-                            styles={selectStyles}
-                        />
-                    </div>
-
-                    <div className="mt-4">
-                        <textarea
-                            value={shortDescription}
-                            onChange={(e) =>
-                                setShortDescription(
-                                    e.target.value
-                                )
-                            }
-                            placeholder="Short Description"
-                            rows={4}
-                            className="w-full bg-[#4A5C6A80] rounded-[12px] px-4 py-3 text-[#CCD0CF] text-[12px] outline-none resize-none"
-                        />
-                    </div>
-
-                    <div className="mt-5">
-                        <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">
-                            Room Images
-                        </label>
-
-                        <div className="flex flex-wrap gap-3">
-                            {images.map((url, index) => (
-                                <div
-                                    key={`${url}-${index}`}
-                                    className="relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] room-image-anim"
-                                >
-                                    <img
-                                        src={url}
-                                        alt="room"
-                                        className="w-full h-full object-cover rounded-[10px]"
-                                    />
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            removeImage(index)
-                                        }
-                                        className="absolute -top-2 -right-2 bg-[#CD2F31] rounded-full w-[20px] h-[20px] flex items-center justify-center text-white text-[10px] cursor-pointer hover:scale-110 transition-transform"
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </div>
-                            ))}
-
-                            {images.length < 5 && (
-                                <label className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-[10px] border-2 border-dashed border-[#4A5C6A] flex items-center justify-center cursor-pointer text-[#CCD0CF]/50 hover:text-[#00C896] hover:border-[#00C896] transition-all duration-300">
-                                    {uploadingImage ? (
-                                        <span className="text-[11px]">
-                                            Uploading...
-                                        </span>
-                                    ) : (
-                                        <FaImage size={22} />
-                                    )}
-
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={
-                                            handleImageUpload
-                                        }
-                                        className="hidden"
-                                        disabled={
-                                            uploadingImage
-                                        }
-                                    />
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="mt-5">
-                        <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">
-                            Room Facilities
-                        </label>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[10px]">
-                            {FACILITY_OPTIONS.map(
-                                ({
-                                    key,
-                                    label,
-                                    icon: Icon
-                                }) => {
-                                    const selected =
-                                        roomFacility[key];
-
-                                    return (
-                                        <button
-                                            key={key}
-                                            type="button"
-                                            onClick={() =>
-                                                toggleFacility(
-                                                    key
-                                                )
-                                            }
-                                            className={`relative min-h-[65px] rounded-[15px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold px-[6px] text-center transition-all duration-200 cursor-pointer hover:scale-[1.02] ${
-                                                selected
-                                                    ? "bg-[#00C896]/20 border-2 border-[#00C896] text-[#CCD0CF]"
-                                                    : "bg-[#4A5C6A]/50 border-2 border-transparent text-[#CCD0CF] hover:border-[#4A5C6A]"
-                                            }`}
-                                        >
-                                            {selected && (
-                                                <span className="absolute -top-[6px] -right-[6px] w-[18px] h-[18px] rounded-full bg-[#00C896] flex items-center justify-center text-[#06141B] text-[9px]">
-                                                    <FaCheck />
-                                                </span>
-                                            )}
-
-                                            <Icon className="text-[#00C896] text-[16px]" />
-
-                                            <span className="leading-[13px]">
-                                                {label}
-                                            </span>
-                                        </button>
-                                    );
+                            <Select
+                                options={ROOM_TYPES}
+                                value={
+                                    ROOM_TYPES.find(
+                                        (option) =>
+                                            option.value ===
+                                            roomType
+                                    ) || null
                                 }
-                            )}
+                                onChange={(selected) =>
+                                    setRoomType(
+                                        selected?.value ||
+                                            ""
+                                    )
+                                }
+                                placeholder="Room Type"
+                                menuPosition="fixed"
+                                styles={selectStyles}
+                            />
 
-                            {otherFacility.map(
-                                (label, index) => (
-                                    <button
-                                        key={`${label}-${index}`}
-                                        type="button"
-                                        onClick={() =>
-                                            removeOtherFacility(
-                                                index
-                                            )
-                                        }
-                                        title="Click to remove"
-                                        className="relative min-h-[65px] rounded-[15px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold px-[6px] text-center bg-[#00C896]/20 border-2 border-[#00C896] text-[#CCD0CF] transition-all duration-200 cursor-pointer hover:scale-[1.02]"
-                                    >
-                                        <span className="absolute -top-[6px] -right-[6px] w-[18px] h-[18px] rounded-full bg-[#00C896] flex items-center justify-center text-[#06141B] text-[9px]">
-                                            <FaTimes />
-                                        </span>
-
-                                        <span className="leading-[13px] break-words">
-                                            {label}
-                                        </span>
-                                    </button>
-                                )
-                            )}
+                            <Select
+                                options={
+                                    CAPACITY_OPTIONS
+                                }
+                                value={
+                                    CAPACITY_OPTIONS.find(
+                                        (option) =>
+                                            option.value ===
+                                            capacity
+                                    ) || null
+                                }
+                                onChange={(selected) =>
+                                    setCapacity(
+                                        selected?.value ||
+                                            null
+                                    )
+                                }
+                                placeholder="No of Guests"
+                                menuPosition="fixed"
+                                styles={selectStyles}
+                            />
                         </div>
 
                         <div className="mt-4">
+                            <textarea
+                                value={shortDescription}
+                                onChange={(e) =>
+                                    setShortDescription(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="Short Description"
+                                rows={4}
+                                className="w-full bg-[#4A5C6A80] rounded-[12px] px-4 py-3 text-[#CCD0CF] text-[12px] outline-none resize-none"
+                            />
+                        </div>
+
+                        <div className="mt-5">
                             <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">
-                                Other Facility
+                                Room Images
                             </label>
 
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Type a facility and press Enter...."
-                                    value={
-                                        otherFacilityInput
-                                    }
-                                    maxLength={
-                                        CUSTOM_FACILITY_MAX_LENGTH
-                                    }
-                                    onChange={(e) =>
-                                        setOtherFacilityInput(
-                                            e.target.value
-                                        )
-                                    }
-                                    onKeyDown={(e) => {
-                                        if (
-                                            e.key ===
-                                            "Enter"
-                                        ) {
-                                            e.preventDefault();
-                                            addOtherFacility();
-                                        }
-                                    }}
-                                    className="w-full h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pr-[65px] outline-none focus:ring-1 focus:ring-[#00C896]/50"
-                                />
+                            <div className="flex flex-wrap gap-3">
+                                {images.map(
+                                    (url, index) => (
+                                        <div
+                                            key={`${url}-${index}`}
+                                            className="relative w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] room-image-anim"
+                                        >
+                                            <img
+                                                src={url}
+                                                alt="room"
+                                                className="w-full h-full object-cover rounded-[10px]"
+                                            />
 
-                                <span className="absolute right-[20px] top-1/2 -translate-y-1/2 text-[10px] text-[#CCD0CF]/50">
-                                    {
-                                        otherFacilityInput.length
-                                    }
-                                    /
-                                    {
-                                        CUSTOM_FACILITY_MAX_LENGTH
-                                    }
-                                </span>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeImage(
+                                                        index
+                                                    )
+                                                }
+                                                className="absolute -top-2 -right-2 bg-[#CD2F31] rounded-full w-[20px] h-[20px] flex items-center justify-center text-white text-[10px] cursor-pointer hover:scale-110 transition-transform"
+                                            >
+                                                <FaTimes />
+                                            </button>
+                                        </div>
+                                    )
+                                )}
+
+                                {images.length < 5 && (
+                                    <label className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] rounded-[10px] border-2 border-dashed border-[#4A5C6A] flex items-center justify-center cursor-pointer text-[#CCD0CF]/50 hover:text-[#00C896] hover:border-[#00C896] transition-all duration-300">
+                                        {uploadingImage ? (
+                                            <span className="text-[11px]">
+                                                Uploading...
+                                            </span>
+                                        ) : (
+                                            <FaImage size={22} />
+                                        )}
+
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={
+                                                handleImageUpload
+                                            }
+                                            className="hidden"
+                                            disabled={
+                                                uploadingImage
+                                            }
+                                        />
+                                    </label>
+                                )}
                             </div>
+                        </div>
+
+                        <div className="mt-5">
+                            <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">
+                                Room Facilities
+                            </label>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[10px]">
+                                {FACILITY_OPTIONS.map(
+                                    ({
+                                        key,
+                                        label,
+                                        icon: Icon
+                                    }) => {
+                                        const selected =
+                                            roomFacility[
+                                                key
+                                            ];
+
+                                        return (
+                                            <button
+                                                key={key}
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleFacility(
+                                                        key
+                                                    )
+                                                }
+                                                className={`relative min-h-[65px] rounded-[15px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold px-[6px] text-center transition-all duration-200 cursor-pointer hover:scale-[1.02] ${
+                                                    selected
+                                                        ? "bg-[#00C896]/20 border-2 border-[#00C896] text-[#CCD0CF]"
+                                                        : "bg-[#4A5C6A]/50 border-2 border-transparent text-[#CCD0CF] hover:border-[#4A5C6A]"
+                                                }`}
+                                            >
+                                                {selected && (
+                                                    <span className="absolute -top-[6px] -right-[6px] w-[18px] h-[18px] rounded-full bg-[#00C896] flex items-center justify-center text-[#06141B] text-[9px]">
+                                                        <FaCheck />
+                                                    </span>
+                                                )}
+
+                                                <Icon className="text-[#00C896] text-[16px]" />
+
+                                                <span className="leading-[13px]">
+                                                    {label}
+                                                </span>
+                                            </button>
+                                        );
+                                    }
+                                )}
+
+                                {otherFacility.map(
+                                    (label, index) => (
+                                        <button
+                                            key={`${label}-${index}`}
+                                            type="button"
+                                            onClick={() =>
+                                                removeOtherFacility(
+                                                    index
+                                                )
+                                            }
+                                            title="Click to remove"
+                                            className="relative min-h-[65px] rounded-[15px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold px-[6px] text-center bg-[#00C896]/20 border-2 border-[#00C896] text-[#CCD0CF] transition-all duration-200 cursor-pointer hover:scale-[1.02]"
+                                        >
+                                            <span className="absolute -top-[6px] -right-[6px] w-[18px] h-[18px] rounded-full bg-[#00C896] flex items-center justify-center text-[#06141B] text-[9px]">
+                                                <FaTimes />
+                                            </span>
+
+                                            <span className="leading-[13px] break-words">
+                                                {label}
+                                            </span>
+                                        </button>
+                                    )
+                                )}
+                            </div>
+
+                            <div className="mt-4">
+                                <label className="text-[#CCD0CF]/60 text-[12px] block mb-2">
+                                    Other Facility
+                                </label>
+
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Type a facility and press Enter...."
+                                        value={
+                                            otherFacilityInput
+                                        }
+                                        maxLength={
+                                            CUSTOM_FACILITY_MAX_LENGTH
+                                        }
+                                        onChange={(e) =>
+                                            setOtherFacilityInput(
+                                                e.target.value
+                                            )
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (
+                                                e.key ===
+                                                "Enter"
+                                            ) {
+                                                e.preventDefault();
+                                                addOtherFacility();
+                                            }
+                                        }}
+                                        className="w-full h-[50px] text-[#CCD0CF] text-[12px] bg-[#4A5C6A]/50 rounded-[20px] pl-[20px] pr-[65px] outline-none focus:ring-1 focus:ring-[#00C896]/50"
+                                    />
+
+                                    <span className="absolute right-[20px] top-1/2 -translate-y-1/2 text-[10px] text-[#CCD0CF]/50">
+                                        {
+                                            otherFacilityInput.length
+                                        }
+                                        /
+                                        {
+                                            CUSTOM_FACILITY_MAX_LENGTH
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={submitting}
+                            className="mt-6 w-full h-[45px] bg-[#00C896]/80 hover:bg-[#00C896] active:scale-[0.99] transition-all duration-300 text-white font-bold rounded-[15px] cursor-pointer disabled:opacity-50"
+                        >
+                            {submitting
+                                ? "Saving..."
+                                : editingOriginalRoomNumber
+                                ? "Update Room"
+                                : "Add Room"}
+                        </button>
+                    </form>
+                )}
+
+                <div className="bg-[#253745] rounded-[20px] p-4 sm:p-6 room-list-anim">
+                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+                        <h2 className="text-[#CCD0CF] text-[19px] sm:text-[20px] font-bold">
+                            Rooms
+                        </h2>
+
+                        <div className="relative w-full lg:w-[280px]">
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) =>
+                                    setSearchTerm(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="Search room by room number"
+                                className="w-full h-[42px] bg-[#4A5C6A]/50 rounded-[20px] pl-[16px] pr-[40px] text-[#CCD0CF] text-[13px] outline-none focus:ring-1 focus:ring-[#00C896]/50"
+                            />
+
+                            <FaSearch className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#00C896] text-[14px]" />
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="mt-6 w-full h-[45px] bg-[#00C896]/80 hover:bg-[#00C896] active:scale-[0.99] transition-all duration-300 text-white font-bold rounded-[15px] cursor-pointer disabled:opacity-50"
-                    >
-                        {submitting
-                            ? "Saving..."
-                            : editingOriginalRoomNumber
-                            ? "Update Room"
-                            : "Add Room"}
-                    </button>
-                </form>
-            )}
+                    {loadingRooms ? (
+                        <div className="py-6">
+                            <p className="text-[#CCD0CF]/60 text-[14px]">
+                                Loading rooms...
+                            </p>
+                        </div>
+                    ) : filteredRooms.length ===
+                      0 ? (
+                        <div className="py-6">
+                            <p className="text-[#CCD0CF]/60 text-[14px]">
+                                No rooms found.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="relative w-full overflow-x-auto overflow-y-visible room-table-wrapper">
+                            <table className="w-full min-w-[700px] border-collapse">
+                                <thead>
+                                    <tr className="text-left text-[#CCD0CF] text-[13px] font-bold">
+                                        <th className="pb-4 pr-4 whitespace-nowrap">
+                                            Room Number
+                                        </th>
 
-            <div className="bg-[#253745] rounded-[20px] p-4 sm:p-6 room-list-anim">
-                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-                    <h2 className="text-[#CCD0CF] text-[19px] sm:text-[20px] font-bold">
-                        Rooms
-                    </h2>
+                                        <th className="pb-4 pr-4 whitespace-nowrap">
+                                            Capacity
+                                        </th>
 
-                    <div className="relative w-full lg:w-[280px]">
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
-                            placeholder="Search room by room number"
-                            className="w-full h-[42px] bg-[#4A5C6A]/50 rounded-[20px] pl-[16px] pr-[40px] text-[#CCD0CF] text-[13px] outline-none focus:ring-1 focus:ring-[#00C896]/50"
-                        />
+                                        <th className="pb-4 pr-4 whitespace-nowrap">
+                                            Price per night
+                                        </th>
 
-                        <FaSearch className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#00C896] text-[14px]" />
-                    </div>
-                </div>
+                                        <th className="pb-4 pr-4 whitespace-nowrap">
+                                            Status
+                                        </th>
 
-                {loadingRooms ? (
-                    <div className="py-6">
-                        <p className="text-[#CCD0CF]/60 text-[14px]">
-                            Loading rooms...
-                        </p>
-                    </div>
-                ) : filteredRooms.length === 0 ? (
-                    <div className="py-6">
-                        <p className="text-[#CCD0CF]/60 text-[14px]">
-                            No rooms found.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="relative w-full overflow-x-auto overflow-y-visible room-table-wrapper">
-                        <table className="w-full min-w-[700px] border-collapse">
-                            <thead>
-                                <tr className="text-left text-[#CCD0CF] text-[13px] font-bold">
-                                    <th className="pb-4 pr-4 whitespace-nowrap">
-                                        Room Number
-                                    </th>
+                                        <th className="pb-4 whitespace-nowrap">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
 
-                                    <th className="pb-4 pr-4 whitespace-nowrap">
-                                        Capacity
-                                    </th>
+                                <tbody>
+                                    {filteredRooms.map(
+                                        (room, index) => (
+                                            <tr
+                                                key={
+                                                    room._id
+                                                }
+                                                className="border-t border-[#4A5C6A]/40 room-row-anim"
+                                                style={{
+                                                    animationDelay: `${
+                                                        index *
+                                                        0.06
+                                                    }s`
+                                                }}
+                                            >
+                                                <td className="py-4 pr-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-[55px] h-[55px] sm:w-[60px] sm:h-[60px] rounded-[10px] bg-[#1B2B34] flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                            {room
+                                                                .images?.[0] ? (
+                                                                <img
+                                                                    src={
+                                                                        room
+                                                                            .images[0]
+                                                                    }
+                                                                    alt={
+                                                                        room.roomNumber
+                                                                    }
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <FaBed className="text-[#4A5C6A] text-[20px]" />
+                                                            )}
+                                                        </div>
 
-                                    <th className="pb-4 pr-4 whitespace-nowrap">
-                                        Price per night
-                                    </th>
-
-                                    <th className="pb-4 pr-4 whitespace-nowrap">
-                                        Status
-                                    </th>
-
-                                    <th className="pb-4 whitespace-nowrap">
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {filteredRooms.map(
-                                    (room, index) => (
-                                        <tr
-                                            key={room._id}
-                                            className="border-t border-[#4A5C6A]/40 room-row-anim"
-                                            style={{
-                                                animationDelay: `${
-                                                    index * 0.06
-                                                }s`
-                                            }}
-                                        >
-                                            <td className="py-4 pr-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-[55px] h-[55px] sm:w-[60px] sm:h-[60px] rounded-[10px] bg-[#1B2B34] flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                        {room.images?.[0] ? (
-                                                            <img
-                                                                src={
-                                                                    room.images[0]
-                                                                }
-                                                                alt={
+                                                        <div>
+                                                            <p className="text-[#CCD0CF] font-bold text-[14px] sm:text-[15px]">
+                                                                {
                                                                     room.roomNumber
                                                                 }
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <FaBed className="text-[#4A5C6A] text-[20px]" />
-                                                        )}
+                                                            </p>
+
+                                                            <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">
+                                                                {
+                                                                    room.roomType
+                                                                }
+                                                            </p>
+                                                        </div>
                                                     </div>
+                                                </td>
 
-                                                    <div>
-                                                        <p className="text-[#CCD0CF] font-bold text-[14px] sm:text-[15px]">
-                                                            {
-                                                                room.roomNumber
-                                                            }
-                                                        </p>
+                                                <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
+                                                    {
+                                                        room.capacity
+                                                    }{" "}
+                                                    Guests
+                                                </td>
 
-                                                        <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px]">
-                                                            {
-                                                                room.roomType
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                                <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
+                                                    LKR{" "}
+                                                    {Number(
+                                                        room.pricePerNight
+                                                    ).toLocaleString()}
+                                                </td>
 
-                                            <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
-                                                {room.capacity} Guests
-                                            </td>
+                                                <td className="py-4 pr-4">
+                                                    <span className="flex items-center gap-2 text-[13px] sm:text-[14px] whitespace-nowrap">
+                                                        <span
+                                                            className={`w-[8px] h-[8px] rounded-full ${
+                                                                room.status ===
+                                                                "maintenance"
+                                                                    ? "bg-[#CD2F31]"
+                                                                    : "bg-[#00C896]"
+                                                            }`}
+                                                        />
 
-                                            <td className="py-4 pr-4 text-[#CCD0CF] text-[13px] sm:text-[14px] whitespace-nowrap">
-                                                LKR{" "}
-                                                {Number(
-                                                    room.pricePerNight
-                                                ).toLocaleString()}
-                                            </td>
-
-                                            <td className="py-4 pr-4">
-                                                <span className="flex items-center gap-2 text-[13px] sm:text-[14px] whitespace-nowrap">
-                                                    <span
-                                                        className={`w-[8px] h-[8px] rounded-full ${
-                                                            room.status ===
+                                                        <span className="text-[#CCD0CF]">
+                                                            {room.status ===
                                                             "maintenance"
-                                                                ? "bg-[#CD2F31]"
-                                                                : "bg-[#00C896]"
-                                                        }`}
-                                                    />
-
-                                                    <span className="text-[#CCD0CF]">
-                                                        {room.status ===
-                                                        "maintenance"
-                                                            ? "Maintenance"
-                                                            : "Available"}
+                                                                ? "Maintenance"
+                                                                : "Available"}
+                                                        </span>
                                                     </span>
-                                                </span>
-                                            </td>
+                                                </td>
 
-                                            <td className="py-4 relative">
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) =>
-                                                        handleActionMenu(
-                                                            e,
-                                                            room._id
-                                                        )
-                                                    }
-                                                    className="text-[#CCD0CF]/60 hover:text-[#CCD0CF] active:scale-90 transition-all cursor-pointer p-2"
-                                                >
-                                                    <FaEllipsisV />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    )
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                                                <td className="py-4 relative">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(
+                                                            e
+                                                        ) =>
+                                                            handleActionMenu(
+                                                                e,
+                                                                room._id
+                                                            )
+                                                        }
+                                                        className="text-[#CCD0CF]/60 hover:text-[#CCD0CF] active:scale-90 transition-all cursor-pointer p-2"
+                                                    >
+                                                        <FaEllipsisV />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {openMenuId && (
@@ -1091,7 +1147,8 @@ export default function RoomManagement() {
                         {(() => {
                             const room = rooms.find(
                                 (item) =>
-                                    item._id === openMenuId
+                                    item._id ===
+                                    openMenuId
                             );
 
                             if (!room) return null;
@@ -1101,7 +1158,9 @@ export default function RoomManagement() {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            startEdit(room)
+                                            startEdit(
+                                                room
+                                            )
                                         }
                                         className="w-full text-left px-4 py-3 text-[#CCD0CF] text-[13px] hover:bg-[#00C896]/20 active:bg-[#00C896]/30 transition-colors cursor-pointer"
                                     >
@@ -1136,7 +1195,9 @@ export default function RoomManagement() {
                                                 );
                                             }
 
-                                            setOpenMenuId(null);
+                                            setOpenMenuId(
+                                                null
+                                            );
                                         }}
                                         className="w-full text-left px-4 py-3 text-[#CD2F31] text-[13px] hover:bg-[#CD2F31]/10 active:bg-[#CD2F31]/20 transition-colors cursor-pointer"
                                     >
