@@ -21,10 +21,7 @@ export default function HotelOwnerDashboard() {
         <TopBar />
 
         <main className="flex-1 w-full px-3 sm:px-5 md:px-8 py-6 md:py-8">
-          <section 
-            id="overview"
-            className="w-full flex flex-col  justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-6 overflow-x-hidden"
-          >
+          <section id="overview">
             <Overview />
           </section>
 
@@ -45,6 +42,6 @@ export default function HotelOwnerDashboard() {
           </section>
         </main>
       </div>
-    </div> 
+    </div>
   );
 }
