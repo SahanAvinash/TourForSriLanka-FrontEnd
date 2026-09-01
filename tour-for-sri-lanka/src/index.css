@@ -1,799 +1,799 @@
 @import "tailwindcss";
 
 @theme {
-    --font-antonsc: "Anton SC", sans-serif;
+  --font-antonsc: "Anton SC", sans-serif;
 
-    --color-primary-1: #06141B;
-    --color-primary-2: #253745;
-    --color-primary-green: #00C896;
-    --color-text: #CCD0CF;
-    --color-border: #4A5C6A;
+  --color-primary-1: #06141B;
+  --color-primary-2: #253745;
+  --color-primary-green: #00C896;
+  --color-text: #CCD0CF;
+  --color-border: #4A5C6A;
 }
 
 @keyframes logoEntrance {
-    0% {
-        opacity: 0;
-        transform: translateY(15px) scale(0.97);
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
 
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes boxEntrance {
-    0% {
-        opacity: 0;
-        transform: translateY(25px) scale(0.96);
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(25px) scale(0.96);
+  }
 
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .animate-logo {
-    animation: logoEntrance 0.7s ease-out forwards;
+  animation: logoEntrance 0.7s ease-out forwards;
 }
 
 .animate-box {
-    animation: boxEntrance 0.1s ease-out forwards;
+  animation: boxEntrance 0.1s ease-out forwards;
 }
 
 @keyframes loginLogoFadeIn {
-    from {
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes loginCardSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(50px) scale(0.96);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(50px) scale(0.96);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .login-logo-anim {
-    opacity: 0;
-    animation: loginLogoFadeIn 0.7s ease-out forwards;
+  opacity: 0;
+  animation: loginLogoFadeIn 0.7s ease-out forwards;
 }
 
 .login-card-anim {
-    opacity: 0;
-    animation: loginCardSlideIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation-delay: 0.45s;
+  opacity: 0;
+  animation: loginCardSlideIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.45s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .login-logo-anim,
-    .login-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .login-logo-anim,
+  .login-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes stepBarFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-24px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .step-bar-anim {
-    opacity: 0;
-    animation: stepBarFadeIn 0.6s ease-out 1s forwards;
+  opacity: 0;
+  animation: stepBarFadeIn 0.6s ease-out 1s forwards;
 }
 @keyframes navbarFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes heroBgFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes heroTextFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .navbar-anim {
-    opacity: 0;
-    animation: navbarFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: navbarFadeIn 0.6s ease-out forwards;
 }
 
 .hero-bg-anim {
-    opacity: 0;
-    animation: heroBgFadeIn 0.8s ease-out 0.3s forwards;
+  opacity: 0;
+  animation: heroBgFadeIn 0.8s ease-out 0.3s forwards;
 }
 
 .hero-title-anim {
-    opacity: 0;
-    animation: heroTextFadeIn 0.7s ease-out 0.8s forwards;
+  opacity: 0;
+  animation: heroTextFadeIn 0.7s ease-out 0.8s forwards;
 }
 
 .hero-desc-anim {
-    opacity: 0;
-    animation: heroTextFadeIn 0.7s ease-out 1.2s forwards;
+  opacity: 0;
+  animation: heroTextFadeIn 0.7s ease-out 1.2s forwards;
 }
 
 .hero-btn-anim {
-    opacity: 0;
-    animation: heroTextFadeIn 0.7s ease-out 1.6s forwards;
+  opacity: 0;
+  animation: heroTextFadeIn 0.7s ease-out 1.6s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .navbar-anim,
-    .hero-bg-anim,
-    .hero-title-anim,
-    .hero-desc-anim,
-    .hero-btn-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .navbar-anim,
+  .hero-bg-anim,
+  .hero-title-anim,
+  .hero-desc-anim,
+  .hero-btn-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes categoryCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .category-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .category-card-anim.in-view {
-    animation: categoryCardFadeIn 0.7s ease-out forwards;
+  animation: categoryCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .category-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .category-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes footerFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .footer-fade-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .footer-fade-anim.in-view {
-    animation: footerFadeIn 0.8s ease-out forwards;
+  animation: footerFadeIn 0.8s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .footer-fade-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .footer-fade-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes pageTitleFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pageDescFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .page-title-anim {
-    opacity: 0;
-    animation: pageTitleFadeIn 0.7s ease-out 0.2s forwards;
+  opacity: 0;
+  animation: pageTitleFadeIn 0.7s ease-out 0.2s forwards;
 }
 
 .page-desc-anim {
-    opacity: 0;
-    animation: pageDescFadeIn 0.7s ease-out 0.4s forwards;
+  opacity: 0;
+  animation: pageDescFadeIn 0.7s ease-out 0.4s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .page-title-anim,
-    .page-desc-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .page-title-anim,
+  .page-desc-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes detailSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .destination-gallery-anim {
-    opacity: 0;
-    animation: detailSectionFadeIn 0.7s ease-out 0.15s forwards;
+  opacity: 0;
+  animation: detailSectionFadeIn 0.7s ease-out 0.15s forwards;
 }
 
 .destination-info-anim {
-    opacity: 0;
-    animation: detailSectionFadeIn 0.7s ease-out 0.35s forwards;
+  opacity: 0;
+  animation: detailSectionFadeIn 0.7s ease-out 0.35s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .destination-gallery-anim,
-    .destination-info-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .destination-gallery-anim,
+  .destination-info-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes destinationCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .destination-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .destination-card-anim.in-view {
-    animation: destinationCardFadeIn 0.7s ease-out forwards;
+  animation: destinationCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .destination-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .destination-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes modalBackdropFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-backdrop-anim {
-    opacity: 0;
-    animation: modalBackdropFadeIn 0.2s ease-out forwards;
+  opacity: 0;
+  animation: modalBackdropFadeIn 0.2s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .modal-backdrop-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .modal-backdrop-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes vehicleCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .vehicle-card-anim {
-    opacity: 0;
-    animation: vehicleCardFadeIn 0.7s ease-out forwards;
+  opacity: 0;
+  animation: vehicleCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .vehicle-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .vehicle-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes bookingSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .booking-vehicle-anim {
-    opacity: 0;
-    animation: bookingSectionFadeIn 0.7s ease-out 0.15s forwards;
+  opacity: 0;
+  animation: bookingSectionFadeIn 0.7s ease-out 0.15s forwards;
 }
 
 .booking-owner-anim {
-    opacity: 0;
-    animation: bookingSectionFadeIn 0.7s ease-out 0.35s forwards;
+  opacity: 0;
+  animation: bookingSectionFadeIn 0.7s ease-out 0.35s forwards;
 }
 
 .booking-form-anim {
-    opacity: 0;
-    animation: bookingSectionFadeIn 0.7s ease-out 0.3s forwards;
+  opacity: 0;
+  animation: bookingSectionFadeIn 0.7s ease-out 0.3s forwards;
 }
 
 .booking-reviews-anim {
-    opacity: 0;
-    animation: bookingSectionFadeIn 0.7s ease-out 0.55s forwards;
+  opacity: 0;
+  animation: bookingSectionFadeIn 0.7s ease-out 0.55s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .booking-vehicle-anim,
-    .booking-owner-anim,
-    .booking-form-anim,
-    .booking-reviews-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .booking-vehicle-anim,
+  .booking-owner-anim,
+  .booking-form-anim,
+  .booking-reviews-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes tourFormFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tour-form-anim {
-    opacity: 0;
-    animation: tourFormFadeIn 0.7s ease-out 0.6s forwards;
+  opacity: 0;
+  animation: tourFormFadeIn 0.7s ease-out 0.6s forwards;
 }
 
 @keyframes tourFeatureCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .tour-feature-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .tour-feature-card-anim.in-view {
-    animation: tourFeatureCardFadeIn 0.7s ease-out forwards;
+  animation: tourFeatureCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .tour-form-anim,
-    .tour-feature-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .tour-form-anim,
+  .tour-feature-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes guideHeroFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes guideDetailFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .guide-hero-anim {
-    opacity: 0;
-    animation: guideHeroFadeIn 0.8s ease-out forwards;
+  opacity: 0;
+  animation: guideHeroFadeIn 0.8s ease-out forwards;
 }
 
 .guide-info-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.15s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.15s forwards;
 }
 
 .guide-languages-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.3s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.3s forwards;
 }
 
 .guide-skills-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.45s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.45s forwards;
 }
 
 .guide-price-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.6s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.6s forwards;
 }
 
 .guide-mybookings-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.75s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.75s forwards;
 }
 
 .guide-reviews-anim {
-    opacity: 0;
-    animation: guideDetailFadeIn 0.7s ease-out 0.9s forwards;
+  opacity: 0;
+  animation: guideDetailFadeIn 0.7s ease-out 0.9s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .guide-hero-anim,
-    .guide-info-anim,
-    .guide-languages-anim,
-    .guide-skills-anim,
-    .guide-price-anim,
-    .guide-mybookings-anim,
-    .guide-reviews-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .guide-hero-anim,
+  .guide-info-anim,
+  .guide-languages-anim,
+  .guide-skills-anim,
+  .guide-price-anim,
+  .guide-mybookings-anim,
+  .guide-reviews-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes aboutSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .about-section-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .about-section-anim.in-view {
-    animation: aboutSectionFadeIn 0.7s ease-out forwards;
+  animation: aboutSectionFadeIn 0.7s ease-out forwards;
 }
 
 @keyframes missionSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mission-section-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .mission-section-anim.in-view {
-    animation: missionSectionFadeIn 0.7s ease-out forwards;
+  animation: missionSectionFadeIn 0.7s ease-out forwards;
 }
 
 @keyframes visionSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .vision-section-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .vision-section-anim.in-view {
-    animation: visionSectionFadeIn 0.7s ease-out forwards;
+  animation: visionSectionFadeIn 0.7s ease-out forwards;
 }
 
 @keyframes featureCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .feature-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .feature-card-anim.in-view {
-    animation: featureCardFadeIn 0.7s ease-out forwards;
+  animation: featureCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .about-section-anim,
-    .mission-section-anim,
-    .vision-section-anim,
-    .feature-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .about-section-anim,
+  .mission-section-anim,
+  .vision-section-anim,
+  .feature-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes contactHeroFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .contact-hero-anim {
-    opacity: 0;
-    animation: contactHeroFadeIn 0.7s ease-out 0.2s forwards;
+  opacity: 0;
+  animation: contactHeroFadeIn 0.7s ease-out 0.2s forwards;
 }
 
 @keyframes contactInfoFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .contact-info-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .contact-info-anim.in-view {
-    animation: contactInfoFadeIn 0.7s ease-out forwards;
+  animation: contactInfoFadeIn 0.7s ease-out forwards;
 }
 
 @keyframes officeLocationFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .office-location-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .office-location-anim.in-view {
-    animation: officeLocationFadeIn 0.7s ease-out forwards;
+  animation: officeLocationFadeIn 0.7s ease-out forwards;
 }
 
 @keyframes faqSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .faq-section-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .faq-section-anim.in-view {
-    animation: faqSectionFadeIn 0.7s ease-out forwards;
+  animation: faqSectionFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .contact-hero-anim,
-    .contact-info-anim,
-    .office-location-anim,
-    .faq-section-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .contact-hero-anim,
+  .contact-info-anim,
+  .office-location-anim,
+  .faq-section-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes profileHeaderFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes profileSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes profileAlertSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .profile-title-anim {
-    opacity: 0;
-    animation: profileHeaderFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: profileHeaderFadeIn 0.6s ease-out forwards;
 }
 
 .profile-photo-anim {
-    opacity: 0;
-    animation: profileSectionFadeIn 0.7s ease-out 0.15s forwards;
+  opacity: 0;
+  animation: profileSectionFadeIn 0.7s ease-out 0.15s forwards;
 }
 
 .profile-details-anim {
-    opacity: 0;
-    animation: profileSectionFadeIn 0.7s ease-out 0.3s forwards;
+  opacity: 0;
+  animation: profileSectionFadeIn 0.7s ease-out 0.3s forwards;
 }
 
 .profile-password-anim {
-    opacity: 0;
-    animation: profileSectionFadeIn 0.7s ease-out 0.45s forwards;
+  opacity: 0;
+  animation: profileSectionFadeIn 0.7s ease-out 0.45s forwards;
 }
 
 .profile-save-anim {
-    opacity: 0;
-    animation: profileSectionFadeIn 0.7s ease-out 0.6s forwards;
+  opacity: 0;
+  animation: profileSectionFadeIn 0.7s ease-out 0.6s forwards;
 }
 
 .profile-alert-anim {
-    opacity: 0;
-    animation: profileAlertSlideIn 0.3s ease-out forwards;
+  opacity: 0;
+  animation: profileAlertSlideIn 0.3s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .profile-title-anim,
-    .profile-photo-anim,
-    .profile-details-anim,
-    .profile-password-anim,
-    .profile-save-anim,
-    .profile-alert-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .profile-title-anim,
+  .profile-photo-anim,
+  .profile-details-anim,
+  .profile-password-anim,
+  .profile-save-anim,
+  .profile-alert-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes vehicleOwnerAlertSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes vehicleOwnerHeaderFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes vehicleOwnerCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes vehicleOwnerSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .vehicle-owner-alert-anim {
-    opacity: 0;
-    animation: vehicleOwnerAlertSlideIn 0.3s ease-out forwards;
+  opacity: 0;
+  animation: vehicleOwnerAlertSlideIn 0.3s ease-out forwards;
 }
 
 .vehicle-owner-header-anim {
-    opacity: 0;
-    animation: vehicleOwnerHeaderFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: vehicleOwnerHeaderFadeIn 0.6s ease-out forwards;
 }
 
 .vehicle-owner-card-anim {
-    opacity: 0;
-    animation: vehicleOwnerCardFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: vehicleOwnerCardFadeIn 0.6s ease-out forwards;
 }
 .vehicle-owner-card-anim:nth-child(1) { animation-delay: 0.1s; }
 .vehicle-owner-card-anim:nth-child(2) { animation-delay: 0.2s; }
@@ -803,355 +803,355 @@
 .vehicle-owner-card-anim:nth-child(6) { animation-delay: 0.6s; }
 
 .vehicle-owner-section-anim {
-    opacity: 0;
-    animation: vehicleOwnerSectionFadeIn 0.7s ease-out 0.2s forwards;
+  opacity: 0;
+  animation: vehicleOwnerSectionFadeIn 0.7s ease-out 0.2s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .vehicle-owner-alert-anim,
-    .vehicle-owner-header-anim,
-    .vehicle-owner-card-anim,
-    .vehicle-owner-section-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .vehicle-owner-alert-anim,
+  .vehicle-owner-header-anim,
+  .vehicle-owner-card-anim,
+  .vehicle-owner-section-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes vehiclePhotoFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes vehicleInfoFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes vehicleInfoCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .vehicle-photo-anim,
 .vehicle-info-anim,
 .vehicle-info-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .vehicle-photo-anim.in-view {
-    animation: vehiclePhotoFadeIn 0.7s ease-out forwards;
+  animation: vehiclePhotoFadeIn 0.7s ease-out forwards;
 }
 
 .vehicle-info-anim.in-view {
-    animation: vehicleInfoFadeIn 0.7s ease-out 0.15s forwards;
+  animation: vehicleInfoFadeIn 0.7s ease-out 0.15s forwards;
 }
 
 .vehicle-info-card-anim.in-view {
-    animation: vehicleInfoCardFadeIn 0.6s ease-out forwards;
+  animation: vehicleInfoCardFadeIn 0.6s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .vehicle-photo-anim,
-    .vehicle-info-anim,
-    .vehicle-info-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .vehicle-photo-anim,
+  .vehicle-info-anim,
+  .vehicle-info-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes bookingRowFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .vehicle-owner-row-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .vehicle-owner-row-anim.in-view {
-    animation: bookingRowFadeIn 0.5s ease-out forwards;
+  animation: bookingRowFadeIn 0.5s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .vehicle-owner-row-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .vehicle-owner-row-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes reviewStatCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes reviewItemFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .review-stat-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .review-stat-card-anim.in-view {
-    animation: reviewStatCardFadeIn 0.6s ease-out forwards;
+  animation: reviewStatCardFadeIn 0.6s ease-out forwards;
 }
 .review-stat-card-anim:nth-child(1).in-view { animation-delay: 0s; }
 .review-stat-card-anim:nth-child(2).in-view { animation-delay: 0.1s; }
 .review-stat-card-anim:nth-child(3).in-view { animation-delay: 0.2s; }
 
 .review-item-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .review-item-anim.in-view {
-    animation: reviewItemFadeIn 0.5s ease-out forwards;
+  animation: reviewItemFadeIn 0.5s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .review-stat-card-anim,
-    .review-item-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .review-stat-card-anim,
+  .review-item-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes ownerProfileTitleFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes ownerProfileAlertSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes ownerProfileCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .owner-profile-title-anim {
-    opacity: 0;
-    animation: ownerProfileTitleFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: ownerProfileTitleFadeIn 0.6s ease-out forwards;
 }
 
 .owner-profile-alert-anim {
-    opacity: 0;
-    animation: ownerProfileAlertSlideIn 0.3s ease-out forwards;
+  opacity: 0;
+  animation: ownerProfileAlertSlideIn 0.3s ease-out forwards;
 }
 
 .owner-profile-card-anim {
-    opacity: 0;
+  opacity: 0;
 }
 
 .owner-profile-card-anim.in-view {
-    animation: ownerProfileCardFadeIn 0.7s ease-out forwards;
+  animation: ownerProfileCardFadeIn 0.7s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .owner-profile-title-anim,
-    .owner-profile-alert-anim,
-    .owner-profile-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .owner-profile-title-anim,
+  .owner-profile-alert-anim,
+  .owner-profile-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes tourPreviewSectionFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tour-preview-title-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.1s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.1s forwards;
 }
 
 .tour-preview-map-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.3s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.3s forwards;
 }
 
 .tour-preview-order-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.5s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.5s forwards;
 }
 
 .tour-preview-cart-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.65s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.65s forwards;
 }
 
 .tour-preview-budget-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.8s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.8s forwards;
 }
 
 .tour-preview-cta-anim {
-    opacity: 0;
-    animation: tourPreviewSectionFadeIn 0.7s ease-out 0.95s forwards;
+  opacity: 0;
+  animation: tourPreviewSectionFadeIn 0.7s ease-out 0.95s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .tour-preview-title-anim,
-    .tour-preview-map-anim,
-    .tour-preview-order-anim,
-    .tour-preview-cart-anim,
-    .tour-preview-budget-anim,
-    .tour-preview-cta-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .tour-preview-title-anim,
+  .tour-preview-map-anim,
+  .tour-preview-order-anim,
+  .tour-preview-cart-anim,
+  .tour-preview-budget-anim,
+  .tour-preview-cta-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes hotelDetailCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .hotel-detail-card-anim {
-    opacity: 0;
-    animation: hotelDetailCardFadeIn 0.35s ease-out forwards;
+  opacity: 0;
+  animation: hotelDetailCardFadeIn 0.35s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hotel-detail-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .hotel-detail-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes adminTableFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .admin-table-anim {
-    opacity: 0;
-    animation: adminTableFadeIn 0.5s ease-out forwards;
+  opacity: 0;
+  animation: adminTableFadeIn 0.5s ease-out forwards;
 }
 
 @keyframes adminRowFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .admin-row-anim {
-    opacity: 0;
-    animation: adminRowFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation: adminRowFadeIn 0.4s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .admin-table-anim,
-    .admin-row-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .admin-table-anim,
+  .admin-row-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes adminSidebarSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (min-width: 768px) {
-    .admin-sidebar-anim {
-        opacity: 0;
-        animation: adminSidebarSlideIn 0.6s ease-out forwards;
-    }
+  .admin-sidebar-anim {
+    opacity: 0;
+    animation: adminSidebarSlideIn 0.6s ease-out forwards;
+  }
 }
 
 @keyframes adminNavItemFadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .admin-nav-item-anim {
-    opacity: 0;
-    animation: adminNavItemFadeIn 0.5s ease-out forwards;
+  opacity: 0;
+  animation: adminNavItemFadeIn 0.5s ease-out forwards;
 }
 .admin-nav-item-anim:nth-child(1) { animation-delay: 0.05s; }
 .admin-nav-item-anim:nth-child(2) { animation-delay: 0.1s; }
@@ -1161,177 +1161,99 @@
 .admin-nav-item-anim:nth-child(6) { animation-delay: 0.3s; }
 
 @keyframes adminContentFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .admin-content-anim {
-    opacity: 0;
-    animation: adminContentFadeIn 0.5s ease-out 0.15s forwards;
+  opacity: 0;
+  animation: adminContentFadeIn 0.5s ease-out 0.15s forwards;
 }
 
 @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-    .admin-sidebar-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .admin-sidebar-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .admin-nav-item-anim,
-    .admin-content-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .admin-nav-item-anim,
+  .admin-content-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 .admin-navbar-anim {
-    opacity: 0;
-    animation: navbarFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: navbarFadeIn 0.6s ease-out forwards;
 }
-@keyframes adminSidebarSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@media (min-width: 768px) {
-    .admin-sidebar-anim {
-        opacity: 0;
-        animation: adminSidebarSlideIn 0.6s ease-out forwards;
-    }
-}
-
-@keyframes adminNavItemFadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.admin-nav-item-anim {
-    opacity: 0;
-    animation: adminNavItemFadeIn 0.5s ease-out forwards;
-}
-.admin-nav-item-anim:nth-child(1) { animation-delay: 0.05s; }
-.admin-nav-item-anim:nth-child(2) { animation-delay: 0.1s; }
-.admin-nav-item-anim:nth-child(3) { animation-delay: 0.15s; }
-.admin-nav-item-anim:nth-child(4) { animation-delay: 0.2s; }
-.admin-nav-item-anim:nth-child(5) { animation-delay: 0.25s; }
-.admin-nav-item-anim:nth-child(6) { animation-delay: 0.3s; }
-
-@keyframes adminContentFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.admin-content-anim {
-    opacity: 0;
-    animation: adminContentFadeIn 0.5s ease-out 0.15s forwards;
-}
-
-.admin-navbar-anim {
-    opacity: 0;
-    animation: navbarFadeIn 0.6s ease-out forwards;
-}
-
 @keyframes adminTitleFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .admin-title-anim {
-    animation: adminTitleFadeIn 0.25s ease-out forwards;
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-    .admin-sidebar-anim {
-        animation: none;
-        opacity: 1;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .admin-nav-item-anim,
-    .admin-content-anim,
-    .admin-navbar-anim,
-    .admin-title-anim {
-        animation: none;
-        opacity: 1;
-    }
+  animation: adminTitleFadeIn 0.25s ease-out forwards;
 }
 @keyframes overviewHeaderFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes overviewAlertSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes overviewStatCardFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .overview-header-anim {
-    opacity: 0;
-    animation: overviewHeaderFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: overviewHeaderFadeIn 0.6s ease-out forwards;
 }
 
 .overview-alert-anim {
-    opacity: 0;
-    animation: overviewAlertSlideIn 0.3s ease-out forwards;
+  opacity: 0;
+  animation: overviewAlertSlideIn 0.3s ease-out forwards;
 }
 
 .overview-stat-card-anim {
-    opacity: 0;
-    animation: overviewStatCardFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: overviewStatCardFadeIn 0.6s ease-out forwards;
 }
 .overview-stat-card-anim:nth-child(1) { animation-delay: 0.05s; }
 .overview-stat-card-anim:nth-child(2) { animation-delay: 0.1s; }
@@ -1340,62 +1262,66 @@
 .overview-stat-card-anim:nth-child(5) { animation-delay: 0.25s; }
 .overview-stat-card-anim:nth-child(6) { animation-delay: 0.3s; }
 
+.overview-stat-card-anim:hover {
+  transform: translateY(-4px);
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .overview-header-anim,
-    .overview-alert-anim,
-    .overview-stat-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .overview-header-anim,
+  .overview-alert-anim,
+  .overview-stat-card-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes hotelSidebarSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (min-width: 768px) {
-    .hotel-sidebar-anim {
-        opacity: 0;
-        animation: hotelSidebarSlideIn 0.6s ease-out forwards;
-    }
+  .hotel-sidebar-anim {
+    opacity: 0;
+    animation: hotelSidebarSlideIn 0.6s ease-out forwards;
+  }
 }
 
 @keyframes hotelSidebarLogoFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hotel-sidebar-logo-anim {
-    opacity: 0;
-    animation: hotelSidebarLogoFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: hotelSidebarLogoFadeIn 0.6s ease-out forwards;
 }
 
 @keyframes hotelSidebarNavItemFadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .hotel-sidebar-nav-item-anim {
-    opacity: 0;
-    animation: hotelSidebarNavItemFadeIn 0.5s ease-out forwards;
+  opacity: 0;
+  animation: hotelSidebarNavItemFadeIn 0.5s ease-out forwards;
 }
 .hotel-sidebar-nav-item-anim:nth-child(1) { animation-delay: 0.05s; }
 .hotel-sidebar-nav-item-anim:nth-child(2) { animation-delay: 0.1s; }
@@ -1404,109 +1330,108 @@
 .hotel-sidebar-nav-item-anim:nth-child(5) { animation-delay: 0.2s; }
 
 .hotel-sidebar-mobilebar-anim {
-    opacity: 0;
-    animation: navbarFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: navbarFadeIn 0.6s ease-out forwards;
 }
 
 @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-    .hotel-sidebar-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .hotel-sidebar-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hotel-sidebar-logo-anim,
-    .hotel-sidebar-nav-item-anim,
-    .hotel-sidebar-mobilebar-anim {
-        animation: none;
-        opacity: 1;
-    }
+  .hotel-sidebar-logo-anim,
+  .hotel-sidebar-nav-item-anim,
+  .hotel-sidebar-mobilebar-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 @keyframes roomManagementFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes roomManagementFormFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes roomManagementRowFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes roomManagementMenuFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.96) translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .room-management-anim {
-    opacity: 0;
-    animation: roomManagementFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+  animation: roomManagementFadeIn 0.6s ease-out forwards;
 }
 
 .room-management-form-anim {
-    opacity: 0;
-    animation: roomManagementFormFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation: roomManagementFormFadeIn 0.4s ease-out forwards;
 }
 
 .room-management-row-anim {
-    opacity: 0;
-    animation: roomManagementRowFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  animation: roomManagementRowFadeIn 0.4s ease-out forwards;
 }
 
 .room-management-menu-anim {
-    animation: roomManagementMenuFadeIn 0.15s ease-out forwards;
+  animation: roomManagementMenuFadeIn 0.15s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .room-management-anim,
-    .room-management-form-anim,
-    .room-management-row-anim,
-    .room-management-menu-anim {
-        animation: none;
-        opacity: 1;
-    }
-}
-.overview-stat-card-anim {
-    opacity: 0;
-    animation: overviewStatCardFadeIn 0.6s ease-out forwards;
+  .room-management-anim,
+  .room-management-form-anim,
+  .room-management-row-anim,
+  .room-management-menu-anim {
+    animation: none;
+    opacity: 1;
+  }
 }
 
-.overview-stat-card-anim:hover {
-    transform: translateY(-4px);
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .overview-stat-card-anim {
-        animation: none;
-        opacity: 1;
-    }
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 1;
 }
