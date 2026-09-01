@@ -805,11 +805,15 @@ const TourPage = () => {
           </div>
 
           <input
-  type="date"
-  min={getTodayString()}
-  value={startDate}
-  onChange={(event) => setStartDate(event.target.value)}
-/>
+              type="date"
+              min={getTodayString()}
+              value={startDate}
+              onChange={(event) => {
+                setStartDate(event.target.value);
+                setError("");
+              }}
+              className="w-full bg-[#253745] border border-[#3A4B58] rounded-md px-3 py-2 text-white focus:outline-non focus:border-[#00C896]"
+          />
 
           <div className="max-w-sm mx-auto mb-4 text-left">
             <label className="block text-sm text-gray-300 mb-2">
