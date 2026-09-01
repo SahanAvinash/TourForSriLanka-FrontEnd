@@ -804,10 +804,10 @@ const TourPage = () => {
             )}
           </div>
           <div className="max-w-sm mx-auto mb-4 text-left">
-            <label className="block text-sm text-gray-300 mb-2">
-              Trip Start Date
-            </label>
-            <div className="relative">
+              <label className="block text-sm text-gray-300 mb-2">
+                Trip Start Date
+              </label>
+
                 <input
                   type="date"
                   min={getTodayString()}
@@ -816,10 +816,15 @@ const TourPage = () => {
                     setStartDate(event.target.value);
                     setError("");
                   }}
-                  className="w-full bg-[#253745] border border-[#3A4B58] rounded-md px-3 py-2 text-white focus:outline-non focus:border-[#00C896]"
+                  className="block w-full min-w-0 max-w-full h-[42px] bg-[#253745] border border-[#3A4B58] rounded-md px-3 py-2 text-white focus:outline-none focus:border-[#00C896]"
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    minWidth: 0,
+                    boxSizing: "border-box",
+                  }}
                 />
             </div>
-          </div>
 
           <div className="max-w-sm mx-auto mb-4 text-left">
             <label className="block text-sm text-gray-300 mb-2">
