@@ -805,21 +805,21 @@ const TourPage = () => {
           </div>
 
           <div className="max-w-sm mx-auto mb-4 text-left">
-            <label className="block text-sm text-gray-300 mb-2">
-              Trip start date
-            </label>
+  <label className="block text-sm text-gray-300 mb-2">
+    Trip start date
+  </label>
 
-            <input
-              type="date"
-              min={getTodayString()}
-              value={startDate}
-              onChange={(event) => {
-                setStartDate(event.target.value);
-                setError("");
-              }}
-              className="w-full max-w-full box-border bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-[#00C896] [color-scheme:dark]"
-            />
-          </div>
+  <input
+    type="date"
+    min={getTodayString()}
+    value={startDate}
+    onChange={(event) => {
+      setStartDate(event.target.value);
+      setError("");
+    }}
+    className="w-full max-w-full box-border bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white text-sm sm:text-base focus:outline-none focus:border-[#00C896] [color-scheme:dark]"
+  />
+</div>
 
           <div className="max-w-sm mx-auto mb-4 text-left">
             <label className="block text-sm text-gray-300 mb-2">
