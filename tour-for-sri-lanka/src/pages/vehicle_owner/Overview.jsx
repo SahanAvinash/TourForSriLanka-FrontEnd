@@ -12,7 +12,6 @@ import axios from "axios";
 
 export default function Overview() {
   const [loadingStats, setLoadingStats] = useState(true);
-  const [ownerName, setOwnerName] = useState("");
   const [isApproved, setIsApproved] = useState(false);
 
   const [todayBookings, setTodayBookings] = useState(0);
@@ -42,8 +41,6 @@ export default function Overview() {
 
     const user = JSON.parse(storedUser);
     const transportId = user._id;
-
-    setOwnerName(user.firstName || "");
 
     axios
       .get(`${API_BASE_URL}/api/transport/${transportId}`)
@@ -167,7 +164,7 @@ export default function Overview() {
         </div>
       )}
 
-      <div className="vehicle-owner-header-anim w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+      <div className="vehicle-owner-header-anim w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
             Overview
@@ -179,12 +176,6 @@ export default function Overview() {
         </div>
 
         <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">{today}</span>
-      </div>
-
-      <div className="vehicle-owner-header-anim w-full max-w-[1100px] flex items-center justify-start mb-6">
-        <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
-          {ownerName}
-        </p>
       </div>
 
       <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
