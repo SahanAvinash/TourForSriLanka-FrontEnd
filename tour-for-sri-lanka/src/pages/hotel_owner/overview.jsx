@@ -155,7 +155,7 @@ export default function Overview() {
   return (
     <section
       id="overview"
-      className="w-full flex flex-col  justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-[10px] sm:pt-20 overflow-x-hidden"
+      className="w-full flex flex-col  justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-6 sm:pt-8q overflow-x-hidden"
     >
       <div className="w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
         <div className="flex items-center gap-2">
