@@ -42,6 +42,6 @@ export default function HotelOwnerDashboard() {
           </section>
         </main>
       </div>
-    </div>
+    </div> 
   );
 }
