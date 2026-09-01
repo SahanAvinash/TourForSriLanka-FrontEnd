@@ -1,6 +1,6 @@
 import {
   FaHome,
-  FaCar,
+  FaBed,
   FaStar,
   FaCog,
   FaSignOutAlt,
@@ -11,16 +11,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
-export const vehicleOwnerMenu = [
+export const hotelOwnerMenu = [
   {
     name: "Overview",
     icon: <FaHome />,
     id: "overview",
   },
   {
-    name: "My Vehicle",
-    icon: <FaCar />,
-    id: "my-vehicle",
+    name: "Room Management",
+    icon: <FaBed />,
+    id: "rooms",
   },
   {
     name: "Bookings",
@@ -39,7 +39,10 @@ export const vehicleOwnerMenu = [
   },
 ];
 
-export default function Sidebar({ activeSection, setActiveSection }) {
+export default function Sidebar({
+  activeSection,
+  setActiveSection,
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -51,7 +54,8 @@ export default function Sidebar({ activeSection, setActiveSection }) {
         const visibleSections = entries
           .filter((entry) => entry.isIntersecting)
           .sort(
-            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+            (a, b) =>
+              a.boundingClientRect.top - b.boundingClientRect.top
           );
 
         if (visibleSections.length > 0) {
@@ -76,7 +80,9 @@ export default function Sidebar({ activeSection, setActiveSection }) {
       const offset = window.innerWidth < 768 ? 80 : 20;
 
       const sectionTop =
-        section.getBoundingClientRect().top + window.scrollY - offset;
+        section.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
 
       window.scrollTo({
         top: sectionTop,
@@ -146,7 +152,7 @@ export default function Sidebar({ activeSection, setActiveSection }) {
         </div>
 
         <nav className="flex-1 px-4 sm:px-5 pt-5 md:pt-0">
-          {vehicleOwnerMenu.map((item) => (
+          {hotelOwnerMenu.map((item) => (
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
