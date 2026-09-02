@@ -46,18 +46,20 @@ export default function AdminTransport() {
             header: "Rate / Km", 
             render: (item) => {
               const oldRate = item.oldRatePerKm || item.previousRatePerKm || item.oldRate;
-              const newRate = item.ratePerKm;
+              const newRate = item.ratePerKm || item.newRatePerKm;
+              
+              // If pending or has old rate, show inside yellow box with Old & New labels
+              if (!item.isApproved || oldRate) {
+                return (
+                  <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
+                    <span className="text-gray-300">Old Rate : LKR {oldRate || "N/A"}</span>
+                    <span className="text-[#00C896] font-bold">New Rate : LKR {newRate}</span>
+                  </div>
+                );
+              }
+
               return (
-                <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
-                  {oldRate ? (
-                    <>
-                      <span className="text-gray-300">Old Rate : LKR {oldRate}</span>
-                      <span className="text-[#00C896] font-bold">New Rate : LKR {newRate}</span>
-                    </>
-                  ) : (
-                    <span className="text-yellow-400 font-semibold">Rate : LKR {newRate}</span>
-                  )}
-                </div>
+                <span className="text-white font-semibold">LKR {newRate}</span>
               );
             } 
           },
@@ -132,10 +134,10 @@ export default function AdminTransport() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
                     <span className="text-gray-300">Rate Per Km:</span>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
-                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) ? (
+                      {(!selectedTransport.isApproved || selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) ? (
                         <>
                           <span className="text-gray-300">
-                            Old Rate : LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate}
+                            Old Rate : LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate || "N/A"}
                           </span>
                           <span className="text-[#00C896] font-bold">
                             New Rate : LKR {selectedTransport.ratePerKm}
