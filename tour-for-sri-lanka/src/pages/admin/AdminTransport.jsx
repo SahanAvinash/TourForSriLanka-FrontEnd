@@ -50,15 +50,21 @@ export default function AdminTransport() {
               
               if (!item.isApproved || oldRate) {
                 return (
-                  <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg my-1">
-                    <span className="text-gray-300">Old Rate : LKR {oldRate || "N/A"}</span>
-                    <span className="text-[#00C896] font-bold">New Rate : LKR {newRate}</span>
+                  <div className="flex flex-col gap-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg my-1 min-w-[140px] max-w-[180px]">
+                    <div className="flex justify-between items-center text-[11px] text-gray-400 border-b border-yellow-500/20 pb-0.5">
+                      <span>Old:</span>
+                      <span className="line-through text-gray-300">LKR {oldRate || "N/A"}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs font-bold text-[#00C896]">
+                      <span>New:</span>
+                      <span>LKR {newRate}</span>
+                    </div>
                   </div>
                 );
               }
 
               return (
-                <span className="text-white font-semibold">LKR {newRate}</span>
+                <span className="text-white font-semibold text-xs">LKR {newRate}</span>
               );
             } 
           },
@@ -137,19 +143,19 @@ export default function AdminTransport() {
                   <p className="truncate"><span className="text-gray-400">Vehicle Type:</span> {selectedTransport.vehicleType}</p>
                   <p className="truncate"><span className="text-gray-400">Registration No:</span> {selectedTransport.registrationNo}</p>
                   
-                  {/* Rate Box */}
+                  {/* Clean Rate Box */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
-                    <span className="text-gray-300">Rate Per Km:</span>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs">
+                    <span className="text-gray-300 font-medium">Rate Per Km:</span>
+                    <div className="flex items-center gap-4 text-xs">
                       {(!selectedTransport.isApproved || selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) ? (
-                        <>
-                          <span className="text-gray-300">
-                            Old Rate : LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate || "N/A"}
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-400 line-through">
+                            Old: LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate || "N/A"}
                           </span>
-                          <span className="text-[#00C896] font-bold">
-                            New Rate : LKR {selectedTransport.ratePerKm}
+                          <span className="text-[#00C896] font-bold bg-[#00C896]/10 px-2 py-1 rounded">
+                            New: LKR {selectedTransport.ratePerKm}
                           </span>
-                        </>
+                        </div>
                       ) : (
                         <span className="text-[#00C896] font-bold">LKR {selectedTransport.ratePerKm}</span>
                       )}
