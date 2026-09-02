@@ -35,7 +35,7 @@ export default function AdminTransport() {
                   ? "bg-[#00C896]/10 text-[#00C896] border-[#00C896]/30" 
                   : "bg-yellow-400/10 text-yellow-400 border-yellow-400/30"
               }`}>
-                {item.isApproved ? "Approved" : "Pending Review"}
+                {item.isApproved ? "Approved" : "Pending"}
               </span>
             )
           },
