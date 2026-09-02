@@ -47,15 +47,15 @@ export default function AdminTransport() {
             render: (item) => {
               const oldRate = item.oldRatePerKm || item.previousRatePerKm || item.oldRate;
               return (
-                <div className="flex flex-col text-xs space-y-0.5">
-                  {oldRate && (
-                    <span className="text-gray-400 line-through">
-                      Old: LKR {oldRate}
-                    </span>
+                <div className="flex flex-col text-xs space-y-1">
+                  {oldRate ? (
+                    <>
+                      <span className="text-gray-400">Old Rate : LKR {oldRate}</span>
+                      <span className="text-[#00C896] font-bold">New Rate : LKR {item.ratePerKm}</span>
+                    </>
+                  ) : (
+                    <span className="text-white font-semibold">LKR {item.ratePerKm}</span>
                   )}
-                  <span className="text-[#00C896] font-bold">
-                    New: LKR {item.ratePerKm}
-                  </span>
                 </div>
               );
             } 
@@ -130,15 +130,19 @@ export default function AdminTransport() {
                   
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-black/30 p-3 rounded-lg sm:col-span-2 border border-yellow-500/20 gap-2">
                     <span className="text-gray-400">Rate Per Km:</span>
-                    <div className="flex items-center gap-4">
-                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) && (
-                        <span className="text-gray-400 line-through text-xs">
-                          Old: LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate}
-                        </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) ? (
+                        <>
+                          <span className="text-gray-400">
+                            Old Rate : LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate}
+                          </span>
+                          <span className="text-[#00C896] font-bold">
+                            New Rate : LKR {selectedTransport.ratePerKm}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[#00C896] font-bold">LKR {selectedTransport.ratePerKm}</span>
                       )}
-                      <span className="text-[#00C896] font-bold">
-                        New: LKR {selectedTransport.ratePerKm}
-                      </span>
                     </div>
                   </div>
 
