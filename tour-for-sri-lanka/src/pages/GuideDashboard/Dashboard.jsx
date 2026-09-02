@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Overview from "./Overview";
 import Sidebar from "./SlideBar";
-import TopBar from "../hotel_owner/TopBar";
+import TopBar from "./TopBar";
 import Bookings from "./Bookings";
 import Reviews from "./Reviews";
 import Profile from "./Profile";
