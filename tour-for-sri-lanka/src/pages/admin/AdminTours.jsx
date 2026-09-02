@@ -14,7 +14,19 @@ export default function AdminTours() {
     setLoading(true);
     axios
       .get(`${API_BASE_URL}/api/tour`, { headers: { Authorization: "Bearer " + token } })
-      .then((res) => setTours(res.data))
+      .then((res) => {
+        // Backend eken direct array ekak dunnath, object ekak (e.g. { tours: [...] }) dunnath safe widihata handle karai
+        const responseData = res.data;
+        if (Array.isArray(responseData)) {
+          setTours(responseData);
+        } else if (responseData && Array.isArray(responseData.tours)) {
+          setTours(responseData.tours);
+        } else if (responseData && Array.isArray(responseData.data)) {
+          setTours(responseData.data);
+        } else {
+          setTours([]);
+        }
+      })
       .catch(() => toast.error("Failed to load tours"))
       .finally(() => setLoading(false));
   }
@@ -36,9 +48,10 @@ export default function AdminTours() {
       .catch(() => toast.error("Failed to remove tour"));
   }
 
-  const filtered = tours.filter((t) =>
-    JSON.stringify(t).toLowerCase().includes(search.toLowerCase())
-  );
+  // Safe filtering
+  const filtered = Array.isArray(tours) 
+    ? tours.filter((t) => JSON.stringify(t).toLowerCase().includes(search.toLowerCase()))
+    : [];
 
   return (
     <div>
@@ -65,7 +78,7 @@ export default function AdminTours() {
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Guide</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Hotels</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Transport</th>
-                <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Distance</th>
+                <th className="text-[#CCD0CF] px-5 py-3 text-sm font-semibold">Distance</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Status</th>
                 <th className="text-[#CCD0CF] px-4 py-3 text-sm font-semibold">Actions</th>
               </tr>
@@ -77,13 +90,13 @@ export default function AdminTours() {
                   className="border-t border-[#253745] hover:bg-[#243b4a] transition-colors"
                 >
                   <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.traveler ? `${tour.traveler.firstName} ${tour.traveler.lastName}` : "-"}
+                    {tour.traveler ? `${tour.traveler.firstName || ""} ${tour.traveler.lastName || ""}` : "-"}
                   </td>
                   <td className="text-[#CCD0CF] px-4 py-3 text-sm">
                     {(tour.destinations || []).map((d) => d.name).join(", ") || "-"}
                   </td>
                   <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.selectedGuide ? `${tour.selectedGuide.firstName} ${tour.selectedGuide.lastName}` : "-"}
+                    {tour.selectedGuide ? `${tour.selectedGuide.firstName || ""} ${tour.selectedGuide.lastName || ""}` : "-"}
                   </td>
                   <td className="text-[#CCD0CF] px-4 py-3 text-sm">
                     {(tour.selectedHotels || []).map((h) => h.hotelName).join(", ") || "-"}
@@ -106,13 +119,13 @@ export default function AdminTours() {
                           : "text-yellow-400 font-semibold"
                       }
                     >
-                      {tour.status}
+                      {tour.status || "pending"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <button
                       onClick={() => handleRemove(tour)}
-                      className="bg-red-500/80 text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition"
+                      className="bg-red-500/80 text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition cursor-pointer"
                     >
                       Remove
                     </button>
