@@ -41,7 +41,25 @@ export default function AdminGuides() {
           { header: "Email", render: (item) => item.email },
           { header: "District", render: (item) => item.district },
           { header: "License No.", render: (item) => item.GuideLicenseNumber },
-          { header: "Price/Day", render: (item) => `${item.currency || "LKR"} ${item.pricePerDay}` },
+          { 
+            header: "Price/Day", 
+            render: (item) => {
+              const oldDayPrice = item.oldPricePerDay || item.previousPricePerDay || item.oldPrice;
+              const currency = item.currency || "LKR";
+              return (
+                <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
+                  {oldDayPrice ? (
+                    <>
+                      <span className="text-gray-300">Old Rate : {currency} {oldDayPrice}</span>
+                      <span className="text-[#00C896] font-bold">New Rate : {currency} {item.pricePerDay}</span>
+                    </>
+                  ) : (
+                    <span className="text-yellow-400 font-semibold">Rate : {currency} {item.pricePerDay}</span>
+                  )}
+                </div>
+              );
+            } 
+          },
           {
             header: "Actions",
             render: (item) => (
@@ -74,7 +92,6 @@ export default function AdminGuides() {
             </div>
 
             <div className="space-y-6 text-sm">
-              {/* Profile Picture & Role */}
               {selectedGuide.profilePic && (
                 <div className="flex items-center gap-4 bg-black/20 p-4 rounded-xl">
                   <img 
@@ -89,7 +106,6 @@ export default function AdminGuides() {
                 </div>
               )}
 
-              {/* Personal Information */}
               <div>
                 <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Personal Information
@@ -99,17 +115,9 @@ export default function AdminGuides() {
                   <p><span className="text-gray-400">Email:</span> {selectedGuide.email}</p>
                   <p><span className="text-gray-400">Mobile:</span> {selectedGuide.mobile}</p>
                   <p><span className="text-gray-400">NIC:</span> {selectedGuide.NIC}</p>
-                  <p><span className="text-gray-400">Date of Birth:</span> {selectedGuide.dateOfBirth ? new Date(selectedGuide.dateOfBirth).toLocaleDateString() : "N/A"}</p>
-                  <p><span className="text-gray-400">Gender:</span> {selectedGuide.gender}</p>
-                  <p><span className="text-gray-400">Marital Status:</span> {selectedGuide.maritalStatus}</p>
-                  <p><span className="text-gray-400">Ethnicity:</span> {selectedGuide.ethnicity || "N/A"}</p>
-                  <p><span className="text-gray-400">Country:</span> {selectedGuide.country}</p>
-                  <p><span className="text-gray-400">Province / District:</span> {selectedGuide.province}, {selectedGuide.district}</p>
-                  <p className="sm:col-span-2"><span className="text-gray-400">Address:</span> {selectedGuide.address}</p>
                 </div>
               </div>
 
-              {/* Professional Details & Pricing */}
               <div>
                 <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Professional & Pricing Details
@@ -117,69 +125,52 @@ export default function AdminGuides() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
                   <p><span className="text-gray-400">License Number:</span> {selectedGuide.GuideLicenseNumber}</p>
                   <p><span className="text-gray-400">Experience:</span> {selectedGuide.yearsOfExperience} Years</p>
-                  <p><span className="text-gray-400">Price Per Hour:</span> {selectedGuide.currency} {selectedGuide.pricePerHour}</p>
-                  <p><span className="text-gray-400">Price Per Day:</span> {selectedGuide.currency} {selectedGuide.pricePerDay}</p>
-                  <p><span className="text-gray-400">Max Guests:</span> {selectedGuide.maximumGuests}</p>
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/30 gap-2">
+                    <span className="text-gray-300">Price Per Hour:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                      {(selectedGuide.oldPricePerHour || selectedGuide.previousPricePerHour) ? (
+                        <>
+                          <span className="text-gray-300">
+                            Old Rate : {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerHour || selectedGuide.previousPricePerHour}
+                          </span>
+                          <span className="text-[#00C896] font-bold">
+                            New Rate : {selectedGuide.currency || "LKR"} {selectedGuide.pricePerHour}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[#00C896] font-bold">{selectedGuide.currency || "LKR"} {selectedGuide.pricePerHour}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/30 gap-2">
+                    <span className="text-gray-300">Price Per Day:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                      {(selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice) ? (
+                        <>
+                          <span className="text-gray-300">
+                            Old Rate : {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice}
+                          </span>
+                          <span className="text-[#00C896] font-bold">
+                            New Rate : {selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[#00C896] font-bold">{selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {!selectedGuide.isApproved && (
+                    <div className="sm:col-span-2 bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-lg text-yellow-300 text-xs flex items-center gap-2">
+                      <span>⚠️</span>
+                      <span>This profile / pricing has been recently updated and is awaiting admin approval.</span>
+                    </div>
+                  )}
                 </div>
-                {selectedGuide.aboutYourSelf && (
-                  <div className="mt-3 bg-black/20 p-4 rounded-xl">
-                    <p className="text-gray-400 mb-1">About Self:</p>
-                    <p className="text-gray-300">{selectedGuide.aboutYourSelf}</p>
-                  </div>
-                )}
-                {selectedGuide.additionalFields && (
-                  <div className="mt-3 bg-black/20 p-4 rounded-xl">
-                    <p className="text-gray-400 mb-1">Additional Notes:</p>
-                    <p className="text-gray-300">{selectedGuide.additionalFields}</p>
-                  </div>
-                )}
               </div>
 
-              {/* Skills */}
-              {selectedGuide.skill && (
-                <div>
-                  <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
-                    Skills & Tour Types
-                  </h3>
-                  <div className="flex flex-wrap gap-2 bg-black/20 p-4 rounded-xl">
-                    {Object.entries(selectedGuide.skill).map(
-                      ([key, value]) =>
-                        value && (
-                          <span
-                            key={key}
-                            className="bg-[#00C896]/20 text-[#00C896] px-2.5 py-1 rounded-lg text-xs capitalize"
-                          >
-                            {key.replace(/([A-Z])/g, ' $1')}
-                          </span>
-                        )
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Languages */}
-              {selectedGuide.languages && (
-                <div>
-                  <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
-                    Languages Known
-                  </h3>
-                  <div className="flex flex-wrap gap-2 bg-black/20 p-4 rounded-xl">
-                    {Object.entries(selectedGuide.languages).map(
-                      ([key, value]) =>
-                        value && (
-                          <span
-                            key={key}
-                            className="bg-gray-700 text-gray-200 px-2.5 py-1 rounded-lg text-xs capitalize"
-                          >
-                            {key}
-                          </span>
-                        )
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Uploaded Documents */}
               <div>
                 <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Uploaded Documents & Verification Files

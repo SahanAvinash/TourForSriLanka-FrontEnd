@@ -46,15 +46,16 @@ export default function AdminTransport() {
             header: "Rate / Km", 
             render: (item) => {
               const oldRate = item.oldRatePerKm || item.previousRatePerKm || item.oldRate;
+              const newRate = item.ratePerKm;
               return (
-                <div className="flex flex-col text-xs space-y-1">
+                <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
                   {oldRate ? (
                     <>
-                      <span className="text-gray-400">Old Rate : LKR {oldRate}</span>
-                      <span className="text-[#00C896] font-bold">New Rate : LKR {item.ratePerKm}</span>
+                      <span className="text-gray-300">Old Rate : LKR {oldRate}</span>
+                      <span className="text-[#00C896] font-bold">New Rate : LKR {newRate}</span>
                     </>
                   ) : (
-                    <span className="text-white font-semibold">LKR {item.ratePerKm}</span>
+                    <span className="text-yellow-400 font-semibold">Rate : LKR {newRate}</span>
                   )}
                 </div>
               );
@@ -128,12 +129,12 @@ export default function AdminTransport() {
                   <p><span className="text-gray-400">Vehicle Type:</span> {selectedTransport.vehicleType}</p>
                   <p><span className="text-gray-400">Registration No:</span> {selectedTransport.registrationNo}</p>
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-black/30 p-3 rounded-lg sm:col-span-2 border border-yellow-500/20 gap-2">
-                    <span className="text-gray-400">Rate Per Km:</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
+                    <span className="text-gray-300">Rate Per Km:</span>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
                       {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) ? (
                         <>
-                          <span className="text-gray-400">
+                          <span className="text-gray-300">
                             Old Rate : LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate}
                           </span>
                           <span className="text-[#00C896] font-bold">
