@@ -44,26 +44,28 @@ export default function AdminGuides() {
           { 
             header: "Price/Day", 
             render: (item) => {
-              const oldDayPrice = item.oldPricePerDay || item.previousPricePerDay || item.oldPrice;
+              // Check all possible variations for old and new day prices
+              const oldDayPrice = item.oldPricePerDay || item.previousPricePerDay || item.oldPrice || item.oldRatePerDay;
+              const newDayPrice = item.pricePerDay || item.newPricePerDay || item.ratePerDay;
               const currency = item.currency || "LKR";
               
-              if (oldDayPrice) {
+              if (!item.isApproved || oldDayPrice) {
                 return (
                   <div className="flex flex-col gap-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg my-1 min-w-[140px] max-w-[180px]">
                     <div className="flex justify-between items-center text-[11px] text-gray-400 border-b border-yellow-500/20 pb-0.5">
                       <span>Old:</span>
-                      <span className="line-through text-gray-300">{currency} {oldDayPrice}</span>
+                      <span className="line-through text-gray-300">{currency} {oldDayPrice || "N/A"}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs font-bold text-[#00C896]">
                       <span>New:</span>
-                      <span>{currency} {item.pricePerDay}</span>
+                      <span>{currency} {newDayPrice}</span>
                     </div>
                   </div>
                 );
               }
 
               return (
-                <span className="text-white font-semibold text-xs">{currency} {item.pricePerDay}</span>
+                <span className="text-white font-semibold text-xs">{currency} {newDayPrice}</span>
               );
             } 
           },
@@ -158,13 +160,15 @@ export default function AdminGuides() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
                     <span className="text-gray-300 font-medium">Price Per Day:</span>
                     <div className="flex items-center gap-4 text-xs">
-                      {(selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice) ? (
+                      {(selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice || !selectedGuide.isApproved) ? (
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-400 line-through">
-                            Old: {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice}
-                          </span>
+                          {(selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice) && (
+                            <span className="text-gray-400 line-through">
+                              Old: {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice}
+                            </span>
+                          )}
                           <span className="text-[#00C896] font-bold bg-[#00C896]/10 px-2 py-1 rounded">
-                            New: {selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}
+                            New: {selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay || selectedGuide.newPricePerDay}
                           </span>
                         </div>
                       ) : (
