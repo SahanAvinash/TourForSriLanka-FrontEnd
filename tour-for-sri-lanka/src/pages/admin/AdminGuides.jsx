@@ -16,7 +16,7 @@ export default function AdminGuides() {
   };
 
   return (
-    <>
+    <div className="admin-content-anim w-full overflow-x-hidden">
       <AdminApprovalTable
         title="Guides"
         fetchUrl={`${API_BASE_URL}/api/guide`}
@@ -28,7 +28,7 @@ export default function AdminGuides() {
           { 
             header: "Status", 
             render: (item) => (
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+              <span className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold border ${
                 item.isApproved 
                   ? "bg-[#00C896]/10 text-[#00C896] border-[#00C896]/30" 
                   : "bg-yellow-400/10 text-yellow-400 border-yellow-400/30"
@@ -46,17 +46,24 @@ export default function AdminGuides() {
             render: (item) => {
               const oldDayPrice = item.oldPricePerDay || item.previousPricePerDay || item.oldPrice;
               const currency = item.currency || "LKR";
+              
+              if (oldDayPrice) {
+                return (
+                  <div className="flex flex-col gap-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg my-1 min-w-[140px] max-w-[180px]">
+                    <div className="flex justify-between items-center text-[11px] text-gray-400 border-b border-yellow-500/20 pb-0.5">
+                      <span>Old:</span>
+                      <span className="line-through text-gray-300">{currency} {oldDayPrice}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs font-bold text-[#00C896]">
+                      <span>New:</span>
+                      <span>{currency} {item.pricePerDay}</span>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
-                <div className="flex flex-col text-xs space-y-1 bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
-                  {oldDayPrice ? (
-                    <>
-                      <span className="text-gray-300">Old Rate : {currency} {oldDayPrice}</span>
-                      <span className="text-[#00C896] font-bold">New Rate : {currency} {item.pricePerDay}</span>
-                    </>
-                  ) : (
-                    <span className="text-yellow-400 font-semibold">Rate : {currency} {item.pricePerDay}</span>
-                  )}
-                </div>
+                <span className="text-white font-semibold text-xs">{currency} {item.pricePerDay}</span>
               );
             } 
           },
@@ -66,7 +73,7 @@ export default function AdminGuides() {
               <button
                 type="button"
                 onClick={() => setSelectedGuide(item)}
-                className="text-[#00C896] bg-[#00C896]/10 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#00C896] hover:text-white active:scale-95 transition-all duration-300 cursor-pointer"
+                className="text-[#00C896] bg-[#00C896]/10 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#00C896] hover:text-white active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap"
               >
                 View Details & PDFs
               </button>
@@ -78,84 +85,88 @@ export default function AdminGuides() {
       {selectedGuide && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto modal-backdrop-anim">
           <div className="hotel-detail-card-anim bg-[#1e293b] text-white w-full max-w-3xl rounded-2xl p-4 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl border border-gray-700">
-            <div className="flex justify-between items-center gap-3 border-b border-gray-700 pb-4 mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-[#00C896] truncate">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center gap-3 border-b border-gray-700 pb-3 sm:pb-4 mb-4">
+              <h2 className="text-base sm:text-xl font-bold text-[#00C896] truncate">
                 {selectedGuide.firstName} {selectedGuide.lastName} - Guide Details
               </h2>
               <button
                 type="button"
                 onClick={() => setSelectedGuide(null)}
-                className="shrink-0 text-gray-400 hover:text-white text-xl font-bold cursor-pointer"
+                className="shrink-0 text-gray-400 hover:text-white text-lg sm:text-xl font-bold cursor-pointer p-1"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-6 text-sm">
+            <div className="space-y-4 sm:space-y-6 text-sm">
               {selectedGuide.profilePic && (
-                <div className="flex items-center gap-4 bg-black/20 p-4 rounded-xl">
+                <div className="flex items-center gap-3 sm:gap-4 bg-black/20 p-3 sm:p-4 rounded-xl vehicle-info-card-anim">
                   <img 
                     src={selectedGuide.profilePic} 
                     alt="Guide Profile" 
-                    className="w-16 h-16 rounded-full object-cover border border-[#00C896]/30"
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-[#00C896]/30 shrink-0"
                   />
-                  <div>
-                    <p className="text-sm font-semibold text-white">{selectedGuide.firstName} {selectedGuide.lastName}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{selectedGuide.firstName} {selectedGuide.lastName}</p>
                     <p className="text-xs text-[#00C896] uppercase tracking-wider font-medium">{selectedGuide.role || "Tourist Guide"}</p>
                   </div>
                 </div>
               )}
 
-              <div>
-                <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
+              <div className="vehicle-info-card-anim">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Personal Information
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
-                  <p><span className="text-gray-400">Name:</span> {selectedGuide.firstName} {selectedGuide.lastName}</p>
-                  <p><span className="text-gray-400">Email:</span> {selectedGuide.email}</p>
-                  <p><span className="text-gray-400">Mobile:</span> {selectedGuide.mobile}</p>
-                  <p><span className="text-gray-400">NIC:</span> {selectedGuide.NIC}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 bg-black/20 p-3 sm:p-4 rounded-xl text-xs sm:text-sm">
+                  <p className="truncate"><span className="text-gray-400">Name:</span> {selectedGuide.firstName} {selectedGuide.lastName}</p>
+                  <p className="truncate"><span className="text-gray-400">Email:</span> {selectedGuide.email}</p>
+                  <p className="truncate"><span className="text-gray-400">Mobile:</span> {selectedGuide.mobile}</p>
+                  <p className="truncate"><span className="text-gray-400">NIC:</span> {selectedGuide.NIC}</p>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
+              <div className="vehicle-info-card-anim">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Professional & Pricing Details
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
-                  <p><span className="text-gray-400">License Number:</span> {selectedGuide.GuideLicenseNumber}</p>
-                  <p><span className="text-gray-400">Experience:</span> {selectedGuide.yearsOfExperience} Years</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 bg-black/20 p-3 sm:p-4 rounded-xl text-xs sm:text-sm">
+                  <p className="truncate"><span className="text-gray-400">License Number:</span> {selectedGuide.GuideLicenseNumber}</p>
+                  <p className="truncate"><span className="text-gray-400">Experience:</span> {selectedGuide.yearsOfExperience} Years</p>
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/30 gap-2">
-                    <span className="text-gray-300">Price Per Hour:</span>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                  {/* Price Per Hour Box */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
+                    <span className="text-gray-300 font-medium">Price Per Hour:</span>
+                    <div className="flex items-center gap-4 text-xs">
                       {(selectedGuide.oldPricePerHour || selectedGuide.previousPricePerHour) ? (
-                        <>
-                          <span className="text-gray-300">
-                            Old Rate : {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerHour || selectedGuide.previousPricePerHour}
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-400 line-through">
+                            Old: {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerHour || selectedGuide.previousPricePerHour}
                           </span>
-                          <span className="text-[#00C896] font-bold">
-                            New Rate : {selectedGuide.currency || "LKR"} {selectedGuide.pricePerHour}
+                          <span className="text-[#00C896] font-bold bg-[#00C896]/10 px-2 py-1 rounded">
+                            New: {selectedGuide.currency || "LKR"} {selectedGuide.pricePerHour}
                           </span>
-                        </>
+                        </div>
                       ) : (
                         <span className="text-[#00C896] font-bold">{selectedGuide.currency || "LKR"} {selectedGuide.pricePerHour}</span>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/30 gap-2">
-                    <span className="text-gray-300">Price Per Day:</span>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                  {/* Price Per Day Box */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/10 p-3 rounded-lg sm:col-span-2 border border-yellow-500/30 gap-2">
+                    <span className="text-gray-300 font-medium">Price Per Day:</span>
+                    <div className="flex items-center gap-4 text-xs">
                       {(selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice) ? (
-                        <>
-                          <span className="text-gray-300">
-                            Old Rate : {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice}
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-400 line-through">
+                            Old: {selectedGuide.currency || "LKR"} {selectedGuide.oldPricePerDay || selectedGuide.previousPricePerDay || selectedGuide.oldPrice}
                           </span>
-                          <span className="text-[#00C896] font-bold">
-                            New Rate : {selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}
+                          <span className="text-[#00C896] font-bold bg-[#00C896]/10 px-2 py-1 rounded">
+                            New: {selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}
                           </span>
-                        </>
+                        </div>
                       ) : (
                         <span className="text-[#00C896] font-bold">{selectedGuide.currency || "LKR"} {selectedGuide.pricePerDay}</span>
                       )}
@@ -171,24 +182,24 @@ export default function AdminGuides() {
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
+              <div className="vehicle-info-card-anim">
+                <h3 className="text-xs sm:text-sm font-semibold text-[#00C896] uppercase tracking-wider mb-2">
                   Uploaded Documents & Verification Files
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-black/20 p-4 rounded-xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 bg-black/20 p-3 sm:p-4 rounded-xl">
                   {DOCUMENTS.map(
                     (doc, idx) =>
                       selectedGuide[doc.key] && (
                         <div
                           key={doc.key}
                           style={{ animationDelay: `${idx * 0.08}s` }}
-                          className="animate-box bg-black/30 p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+                          className="animate-box bg-black/30 p-2.5 sm:p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
                         >
-                          <span className="text-xs text-white">📄 {doc.label}</span>
+                          <span className="text-xs text-white truncate">📄 {doc.label}</span>
                           <button
                             type="button"
                             onClick={() => openPdf(selectedGuide[doc.key])}
-                            className="text-xs bg-[#00C896]/20 text-[#00C896] px-3 py-1.5 rounded hover:bg-[#00C896] hover:text-white active:scale-95 transition-all cursor-pointer font-semibold w-full sm:w-auto"
+                            className="text-xs bg-[#00C896]/20 text-[#00C896] px-3 py-1.5 rounded hover:bg-[#00C896] hover:text-white active:scale-95 transition-all cursor-pointer font-semibold w-full sm:w-auto shrink-0"
                           >
                             View PDF
                           </button>
@@ -203,7 +214,7 @@ export default function AdminGuides() {
               <button
                 type="button"
                 onClick={() => setSelectedGuide(null)}
-                className="bg-gray-700 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-gray-600 active:scale-95 transition-all cursor-pointer w-full sm:w-auto"
+                className="bg-gray-700 text-white px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold hover:bg-gray-600 active:scale-95 transition-all cursor-pointer w-full sm:w-auto"
               >
                 Close
               </button>
@@ -211,6 +222,6 @@ export default function AdminGuides() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
