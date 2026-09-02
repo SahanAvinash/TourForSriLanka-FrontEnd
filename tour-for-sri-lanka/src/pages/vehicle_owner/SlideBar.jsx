@@ -126,7 +126,7 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`w-64 bg-[#253745] h-dvh fixed top-0 left-0 flex flex-col overflow-y-auto z-50
+        className={`w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col overflow-y-auto z-50
         transition-transform duration-300 ease-in-out
         ${
           sidebarOpen
@@ -176,7 +176,7 @@ export default function Sidebar({
         <div className="p-5 border-t border-[#4A5C6A]">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors"
+            className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors pb-10"
           >
             <FaSignOutAlt />
             <span>Logout</span>
