@@ -83,7 +83,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
       </nav>
 
       <div className="p-5 border-t border-[#4A5C6A]">
-        <button onClick={handleLogout} className="flex items-center gap-3 text-red-400 hover:text-red-300 cursor-pointer">
+        <button onClick={handleLogout} className="flex items-center gap-3 text-red-400 hover:text-red-300 cursor-pointer pb-10">
           <FaSignOutAlt />
           Logout
         </button>
