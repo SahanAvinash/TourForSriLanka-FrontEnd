@@ -11,7 +11,7 @@ export default function TopBar({ onMenuClick }) {
                 >
                     <FaBars />
                 </button>
-                <h2 className="text-[#CCD0CF] font-semibold text-lg">Guide Dashboard</h2>
+                
             </div>
             
             {/* Thawath details monawahari thiyenwanam methana danna puluwan */}
