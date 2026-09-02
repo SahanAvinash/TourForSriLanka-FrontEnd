@@ -126,7 +126,7 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`w-64 bg-[#253745] h-screen fixed top-0 left-0 flex flex-col overflow-y-auto z-50
+        className={`w-64 bg-[#253745] h-dvh fixed top-0 left-0 flex flex-col overflow-y-auto z-50
         transition-transform duration-300 ease-in-out
         ${
           sidebarOpen
