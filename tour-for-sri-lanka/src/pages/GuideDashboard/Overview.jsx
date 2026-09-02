@@ -1,117 +1,173 @@
 import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
-import { FaCalendarCheck, FaStar, FaMoneyBillWave, FaClipboardList, FaCheckCircle } from "react-icons/fa"
-import { MdPending } from "react-icons/md";
+import {
+    FaStar,
+    FaMoneyBillWave,
+} from "react-icons/fa";
+import {
+    MdVerified,
+    MdPending,
+} from "react-icons/md";
 import axios from "axios";
 
-export default function Overview(){
-    const [loadingStats, setLoadingStats] = useState(true)
-    const [guideName, setGuideName] = useState("")
+export default function Overview() {
+    const [loadingStats, setLoadingStats] = useState(true);
+    const [guideName, setGuideName] = useState("");
+    const [isApproved, setIsApproved] = useState(false);
+    const [pricePerDay, setPricePerDay] = useState(0);
+    const [averageRating, setAverageRating] = useState(0);
+    const [reviewCount, setReviewCount] = useState(0);
 
-    const [todayBookings, setTodayBookings] = useState(0)
-    const [pendingBookings, setPendingBookings] = useState(0)
-    const [totalBookings, setTotalBookings] = useState(0)
-    const [completedTours, setCompletedTours] = useState(0)
-    const [totalEarnings, setTotalEarnings] = useState(0)
-
-    const today = new Date().toLocaleDateString("en-US",{
-        weekday: "long", year: "numeric", month: "long", day: "numeric"
-    })
+    const today = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user")
-        if(!storedUser) return
+        const storedUser =
+            localStorage.getItem("user") ||
+            sessionStorage.getItem("user");
 
-        const user = JSON.parse(storedUser)
-        const guideId = user._id
+        if (!storedUser) {
+            setLoadingStats(false);
+            return;
+        }
 
-        setGuideName(user.firstName || "")
+        let user;
 
-        axios.get(`${API_BASE_URL}/api/booking/guide/${guideId}`)
+        try {
+            user = JSON.parse(storedUser);
+        } catch {
+            setLoadingStats(false);
+            return;
+        }
+
+        const guideId = user._id;
+
+        if (!guideId) {
+            setLoadingStats(false);
+            return;
+        }
+
+        // Guide name eka set karaganeema (firstName saha lastName walin)
+        setGuideName(`${user.firstName || ""} ${user.lastName || ""}`.trim() || user.name || "");
+
+        // Guide details fetch karaganeema
+        axios
+            .get(`${API_BASE_URL}/api/guides/${guideId}`)
             .then((res) => {
-                const bookings = res.data
-                const todayStr = new Date().toDateString()
-
-                setTodayBookings(bookings.filter(b => new Date(b.tourDate).toDateString() === todayStr).length)
-                setPendingBookings(bookings.filter(b => b.status === "pending").length)
-                setTotalBookings(bookings.length)
-                setCompletedTours(bookings.filter(b => b.status === "completed").length)
-                setTotalEarnings(
-                    bookings
-                        .filter(b => b.status === "completed")
-                        .reduce((sum, b) => sum + (b.totalPrice || 0), 0)
-                )
-            }).catch((error) => {
-                console.log(error)
-            }).finally(() => {
-                setLoadingStats(false)
+                setIsApproved(res.data?.isApproved === true);
+                setPricePerDay(res.data?.pricePerDay || 0);
             })
-    },[])
+            .catch(() => {})
+            .finally(() => {
+                setLoadingStats(false);
+            });
 
-    return(
-        <section id="overview">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
-                <h1 className="text-[#CCD0CF] text-[24px] font-bold">Overview</h1>
-                <span className="text-[#CCD0CF]/60 text-[14px] sm:text-[16px]">{today}</span>
-            </div>
-            <p className="text-[#CCD0CF] text-[14px] mb-6">{guideName}</p>
+    }, []);
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-[20px]">
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaClipboardList/>
+    const stats = [
+        {
+            label: "Price Per Day",
+            value: `Rs. ${pricePerDay}`,
+            icon: <FaMoneyBillWave />,
+        },
+        {
+            label: "Average Rating",
+            value:
+                reviewCount > 0 ? (
+                    <>
+                        {averageRating.toFixed(1)}
+                        <span className="text-[#FFC107] ml-1">
+                            ★
+                        </span>
+                    </>
+                ) : (
+                    "No reviews yet"
+                ),
+            icon: <FaStar />,
+            rating: true,
+        },
+    ];
+
+    return (
+        <section
+            id="overview"
+            className="w-full flex flex-col justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-6 sm:pt-8 overflow-x-hidden"
+        >
+            <div className="w-full max-w-[1100px] mx-auto">
+                <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
+                            Overview
+                        </h1>
+
+                        {isApproved && (
+                            <MdVerified className="text-[#00C896] text-2xl sm:text-3xl" />
+                        )}
                     </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Total Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">{loadingStats? "..." : totalBookings}</p>
-                    </div>
+
+                    <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">
+                        {today}
+                    </span>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaMoneyBillWave/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Total Earnings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">{loadingStats? "..." : `Rs. ${totalEarnings.toLocaleString()}`}</p>
-                    </div>
+
+                <div className="w-full flex items-center justify-start mb-6">
+                    <p className="text-[#CCD0CF] text-sm sm:text-base font-medium">
+                        {guideName}
+                    </p>
                 </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaCalendarCheck/>
+
+                {/* Verification Pending Banner - isApproved false nam witharai penne */}
+                {!isApproved && !loadingStats && (
+                    <div className="w-full bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+                        <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
+
+                        <div>
+                            <p className="text-[#CCD0CF] text-xs sm:text-sm font-semibold">
+                                Verification Pending
+                            </p>
+
+                            <p className="text-[#CCD0CF]/60 text-[11px] sm:text-xs">
+                                Your profile or pricing details are under review. Some features may be limited until admin approval.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Today Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">{loadingStats? "..." : todayBookings}</p>
-                    </div>
-                </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <MdPending/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Pending Bookings</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">{loadingStats? "..." : pendingBookings}</p>
-                    </div>
-                </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaCheckCircle/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Completed Tours</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">{loadingStats? "..." : completedTours}</p>
-                    </div>
-                </div>
-                <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
-                        <FaStar/>
-                    </div>
-                    <div>
-                        <p className="text-[#CCD0CF]/60 text-[12px]">Average Rating</p>
-                        <p className="text-[#CCD0CF] text-[22px] font-bold">Soon</p>
-                    </div>
+                )}
+
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                    {stats.map((stat) => (
+                        <div
+                            key={stat.label}
+                            className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1"
+                        >
+                            <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
+                                {stat.icon}
+                            </div>
+
+                            <div className="min-w-0">
+                                <p className="text-[#CCD0CF]/60 text-xs">
+                                    {stat.label}
+                                </p>
+
+                                <p
+                                    className={`text-[#CCD0CF] font-bold ${
+                                        stat.rating
+                                            ? "text-xl"
+                                            : "text-2xl"
+                                    }`}
+                                >
+                                    {loadingStats
+                                        ? "..."
+                                        : stat.value}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>
-    )
+    );
 }
