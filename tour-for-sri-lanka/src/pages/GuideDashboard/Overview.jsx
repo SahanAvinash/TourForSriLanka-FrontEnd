@@ -51,10 +51,8 @@ export default function Overview() {
             return;
         }
 
-        // Guide name eka set karaganeema (firstName saha lastName walin)
         setGuideName(`${user.firstName || ""} ${user.lastName || ""}`.trim() || user.name || "");
 
-        // Guide details fetch karaganeema
         axios
             .get(`${API_BASE_URL}/api/guides/${guideId}`)
             .then((res) => {
@@ -95,9 +93,10 @@ export default function Overview() {
     return (
         <section
             id="overview"
-            className="w-full flex flex-col justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-6 sm:pt-8 overflow-x-hidden"
+            className="w-full flex flex-col justify-start items-start px-0 pt-2 overflow-x-hidden"
         >
-            <div className="w-full max-w-[1100px] mx-auto">
+            {/* max-w-[1100px] saha mx-auto ain karala w-full witharak dammoota anith sections ekka samanai */}
+            <div className="w-full">
                 <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                     <div className="flex items-center gap-2">
                         <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
@@ -120,7 +119,7 @@ export default function Overview() {
                     </p>
                 </div>
 
-                {/* Verification Pending Banner - isApproved false nam witharai penne */}
+                {/* Verification Pending Banner */}
                 {!isApproved && !loadingStats && (
                     <div className="w-full bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
                         <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
