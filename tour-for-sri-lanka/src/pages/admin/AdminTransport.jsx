@@ -44,16 +44,24 @@ export default function AdminTransport() {
           { header: "Vehicle", render: (item) => `${item.vehicleBrand || ""} ${item.vehicleModel || ""}` },
           { 
             header: "Rate / Km", 
-            render: (item) => (
-              <div className="flex items-center gap-2">
-                <span>LKR {item.ratePerKm}</span>
-                {!item.isApproved && (
-                  <span className="bg-yellow-500/20 text-yellow-400 text-[10px] px-1.5 py-0.5 rounded border border-yellow-500/30 font-medium">
-                    New Rate
-                  </span>
-                )}
-              </div>
-            ) 
+            render: (item) => {
+              const oldRate = item.oldRatePerKm || item.previousRatePerKm;
+              return (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-white font-semibold">LKR {item.ratePerKm}</span>
+                  {!item.isApproved && oldRate && (
+                    <span className="text-gray-400 text-xs line-through">
+                      LKR {oldRate}
+                    </span>
+                  )}
+                  {!item.isApproved && (
+                    <span className="bg-yellow-500/20 text-yellow-400 text-[10px] px-1.5 py-0.5 rounded border border-yellow-500/30 font-medium">
+                      New Rate
+                    </span>
+                  )}
+                </div>
+              );
+            } 
           },
           { header: "Area", render: (item) => (item.availableArea || []).join(", ") },
           {
@@ -122,17 +130,21 @@ export default function AdminTransport() {
                   <p><span className="text-gray-400">Brand & Model:</span> {selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
                   <p><span className="text-gray-400">Vehicle Type:</span> {selectedTransport.vehicleType}</p>
                   <p><span className="text-gray-400">Registration No:</span> {selectedTransport.registrationNo}</p>
-                  <div className="flex items-center justify-between bg-black/30 p-2 rounded-lg sm:col-span-2 border border-yellow-500/20">
-                    <span className="text-gray-400">Rate Per Km (Updated/Current):</span>
-                    <span className="text-[#00C896] font-bold flex items-center gap-2">
-                      LKR {selectedTransport.ratePerKm}
-                      {!selectedTransport.isApproved && (
-                        <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded border border-yellow-500/30">
-                          ⚠️ Rate Changed
+                  
+                  <div className="flex items-center justify-between bg-black/30 p-3 rounded-lg sm:col-span-2 border border-yellow-500/20">
+                    <span className="text-gray-400">Rate Per Km:</span>
+                    <div className="flex items-center gap-3">
+                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm) && (
+                        <span className="text-gray-400 line-through text-xs">
+                          Old: LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm}
                         </span>
                       )}
-                    </span>
+                      <span className="text-[#00C896] font-bold">
+                        New: LKR {selectedTransport.ratePerKm}
+                      </span>
+                    </div>
                   </div>
+
                   <p><span className="text-gray-400">Passenger Capacity:</span> {selectedTransport.passengerCapacity}</p>
                   <p><span className="text-gray-400">Luggage Capacity:</span> {selectedTransport.luggageCapacity}</p>
                 </div>
