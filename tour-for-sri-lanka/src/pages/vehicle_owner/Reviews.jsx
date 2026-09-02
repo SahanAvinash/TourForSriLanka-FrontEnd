@@ -71,32 +71,32 @@ export default function Reviews() {
     }));
 
     return (
-        <section id="reviews" className="mt-12">
-            <div className="vehicle-owner-header-anim flex justify-between items-center mb-6">
-                <h1 className="text-[#CCD0CF] text-[24px] font-bold">Reviews</h1>
+        <div className="w-full">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">Reviews</h1>
             </div>
 
             {!loadingReviews && totalReviews > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
-                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
-                        <p className="text-[#CCD0CF]/60 text-[15px] mb-3">Average Rating</p>
-                        <p className="text-[#CCD0CF] text-[64px] font-bold leading-none">{averageRating}</p>
-                        <div className="flex gap-2 mt-4">{renderStars(averageRating)}</div>
-                        <p className="text-[#CCD0CF]/50 text-[13px] mt-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                    <ScrollFadeIn className="bg-[#253745] rounded-[20px] sm:rounded-[24px] p-6 sm:p-8 flex flex-col justify-center shadow-md">
+                        <p className="text-[#CCD0CF]/60 text-[14px] sm:text-[15px] mb-2">Average Rating</p>
+                        <p className="text-[#CCD0CF] text-[52px] sm:text-[64px] font-bold leading-none">{averageRating}</p>
+                        <div className="flex gap-1.5 mt-3">{renderStars(averageRating)}</div>
+                        <p className="text-[#CCD0CF]/50 text-[12px] sm:text-[13px] mt-2">
                             Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
                         </p>
                     </ScrollFadeIn>
 
-                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
-                        <p className="text-[#CCD0CF]/60 text-[15px] mb-3">Total Reviews</p>
-                        <p className="text-[#CCD0CF] text-[64px] font-bold leading-none">{totalReviews}</p>
-                        <p className="text-[#CCD0CF]/50 text-[13px] mt-4">
+                    <ScrollFadeIn className="bg-[#253745] rounded-[20px] sm:rounded-[24px] p-6 sm:p-8 flex flex-col justify-center shadow-md">
+                        <p className="text-[#CCD0CF]/60 text-[14px] sm:text-[15px] mb-2">Total Reviews</p>
+                        <p className="text-[#CCD0CF] text-[52px] sm:text-[64px] font-bold leading-none">{totalReviews}</p>
+                        <p className="text-[#CCD0CF]/50 text-[12px] sm:text-[13px] mt-3">
                             {ratingCounts[0].count} five-star {ratingCounts[0].count === 1 ? "review" : "reviews"}
                         </p>
                     </ScrollFadeIn>
 
-                    <ScrollFadeIn className="review-stat-card-anim bg-[#253745] rounded-[24px] p-8">
-                        <p className="text-[#CCD0CF]/60 text-[15px] mb-4">Rating Breakdown</p>
+                    <ScrollFadeIn className="bg-[#253745] rounded-[20px] sm:rounded-[24px] p-6 sm:p-8 shadow-md">
+                        <p className="text-[#CCD0CF]/60 text-[14px] sm:text-[15px] mb-3">Rating Breakdown</p>
                         <div className="space-y-2.5">
                             {ratingCounts.map(({ star, count }) => (
                                 <div key={star} className="flex items-center gap-3 text-[13px]">
@@ -116,16 +116,16 @@ export default function Reviews() {
                 </div>
             )}
 
-            <div className="vehicle-owner-section-anim bg-[#253745] rounded-[20px] p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-[#CCD0CF] text-[20px] font-bold">All Reviews</h2>
-                    <div className="relative w-[280px]">
+            <div className="bg-[#253745] rounded-[20px] p-4 sm:p-6 shadow-md">
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
+                    <h2 className="text-[#CCD0CF] text-[18px] sm:text-[20px] font-bold">All Reviews</h2>
+                    <div className="relative w-full sm:w-[280px]">
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Search by traveler or keyword"
-                            className="w-full h-[42px] bg-[#4A5C6A]/50 rounded-[20px] pl-[16px] pr-[40px] text-[#CCD0CF] text-[13px] outline-none"
+                            className="w-full h-[40px] sm:h-[42px] bg-[#4A5C6A]/50 rounded-[20px] pl-[16px] pr-[40px] text-[#CCD0CF] text-[13px] outline-none"
                         />
                         <FaSearch className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#00C896] text-[14px]" />
                     </div>
@@ -141,11 +141,11 @@ export default function Reviews() {
                             {visibleReviews.map((review, index) => (
                                 <ScrollFadeIn
                                     key={review._id}
-                                    className={`review-item-anim pt-4 ${index === 0 ? "" : "border-t border-[#4A5C6A]/40"}`}
+                                    className={`pt-4 ${index === 0 ? "" : "border-t border-[#4A5C6A]/40"}`}
                                     style={{ animationDelay: `${index * 0.08}s` }}
                                 >
                                     <div className="flex items-start gap-3">
-                                        <div className="w-[45px] h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <div className="w-[40px] h-[40px] sm:w-[45px] sm:h-[45px] rounded-full bg-[#1B2B34] flex items-center justify-center flex-shrink-0 overflow-hidden">
                                             {review.profileImage ? (
                                                 <img
                                                     src={review.profileImage}
@@ -153,24 +153,24 @@ export default function Reviews() {
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <FaUser className="text-[#4A5C6A] text-[16px]" />
+                                                <FaUser className="text-[#4A5C6A] text-[15px]" />
                                             )}
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-[#CCD0CF] font-bold text-[14px]">{review.firstName}</p>
-                                                <p className="text-[#CCD0CF]/60 text-[12px]">{formatDate(review.date)}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-[#CCD0CF] font-bold text-[13px] sm:text-[14px] truncate">{review.firstName}</p>
+                                                <p className="text-[#CCD0CF]/60 text-[11px] sm:text-[12px] flex-shrink-0">{formatDate(review.date)}</p>
                                             </div>
                                             <div className="flex gap-1 my-1">{renderStars(review.rating)}</div>
-                                            <p className="text-[#CCD0CF]/80 text-[13px] leading-relaxed">{review.comment}</p>
+                                            <p className="text-[#CCD0CF]/80 text-[13px] leading-relaxed break-words">{review.comment}</p>
                                             {review.images?.length > 0 && (
-                                                <div className="flex gap-2 mt-3">
+                                                <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
                                                     {review.images.map((img, i) => (
                                                         <img
                                                             key={i}
                                                             src={img}
                                                             alt={`review-${i}`}
-                                                            className="w-[60px] h-[60px] rounded-[10px] object-cover"
+                                                            className="w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] rounded-[10px] object-cover flex-shrink-0"
                                                         />
                                                     ))}
                                                 </div>
@@ -185,7 +185,7 @@ export default function Reviews() {
                             <div className="flex justify-center mt-6">
                                 <button
                                     onClick={() => setShowAll(!showAll)}
-                                    className="h-[42px] px-6 rounded-[20px] bg-[#4A5C6A]/50 text-[#00C896] text-[13px] font-bold hover:bg-[#4A5C6A]/70 cursor-pointer"
+                                    className="h-[40px] sm:h-[42px] px-6 rounded-[20px] bg-[#4A5C6A]/50 text-[#00C896] text-[13px] font-bold hover:bg-[#4A5C6A]/70 cursor-pointer transition-colors"
                                 >
                                     {showAll ? "Show Less" : `View All Reviews (${filteredReviews.length})`}
                                 </button>
@@ -194,6 +194,6 @@ export default function Reviews() {
                     </div>
                 )}
             </div>
-        </section>
+        </div>
     );
 }

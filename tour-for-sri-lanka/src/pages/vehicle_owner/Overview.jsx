@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { MdVerified, MdPending } from "react-icons/md";
 import axios from "axios";
+import ScrollFadeIn from "../../components/ScrollFadeIn";
 
 export default function Overview() {
   const [loadingStats, setLoadingStats] = useState(true);
@@ -143,65 +144,57 @@ export default function Overview() {
   ];
 
   return (
-    <section
-      id="overview"
-      className="w-full flex flex-col justify-start items-start px-4 sm:px-6 md:px-8 lg:px-10 pt-16 sm:pt-20 overflow-x-hidden"
-    >
+    <div className="w-full flex flex-col justify-start items-start">
       {!isApproved && !loadingStats && (
-        <div className="vehicle-owner-alert-anim w-full max-w-[1100px] bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
+        <ScrollFadeIn className="w-full bg-[#4A5C6A]/30 border border-[#CD2F31]/40 rounded-[20px] px-4 sm:px-6 py-4 mb-6 flex items-center gap-3">
           <MdPending className="text-[#00C896] text-xl sm:text-2xl flex-shrink-0" />
-
           <div>
             <p className="text-[#CCD0CF] text-xs sm:text-sm font-semibold">
               Verification Pending
             </p>
-
             <p className="text-[#CCD0CF]/60 text-[11px] sm:text-xs">
-              Your account is under review. Some features may be limited
-              until approval.
+              Your account is under review. Some features may be limited until approval.
             </p>
           </div>
-        </div>
+        </ScrollFadeIn>
       )}
 
-      <div className="vehicle-owner-header-anim w-full max-w-[1100px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+      <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-[#CCD0CF] text-[22px] sm:text-[24px] font-bold">
             Overview
           </h1>
-
           {isApproved && (
             <MdVerified className="text-[#00C896] text-2xl sm:text-3xl" />
           )}
         </div>
-
         <span className="text-[#CCD0CF]/60 text-xs sm:text-sm">{today}</span>
       </div>
 
-      <div className="w-full max-w-[1100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-        {stats.map((stat) => (
-          <div
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {stats.map((stat, index) => (
+          <ScrollFadeIn
             key={stat.label}
-            className="vehicle-owner-card-anim bg-[#253745] rounded-[20px] p-4 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1"
+            style={{ animationDelay: `${index * 0.05}s` }}
+            className="bg-[#253745] rounded-[20px] p-4 sm:p-5 flex items-center gap-4 w-full min-h-[90px] transition-transform duration-300 hover:-translate-y-1 shadow-md"
           >
-            <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
+            <div className="w-[45px] h-[45px] sm:w-[50px] sm:h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[20px] sm:text-[22px] flex-shrink-0">
               {stat.icon}
             </div>
 
-            <div className="min-w-0">
-              <p className="text-[#CCD0CF]/60 text-xs">{stat.label}</p>
-
+            <div className="min-w-0 flex-1">
+              <p className="text-[#CCD0CF]/60 text-xs truncate">{stat.label}</p>
               <p
-                className={`text-[#CCD0CF] font-bold ${
-                  stat.rating ? "text-xl" : "text-2xl"
+                className={`text-[#CCD0CF] font-bold truncate ${
+                  stat.rating ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
                 }`}
               >
                 {loadingStats ? "..." : stat.value}
               </p>
             </div>
-          </div>
+          </ScrollFadeIn>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

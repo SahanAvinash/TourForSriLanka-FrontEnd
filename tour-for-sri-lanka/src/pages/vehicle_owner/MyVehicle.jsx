@@ -191,10 +191,7 @@ export default function MyVehicle() {
   }
 
   return (
-    <section
-      id="my-vehicle"
-      className="w-full px-4 sm:px-6 md:px-8 lg:px-10 mt-8 sm:mt-12 overflow-x-hidden"
-    >
+    <div className="w-full">
       {loading ? (
         <p className="text-[#CCD0CF]/60 text-sm">Loading vehicle details...</p>
       ) : !vehicle ? (
@@ -220,10 +217,10 @@ export default function MyVehicle() {
             </span>
           </div>
 
-          <div className="bg-[#253745] rounded-[20px] p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-              <ScrollFadeIn className="vehicle-photo-anim flex flex-col h-full">
-                <div className="w-full flex-1 min-h-[220px] sm:min-h-[280px] rounded-[15px] bg-[#1B2B34] overflow-hidden flex items-center justify-center relative">
+          <div className="bg-[#253745] rounded-[20px] p-4 sm:p-6 shadow-md">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              <ScrollFadeIn className="flex flex-col h-full">
+                <div className="w-full aspect-[16/10] sm:min-h-[280px] rounded-[15px] bg-[#1B2B34] overflow-hidden flex items-center justify-center relative shadow-inner">
                   {photos.length > 0 ? (
                     <img
                       src={photos[activeImage] || photos[0]}
@@ -236,7 +233,7 @@ export default function MyVehicle() {
                   {!editingImages && (
                     <button
                       onClick={startEditImages}
-                      className="absolute top-3 right-3 bg-[#06141B]/70 hover:bg-[#06141B] text-[#00C896] w-[32px] h-[32px] rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300"
+                      className="absolute top-3 right-3 bg-[#06141B]/70 hover:bg-[#06141B] text-[#00C896] w-[32px] h-[32px] rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 shadow-md"
                     >
                       <FaPen size={12} />
                     </button>
@@ -244,12 +241,12 @@ export default function MyVehicle() {
                 </div>
 
                 {!editingImages && photos.length > 1 && (
-                  <div className="flex gap-2 sm:gap-3 mt-3 flex-wrap">
+                  <div className="flex gap-2 sm:gap-3 mt-3 overflow-x-auto pb-1">
                     {photos.map((url, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveImage(index)}
-                        className={`w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] rounded-[10px] overflow-hidden border-2 cursor-pointer transition-all duration-300 ${
+                        className={`w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] rounded-[10px] overflow-hidden border-2 cursor-pointer flex-shrink-0 transition-all duration-300 ${
                           activeImage === index
                             ? "border-[#00C896]"
                             : "border-transparent"
@@ -320,7 +317,7 @@ export default function MyVehicle() {
                 )}
               </ScrollFadeIn>
 
-              <ScrollFadeIn className="vehicle-info-anim">
+              <ScrollFadeIn className="flex flex-col">
                 <h2 className="text-[#CCD0CF] text-[18px] sm:text-[20px] font-bold capitalize">
                   {vehicle.vehicleBrand} {vehicle.vehicleModel}
                 </h2>
@@ -330,28 +327,28 @@ export default function MyVehicle() {
 
                 <div className="flex items-start gap-2 mb-4">
                   <FaMapMarkerAlt className="text-[#00C896] text-[14px] mt-[3px] flex-shrink-0" />
-                  <p className="text-[#CCD0CF] text-xs sm:text-[13px]">
+                  <p className="text-[#CCD0CF] text-xs sm:text-[13px] break-words">
                     {vehicle.availableArea?.join(", ")}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {infoItems.map(({ icon: Icon, label, value }) => (
-                    <ScrollFadeIn
+                    <div
                       key={label}
-                      className="vehicle-info-card-anim bg-[#4A5C6A]/30 rounded-[12px] p-3"
+                      className="bg-[#4A5C6A]/30 rounded-[12px] p-3 flex flex-col justify-between"
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <Icon className="text-[#00C896] text-[13px] flex-shrink-0" />
                         <p className="text-[#CCD0CF]/60 text-[11px]">{label}</p>
                       </div>
-                      <p className="text-[#CCD0CF] text-[14px] font-bold truncate">
+                      <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-bold truncate">
                         {value}
                       </p>
-                    </ScrollFadeIn>
+                    </div>
                   ))}
 
-                  <ScrollFadeIn className="vehicle-info-card-anim bg-[#4A5C6A]/30 rounded-[12px] p-3">
+                  <div className="bg-[#4A5C6A]/30 rounded-[12px] p-3 flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <FaMoneyBillWave className="text-[#00C896] text-[13px] flex-shrink-0" />
@@ -368,12 +365,12 @@ export default function MyVehicle() {
                     </div>
 
                     {editingRate ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-1">
                         <input
                           type="number"
                           value={rateInput}
                           onChange={(e) => setRateInput(e.target.value)}
-                          className="w-full h-[28px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
+                          className="w-full h-[30px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
                           autoFocus
                         />
                         <button
@@ -392,17 +389,17 @@ export default function MyVehicle() {
                         </button>
                       </div>
                     ) : (
-                      <p className="text-[#CCD0CF] text-[14px] font-bold">
+                      <p className="text-[#CCD0CF] text-[13px] sm:text-[14px] font-bold">
                         LKR {Number(vehicle.ratePerKm).toLocaleString()}
                       </p>
                     )}
-                  </ScrollFadeIn>
+                  </div>
                 </div>
               </ScrollFadeIn>
             </div>
           </div>
         </>
       )}
-    </section>
+    </div>
   );
 }
