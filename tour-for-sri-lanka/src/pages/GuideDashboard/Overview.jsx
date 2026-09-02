@@ -53,13 +53,16 @@ export default function Overview() {
 
         setGuideName(`${user.firstName || ""} ${user.lastName || ""}`.trim() || user.name || "");
 
+        // FIX: Changed from `/api/guides/` to `/api/guide/` to match backend route
         axios
-            .get(`${API_BASE_URL}/api/guides/${guideId}`)
+            .get(`${API_BASE_URL}/api/guide/${guideId}`)
             .then((res) => {
                 setIsApproved(res.data?.isApproved === true);
                 setPricePerDay(res.data?.pricePerDay || 0);
             })
-            .catch(() => {})
+            .catch((err) => {
+                console.error("Error fetching guide stats:", err);
+            })
             .finally(() => {
                 setLoadingStats(false);
             });
@@ -95,7 +98,6 @@ export default function Overview() {
             id="overview"
             className="w-full flex flex-col justify-start items-start px-0 pt-2 overflow-x-hidden"
         >
-            {/* max-w-[1100px] saha mx-auto ain karala w-full witharak dammoota anith sections ekka samanai */}
             <div className="w-full">
                 <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                     <div className="flex items-center gap-2">
