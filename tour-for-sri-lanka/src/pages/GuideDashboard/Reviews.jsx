@@ -74,7 +74,7 @@ export default function Reviews() {
             </div>
 
             {!loadingReviews && totalReviews > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-stretch">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-stretch">
                     <div className="bg-[#253745] rounded-[24px] p-8 flex flex-col justify-center">
                         <p className="text-[#CCD0CF]/60 text-[15px] mb-3">Average Rating</p>
                         <p className="text-[#CCD0CF] text-[64px] font-bold leading-none">{averageRating}</p>
@@ -114,9 +114,9 @@ export default function Reviews() {
             )}
 
             <div className="bg-[#253745] rounded-[20px] p-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 className="text-[#CCD0CF] text-[20px] font-bold">All Reviews</h2>
-                    <div className="relative w-[280px]">
+                    <div className="relative w-full sm:w-[280px]">
                         <input
                             type="text"
                             value={searchTerm}

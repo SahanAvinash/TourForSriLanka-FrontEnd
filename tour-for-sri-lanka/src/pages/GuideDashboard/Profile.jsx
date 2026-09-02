@@ -118,7 +118,7 @@ export default function Profile() {
     <section id="profile" className="pb-16 pt-10">
       <h2 className="text-2xl font-semibold text-white mb-6">Guide Profile</h2>
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <div className="bg-[#253745] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-4">Personal Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
             <DetailRow label="Full Name" value={`${guide?.firstName || ""} ${guide?.lastName || ""}`} />
@@ -151,7 +151,7 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <div className="bg-[#253745] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-3">About Yourself</h3>
         <textarea
           value={aboutYourSelf}
@@ -162,7 +162,7 @@ export default function Profile() {
         />
       </div>
 
-      <div className="bg-[#11212D] rounded-2xl p-6 mb-6">
+      <div className="bg-[#253745] rounded-2xl p-6 mb-6">
         <h3 className="text-lg font-medium text-white mb-3">Change Password</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
@@ -176,7 +176,7 @@ export default function Profile() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -197,7 +197,7 @@ export default function Profile() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="bg-[#00C896] text-white font-medium px-8 py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+        className="bg-[#00C896] text-white font-medium px-8 py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
       >
         {saving ? "Saving..." : "Save Changes"}
       </button>

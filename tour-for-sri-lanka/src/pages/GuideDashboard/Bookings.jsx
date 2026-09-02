@@ -78,9 +78,9 @@ export default function Bookings({guide, onClose, onSuccess}) {
       ) : (
         <div className="flex flex-col gap-[16px]">
           {bookings.map((b) => (
-            <div key={b._id} className="bg-[#253745] rounded-[20px] p-[20px] flex items-center justify-between flex-wrap gap-[16px]">
-              <div className="flex items-center gap-[14px]">
-                <div className="w-[48px] h-[48px] rounded-full bg-[#4A5C6A] overflow-hidden flex items-center justify-center">
+            <div key={b._id} className="bg-[#253745] rounded-[20px] p-[20px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-[16px]">
+              <div className="flex items-start sm:items-center gap-[14px]">
+                <div className="w-[48px] h-[48px] rounded-full bg-[#4A5C6A] overflow-hidden flex items-center justify-center flex-shrink-0">
                   {b.travelerId?.image ? (
                     <img src={b.travelerId.image} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -100,7 +100,7 @@ export default function Bookings({guide, onClose, onSuccess}) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-[12px]">
+              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-[12px]">
                 <span className={`text-[11px] px-[12px] py-[4px] rounded-full font-medium ${
                   b.status === "confirmed" ? "bg-[#00C896]/20 text-[#00C896]" :
                   b.status === "pending" ? "bg-yellow-500/20 text-yellow-500" :
@@ -114,14 +114,14 @@ export default function Bookings({guide, onClose, onSuccess}) {
                   <div className="flex gap-[8px]">
                     <button
                       onClick={() => handleStatusChange(b._id, "confirmed")}
-                      className="w-[34px] h-[34px] rounded-full bg-[#00C896]/20 text-[#00C896] flex items-center justify-center hover:bg-[#00C896]/30"
+                      className="w-[34px] h-[34px] rounded-full bg-[#00C896]/20 text-[#00C896] flex items-center justify-center hover:bg-[#00C896]/30 cursor-pointer"
                       title="Accept"
                     >
                       <FaCheck size={13} />
                     </button>
                     <button
                       onClick={() => handleStatusChange(b._id, "rejected")}
-                      className="w-[34px] h-[34px] rounded-full bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30"
+                      className="w-[34px] h-[34px] rounded-full bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30 cursor-pointer"
                       title="Reject"
                     >
                       <FaTimes size={13} />

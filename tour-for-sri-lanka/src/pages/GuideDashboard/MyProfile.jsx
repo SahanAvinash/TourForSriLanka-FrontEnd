@@ -130,7 +130,7 @@ export default function MyProfile() {
                     </div>
 
                     <div className="bg-[#253745] rounded-[20px] p-6">
-                        <div className="grid grid-cols-2 gap-6 items-stretch">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                             <div className="flex flex-col h-full">
                                 <div className="w-full flex-1 min-h-[280px] rounded-[15px] bg-[#1B2B34] overflow-hidden flex items-center justify-center relative">
                                     {(editingPhoto ? photoDraft : guide.profilePic) ? (
@@ -184,7 +184,7 @@ export default function MyProfile() {
                                     ))}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {infoItems.map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="bg-[#4A5C6A]/30 rounded-[12px] p-3">
                                             <div className="flex items-center gap-2 mb-1">
@@ -195,7 +195,7 @@ export default function MyProfile() {
                                         </div>
                                     ))}
 
-                                    <div className="bg-[#4A5C6A]/30 rounded-[12px] p-3 col-span-2">
+                                    <div className="bg-[#4A5C6A]/30 rounded-[12px] p-3 sm:col-span-2">
                                         <div className="flex items-center justify-between mb-1">
                                             <div className="flex items-center gap-2">
                                                 <FaMoneyBillWave className="text-[#00C896] text-[13px]" />
@@ -209,27 +209,29 @@ export default function MyProfile() {
                                         </div>
 
                                         {editingPrice ? (
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex flex-col sm:flex-row items-center gap-2">
                                                 <input
                                                     type="number"
                                                     value={hourInput}
                                                     onChange={(e) => setHourInput(e.target.value)}
                                                     placeholder="Per hour"
-                                                    className="w-full h-[28px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
+                                                    className="w-full h-[32px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
                                                 />
                                                 <input
                                                     type="number"
                                                     value={dayInput}
                                                     onChange={(e) => setDayInput(e.target.value)}
                                                     placeholder="Per day"
-                                                    className="w-full h-[28px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
+                                                    className="w-full h-[32px] bg-[#1B2B34] rounded-[8px] px-2 text-[#CCD0CF] text-[13px] outline-none"
                                                 />
-                                                <button onClick={savePrice} disabled={savingPrice} className="text-[#00C896] cursor-pointer disabled:opacity-50">
-                                                    <FaCheck size={12} />
-                                                </button>
-                                                <button onClick={cancelEditPrice} disabled={savingPrice} className="text-[#CD2F31] cursor-pointer">
-                                                    <FaTimes size={12} />
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button onClick={savePrice} disabled={savingPrice} className="text-[#00C896] cursor-pointer disabled:opacity-50 p-1">
+                                                        <FaCheck size={14} />
+                                                    </button>
+                                                    <button onClick={cancelEditPrice} disabled={savingPrice} className="text-[#CD2F31] cursor-pointer p-1">
+                                                        <FaTimes size={14} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         ) : (
                                             <p className="text-[#CCD0CF] text-[14px] font-bold">

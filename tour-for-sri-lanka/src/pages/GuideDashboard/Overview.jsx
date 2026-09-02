@@ -50,15 +50,15 @@ export default function Overview(){
 
     return(
         <section id="overview">
-            <div className="flex justify-between items-center mb-1">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
                 <h1 className="text-[#CCD0CF] text-[24px] font-bold">Overview</h1>
-                <span className="text-[#CCD0CF]/60 text-[16px]">{today}</span>
+                <span className="text-[#CCD0CF]/60 text-[14px] sm:text-[16px]">{today}</span>
             </div>
             <p className="text-[#CCD0CF] text-[14px] mb-6">{guideName}</p>
 
-            <div className="grid grid-cols-3 gap-4 mt-[20px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-[20px]">
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaClipboardList/>
                     </div>
                     <div>
@@ -67,7 +67,7 @@ export default function Overview(){
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaMoneyBillWave/>
                     </div>
                     <div>
@@ -76,7 +76,7 @@ export default function Overview(){
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaCalendarCheck/>
                     </div>
                     <div>
@@ -85,7 +85,7 @@ export default function Overview(){
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <MdPending/>
                     </div>
                     <div>
@@ -94,7 +94,7 @@ export default function Overview(){
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaCheckCircle/>
                     </div>
                     <div>
@@ -103,7 +103,7 @@ export default function Overview(){
                     </div>
                 </div>
                 <div className="bg-[#253745] rounded-[20px] p-4 flex items-center gap-4">
-                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px]">
+                    <div className="w-[50px] h-[50px] rounded-full bg-[#00C896]/20 flex items-center justify-center text-[#00C896] text-[22px] flex-shrink-0">
                         <FaStar/>
                     </div>
                     <div>
