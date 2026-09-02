@@ -4,15 +4,14 @@ import {
   FaStar,
   FaCog,
   FaSignOutAlt,
+  FaTimes,
 } from "react-icons/fa";
 import { SiBookingdotcom } from "react-icons/si";
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.png";
 
-import logo from "../../assets/logo.png"
-
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const [activeSection, setActiveSection] = useState("overview");
   const navigate = useNavigate();
 
@@ -44,6 +43,7 @@ export default function Sidebar() {
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (setMobileOpen) setMobileOpen(false); // Close sidebar on mobile after clicking
   };
 
   const handleLogout = () => {
@@ -53,9 +53,19 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#253745] h-screen fixed top-0 left-0 hidden md:flex flex-col z-30">
-      <div className="py-8 flex justify-center">
+    <aside
+      className={`w-64 bg-[#253745] h-screen fixed top-0 left-0 z-30 flex flex-col transition-transform duration-300 ease-in-out
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+    >
+      <div className="py-8 flex justify-between items-center px-6">
         <img src={logo} alt="logo" className="w-36" />
+        {/* Close button for mobile */}
+        <button 
+          onClick={() => setMobileOpen(false)} 
+          className="text-[#CCD0CF] md:hidden text-xl cursor-pointer"
+        >
+          <FaTimes />
+        </button>
       </div>
 
       <nav className="flex-1 px-5 overflow-y-auto">
