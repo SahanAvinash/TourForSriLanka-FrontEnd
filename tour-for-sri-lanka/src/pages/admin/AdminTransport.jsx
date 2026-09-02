@@ -45,20 +45,17 @@ export default function AdminTransport() {
           { 
             header: "Rate / Km", 
             render: (item) => {
-              const oldRate = item.oldRatePerKm || item.previousRatePerKm;
+              const oldRate = item.oldRatePerKm || item.previousRatePerKm || item.oldRate;
               return (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-white font-semibold">LKR {item.ratePerKm}</span>
-                  {!item.isApproved && oldRate && (
-                    <span className="text-gray-400 text-xs line-through">
-                      LKR {oldRate}
+                <div className="flex flex-col text-xs space-y-0.5">
+                  {oldRate && (
+                    <span className="text-gray-400 line-through">
+                      Old: LKR {oldRate}
                     </span>
                   )}
-                  {!item.isApproved && (
-                    <span className="bg-yellow-500/20 text-yellow-400 text-[10px] px-1.5 py-0.5 rounded border border-yellow-500/30 font-medium">
-                      New Rate
-                    </span>
-                  )}
+                  <span className="text-[#00C896] font-bold">
+                    New: LKR {item.ratePerKm}
+                  </span>
                 </div>
               );
             } 
@@ -131,12 +128,12 @@ export default function AdminTransport() {
                   <p><span className="text-gray-400">Vehicle Type:</span> {selectedTransport.vehicleType}</p>
                   <p><span className="text-gray-400">Registration No:</span> {selectedTransport.registrationNo}</p>
                   
-                  <div className="flex items-center justify-between bg-black/30 p-3 rounded-lg sm:col-span-2 border border-yellow-500/20">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-black/30 p-3 rounded-lg sm:col-span-2 border border-yellow-500/20 gap-2">
                     <span className="text-gray-400">Rate Per Km:</span>
-                    <div className="flex items-center gap-3">
-                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm) && (
+                    <div className="flex items-center gap-4">
+                      {(selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate) && (
                         <span className="text-gray-400 line-through text-xs">
-                          Old: LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm}
+                          Old: LKR {selectedTransport.oldRatePerKm || selectedTransport.previousRatePerKm || selectedTransport.oldRate}
                         </span>
                       )}
                       <span className="text-[#00C896] font-bold">
