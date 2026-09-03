@@ -270,7 +270,6 @@ const TourPage = () => {
 
   const [activeTour, setActiveTour] = useState(null);
   const [showActiveTourDetails, setShowActiveTourDetails] = useState(false);
-  const detailsRef = useRef(null);
 
   useEffect(() => {
     if (startDistrict) {
@@ -322,18 +321,6 @@ const TourPage = () => {
 
     fetchActiveTour();
   }, []);
-
-  const handleSeeMoreClick = () => {
-    setShowActiveTourDetails((prev) => {
-      const nextState = !prev;
-      if (nextState) {
-        setTimeout(() => {
-          detailsRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-      }
-      return nextState;
-    });
-  };
 
   const handleMapConfirm = (location) => {
     setStartLocation(location);
@@ -619,34 +606,164 @@ const TourPage = () => {
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
 
-      {/* Active Tour Top Notification Banner */}
+      {/* Active Tour Dropdown Accordion Section */}
       {activeTour && (
         <div className="max-w-4xl mx-auto mb-10 px-4">
-          <div className="bg-[#253745] border border-[#00C896]/30 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#00C896]/10 flex items-center justify-center flex-shrink-0">
-                <Compass size={18} className="text-[#00C896]" />
+          <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-5 shadow-lg transition-all duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#00C896]/10 flex items-center justify-center flex-shrink-0">
+                  <Compass size={18} className="text-[#00C896]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Your Tour</p>
+                  <p className="text-xs text-gray-400">
+                    {activeTour.tripStartDate && activeTour.tripEndDate
+                      ? `${formatDate(activeTour.tripStartDate)} — ${formatDate(
+                          activeTour.tripEndDate
+                        )}`
+                      : `${activeTour.destinations?.length || 0} destinations`}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Your Tour</p>
-                <p className="text-xs text-gray-400">
-                  {activeTour.tripStartDate && activeTour.tripEndDate
-                    ? `${formatDate(activeTour.tripStartDate)} — ${formatDate(
-                        activeTour.tripEndDate
-                      )}`
-                    : `${activeTour.destinations?.length || 0} destinations`}
-                </p>
-              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowActiveTourDetails((prev) => !prev)}
+                className="text-sm font-semibold text-[#00C896] hover:underline flex items-center gap-1 flex-shrink-0 cursor-pointer self-start sm:self-center"
+              >
+                {showActiveTourDetails ? "See Less" : "See More"}
+                {showActiveTourDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleSeeMoreClick}
-              className="text-sm font-semibold text-[#00C896] hover:underline flex items-center gap-1 flex-shrink-0 cursor-pointer"
-            >
-              {showActiveTourDetails ? "See Less" : "See More"}
-              {showActiveTourDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
+            {/* Dropdown Content inside the banner */}
+            {showActiveTourDetails && (
+              <div className="mt-5 pt-5 border-t border-white/10 transition-all duration-300">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-white/10 gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-[#00C896] flex items-center gap-2">
+                      <Compass size={22} /> Your Booked Tour Details
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Trip Reference: TSL-{activeTour._id ? activeTour._id.slice(0, 10).toUpperCase() : ""}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    className="flex items-center gap-2 bg-[#00C896] text-[#11212D] font-semibold text-sm px-4 py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+                  >
+                    <Download size={16} />
+                    Download as PDF
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-[#11212D] rounded-lg p-4">
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">Trip Start</span>
+                    <span className="text-white font-medium text-sm">
+                      {activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">Trip End</span>
+                    <span className="text-white font-medium text-sm">
+                      {activeTour.tripEndDate ? formatDate(activeTour.tripEndDate) : "-"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">Total Distance</span>
+                    <span className="text-white font-medium text-sm">
+                      {activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Day-by-Day Itinerary Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
+                    Trip Itinerary (Day by Day)
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    {Object.entries(
+                      (activeTour.destinations || []).reduce((acc, dest) => {
+                        const day = dest.day || 1;
+                        if (!acc[day]) acc[day] = [];
+                        acc[day].push(dest);
+                        return acc;
+                      }, {})
+                    ).map(([dayNum, dests]) => (
+                      <div key={`day-${dayNum}`} className="bg-[#11212D] rounded-lg p-4">
+                        <h5 className="text-xs font-bold text-[#00C896] mb-2 uppercase tracking-wide">
+                          Day {String(dayNum).padStart(2, "0")}
+                        </h5>
+                        <div className="flex flex-col gap-2">
+                          {dests.map((destination, index) => (
+                            <div
+                              key={destination.id || destination._id || `dest-${index}`}
+                              className="text-sm text-gray-300 flex justify-between items-center bg-[#253745]/50 px-3 py-2 rounded"
+                            >
+                              <span>
+                                {index + 1}. {destination.name}
+                                {destination.location && ` (${destination.location})`}
+                              </span>
+                              {destination.timeSlot && (
+                                <span className="text-gray-400 text-xs bg-[#253745] px-2 py-1 rounded border border-white/5">
+                                  {destination.timeSlot}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bookings Section */}
+                {(activeTour.selectedGuide ||
+                  activeTour.selectedHotels?.length > 0 ||
+                  activeTour.selectedTransport) && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
+                      Bookings
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {activeTour.selectedGuide && (
+                        <div className="bg-[#11212D] rounded-lg p-3">
+                          <span className="text-xs text-gray-400 block mb-0.5">Guide</span>
+                          <p className="text-sm text-white font-medium">
+                            {activeTour.selectedGuide.firstName} {activeTour.selectedGuide.lastName}
+                          </p>
+                        </div>
+                      )}
+
+                      {activeTour.selectedHotels?.map((hotel) => (
+                        <div key={hotel._id} className="bg-[#11212D] rounded-lg p-3">
+                          <span className="text-xs text-gray-400 block mb-0.5">Hotel</span>
+                          <p className="text-sm text-white font-medium">
+                            {hotel.hotelName} ({hotel.location})
+                          </p>
+                        </div>
+                      ))}
+
+                      {activeTour.selectedTransport && (
+                        <div className="bg-[#11212D] rounded-lg p-3">
+                          <span className="text-xs text-gray-400 block mb-0.5">Vehicle</span>
+                          <p className="text-sm text-white font-medium">
+                            {activeTour.selectedTransport.vehicleBrand} {activeTour.selectedTransport.vehicleModel}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -758,136 +875,6 @@ const TourPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Active Tour Expanded Details Section (Appears below form when 'See More' is clicked) */}
-      {activeTour && showActiveTourDetails && (
-        <div ref={detailsRef} className="max-w-4xl mx-auto my-12 px-4 transition-all duration-300">
-          <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-6 shadow-2xl">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-white/10 gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-[#00C896] flex items-center gap-2">
-                  <Compass size={22} /> Your Booked Tour Details
-                </h3>
-                <p className="text-xs text-gray-400 mt-1">
-                  Trip Reference: TSL-{activeTour._id ? activeTour._id.slice(0, 10).toUpperCase() : ""}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleDownloadPdf}
-                className="flex items-center gap-2 bg-[#00C896] text-[#11212D] font-semibold text-sm px-4 py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
-              >
-                <Download size={16} />
-                Download as PDF
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-[#11212D] rounded-lg p-4">
-              <div>
-                <span className="text-xs text-gray-400 block mb-1">Trip Start</span>
-                <span className="text-white font-medium text-sm">
-                  {activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-"}
-                </span>
-              </div>
-              <div>
-                <span className="text-xs text-gray-400 block mb-1">Trip End</span>
-                <span className="text-white font-medium text-sm">
-                  {activeTour.tripEndDate ? formatDate(activeTour.tripEndDate) : "-"}
-                </span>
-              </div>
-              <div>
-                <span className="text-xs text-gray-400 block mb-1">Total Distance</span>
-                <span className="text-white font-medium text-sm">
-                  {activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-"}
-                </span>
-              </div>
-            </div>
-
-            {/* Day-by-Day Itinerary Section */}
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
-                Trip Itinerary (Day by Day)
-              </h4>
-
-              <div className="grid grid-cols-1 gap-3">
-                {Object.entries(
-                  (activeTour.destinations || []).reduce((acc, dest) => {
-                    const day = dest.day || 1;
-                    if (!acc[day]) acc[day] = [];
-                    acc[day].push(dest);
-                    return acc;
-                  }, {})
-                ).map(([dayNum, dests]) => (
-                  <div key={`day-${dayNum}`} className="bg-[#253745] rounded-lg p-4">
-                    <h5 className="text-xs font-bold text-[#00C896] mb-2 uppercase tracking-wide">
-                      Day {String(dayNum).padStart(2, "0")}
-                    </h5>
-                    <div className="flex flex-col gap-2">
-                      {dests.map((destination, index) => (
-                        <div
-                          key={destination.id || destination._id || `dest-${index}`}
-                          className="text-sm text-gray-300 flex justify-between items-center bg-[#11212D]/50 px-3 py-2 rounded"
-                        >
-                          <span>
-                            {index + 1}. {destination.name}
-                            {destination.location && ` (${destination.location})`}
-                          </span>
-                          {destination.timeSlot && (
-                            <span className="text-gray-400 text-xs bg-[#11212D] px-2 py-1 rounded border border-white/5">
-                              {destination.timeSlot}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bookings Section */}
-            {(activeTour.selectedGuide ||
-              activeTour.selectedHotels?.length > 0 ||
-              activeTour.selectedTransport) && (
-              <div>
-                <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
-                  Bookings
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {activeTour.selectedGuide && (
-                    <div className="bg-[#253745] rounded-lg p-3">
-                      <span className="text-xs text-gray-400 block mb-0.5">Guide</span>
-                      <p className="text-sm text-white font-medium">
-                        {activeTour.selectedGuide.firstName} {activeTour.selectedGuide.lastName}
-                      </p>
-                    </div>
-                  )}
-
-                  {activeTour.selectedHotels?.map((hotel) => (
-                    <div key={hotel._id} className="bg-[#253745] rounded-lg p-3">
-                      <span className="text-xs text-gray-400 block mb-0.5">Hotel</span>
-                      <p className="text-sm text-white font-medium">
-                        {hotel.hotelName} ({hotel.location})
-                      </p>
-                    </div>
-                  ))}
-
-                  {activeTour.selectedTransport && (
-                    <div className="bg-[#253745] rounded-lg p-3">
-                      <span className="text-xs text-gray-400 block mb-0.5">Vehicle</span>
-                      <p className="text-sm text-white font-medium">
-                        {activeTour.selectedTransport.vehicleBrand} {activeTour.selectedTransport.vehicleModel}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <FeatureCard
