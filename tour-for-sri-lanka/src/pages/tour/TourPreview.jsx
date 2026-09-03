@@ -956,23 +956,25 @@ const TourPreview = () => {
     for (const item of cart.transports) {
       try {
         await axios.post(
-          `${API_BASE_URL}/api/transport/bookings`,
-          {
-            vehicleId: item.vehicleId,
-            travelerId,
-            pickupLocation: item.pickupLocation,
-            dropoffLocation: item.dropoffLocation,
-            pickup: item.pickup,
-            destination: item.destination,
-            pickupDate: item.pickupDate,
-            returnDate: item.returnDate,
-            numberOfPassengers: item.numberOfGuests,
-            bags: item.bags,
-            isReturnTrip: true,
-            tourId,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+            `${API_BASE_URL}/api/transport/bookings`,
+            {
+              vehicleId: item.vehicleId,
+              travelerId,
+              pickupLocation: item.pickupLocation,
+              dropoffLocation: item.dropoffLocation,
+              pickupLat: item.pickup.lat,
+              pickupLng: item.pickup.lng,
+              dropoffLat: item.destination.lat,
+              dropoffLng: item.destination.lng,
+              pickupDate: item.pickupDate,
+              returnDate: item.returnDate,
+              numberOfPassengers: item.numberOfGuests,
+              bags: item.bags,
+              isReturnTrip: true,
+              tourId,
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
         successfulTransports.push(item);
       } catch (err) {
         console.error("Transport booking failed:", err.response?.data);
