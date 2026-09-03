@@ -269,7 +269,6 @@ const TourPage = () => {
   });
 
   const [activeTour, setActiveTour] = useState(null);
-  const [showTourModal, setShowTourModal] = useState(false);
 
   useEffect(() => {
     if (startDistrict) {
@@ -606,36 +605,6 @@ const TourPage = () => {
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
 
-      {activeTour && (
-        <div className="max-w-4xl mx-auto mb-10 px-4">
-          <div className="bg-[#253745] border border-[#00C896]/30 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#00C896]/10 flex items-center justify-center flex-shrink-0">
-                <Compass size={18} className="text-[#00C896]" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Your Tour</p>
-                <p className="text-xs text-gray-400">
-                  {activeTour.tripStartDate && activeTour.tripEndDate
-                    ? `${formatDate(activeTour.tripStartDate)} — ${formatDate(
-                        activeTour.tripEndDate
-                      )}`
-                    : `${activeTour.destinations?.length || 0} destinations`}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowTourModal(true)}
-              className="text-sm font-semibold text-[#00C896] hover:underline flex-shrink-0"
-            >
-              See More
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="max-w-4xl mx-auto text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 page-title-anim">
           Plan Your Own{" "}
@@ -743,6 +712,136 @@ const TourPage = () => {
         </div>
       </div>
 
+      {/* Active Tour Details Section (Page eke pahalata pennana widihata setup karala thiyenne) */}
+      {activeTour && (
+        <div className="max-w-4xl mx-auto my-12 px-4">
+          <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-white/10 gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-[#00C896] flex items-center gap-2">
+                  <Compass size={22} /> Your Booked Tour
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Trip Reference: TSL-{activeTour._id ? activeTour._id.slice(0, 10).toUpperCase() : ""}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="flex items-center gap-2 bg-[#00C896] text-[#11212D] font-semibold text-sm px-4 py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+              >
+                <Download size={16} />
+                Download as PDF
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-[#11212D] rounded-lg p-4">
+              <div>
+                <span className="text-xs text-gray-400 block mb-1">Trip Start</span>
+                <span className="text-white font-medium text-sm">
+                  {activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-"}
+                </span>
+              </div>
+              <div>
+                <span className="text-xs text-gray-400 block mb-1">Trip End</span>
+                <span className="text-white font-medium text-sm">
+                  {activeTour.tripEndDate ? formatDate(activeTour.tripEndDate) : "-"}
+                </span>
+              </div>
+              <div>
+                <span className="text-xs text-gray-400 block mb-1">Total Distance</span>
+                <span className="text-white font-medium text-sm">
+                  {activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-"}
+                </span>
+              </div>
+            </div>
+
+            {/* Day-by-Day Itinerary Section */}
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
+                Trip Itinerary (Day by Day)
+              </h4>
+
+              <div className="grid grid-cols-1 gap-3">
+                {Object.entries(
+                  (activeTour.destinations || []).reduce((acc, dest) => {
+                    const day = dest.day || 1;
+                    if (!acc[day]) acc[day] = [];
+                    acc[day].push(dest);
+                    return acc;
+                  }, {})
+                ).map(([dayNum, dests]) => (
+                  <div key={`day-${dayNum}`} className="bg-[#253745] rounded-lg p-4">
+                    <h5 className="text-xs font-bold text-[#00C896] mb-2 uppercase tracking-wide">
+                      Day {String(dayNum).padStart(2, "0")}
+                    </h5>
+                    <div className="flex flex-col gap-2">
+                      {dests.map((destination, index) => (
+                        <div
+                          key={destination.id || destination._id || `dest-${index}`}
+                          className="text-sm text-gray-300 flex justify-between items-center bg-[#11212D]/50 px-3 py-2 rounded"
+                        >
+                          <span>
+                            {index + 1}. {destination.name}
+                            {destination.location && ` (${destination.location})`}
+                          </span>
+                          {destination.timeSlot && (
+                            <span className="text-gray-400 text-xs bg-[#11212D] px-2 py-1 rounded border border-white/5">
+                              {destination.timeSlot}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bookings Section */}
+            {(activeTour.selectedGuide ||
+              activeTour.selectedHotels?.length > 0 ||
+              activeTour.selectedTransport) && (
+              <div>
+                <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
+                  Bookings
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {activeTour.selectedGuide && (
+                    <div className="bg-[#253745] rounded-lg p-3">
+                      <span className="text-xs text-gray-400 block mb-0.5">Guide</span>
+                      <p className="text-sm text-white font-medium">
+                        {activeTour.selectedGuide.firstName} {activeTour.selectedGuide.lastName}
+                      </p>
+                    </div>
+                  )}
+
+                  {activeTour.selectedHotels?.map((hotel) => (
+                    <div key={hotel._id} className="bg-[#253745] rounded-lg p-3">
+                      <span className="text-xs text-gray-400 block mb-0.5">Hotel</span>
+                      <p className="text-sm text-white font-medium">
+                        {hotel.hotelName} ({hotel.location})
+                      </p>
+                    </div>
+                  ))}
+
+                  {activeTour.selectedTransport && (
+                    <div className="bg-[#253745] rounded-lg p-3">
+                      <span className="text-xs text-gray-400 block mb-0.5">Vehicle</span>
+                      <p className="text-sm text-white font-medium">
+                        {activeTour.selectedTransport.vehicleBrand} {activeTour.selectedTransport.vehicleModel}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <FeatureCard
           icon={<MapPin className="mx-auto text-[#00C896] mb-3" size={32} />}
@@ -784,151 +883,6 @@ const TourPage = () => {
           onConfirm={handleMapConfirm}
           title="Pick your starting location"
         />
-      )}
-
-      {showTourModal && activeTour && (
-        <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] px-4"
-          onClick={() => setShowTourModal(false)}
-        >
-          <div
-            className="bg-[#1B2B34] rounded-xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-[#00C896]">
-                Your Booked Tour
-              </h3>
-
-              <button
-                type="button"
-                onClick={() => setShowTourModal(false)}
-                className="text-gray-400 hover:text-white text-xl leading-none"
-              >
-                &times;
-              </button>
-            </div>
-
-            <div className="mb-5 bg-[#11212D] rounded-lg p-3">
-              <div className="flex justify-between text-xs text-gray-400 mb-1">
-                <span>Trip Start</span>
-                <span className="text-white font-medium">
-                  {activeTour.tripStartDate
-                    ? formatDate(activeTour.tripStartDate)
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex justify-between text-xs text-gray-400 mb-1">
-                <span>Trip End</span>
-                <span className="text-white font-medium">
-                  {activeTour.tripEndDate
-                    ? formatDate(activeTour.tripEndDate)
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex justify-between text-xs text-gray-400">
-                <span>Total Distance</span>
-                <span className="text-white font-medium">
-                  {activeTour.totalDistanceKm
-                    ? `${activeTour.totalDistanceKm} km`
-                    : "-"}
-                </span>
-              </div>
-            </div>
-
-            {/* Day-by-Day Itinerary Section */}
-            <div className="mb-5">
-              <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
-                Trip Itinerary (Day by Day)
-              </h4>
-
-              <div className="flex flex-col gap-3 mt-2">
-                {Object.entries(
-                  (activeTour.destinations || []).reduce((acc, dest) => {
-                    const day = dest.day || 1;
-                    if (!acc[day]) acc[day] = [];
-                    acc[day].push(dest);
-                    return acc;
-                  }, {})
-                ).map(([dayNum, dests]) => (
-                  <div key={`day-${dayNum}`} className="bg-[#253745] rounded-lg p-3">
-                    <h5 className="text-xs font-bold text-[#00C896] mb-2 uppercase tracking-wide">
-                      Day {String(dayNum).padStart(2, "0")}
-                    </h5>
-                    <div className="flex flex-col gap-1.5">
-                      {dests.map((destination, index) => (
-                        <div
-                          key={destination.id || destination._id || `dest-${index}`}
-                          className="text-xs text-gray-300 flex justify-between items-center"
-                        >
-                          <span>
-                            {index + 1}. {destination.name}
-                            {destination.location && ` (${destination.location})`}
-                          </span>
-                          {destination.timeSlot && (
-                            <span className="text-gray-400 text-[11px] bg-[#11212D] px-2 py-0.5 rounded">
-                              {destination.timeSlot}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {(activeTour.selectedGuide ||
-              activeTour.selectedHotels?.length > 0 ||
-              activeTour.selectedTransport) && (
-              <div className="mb-5">
-                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
-                  Bookings
-                </h4>
-
-                <div className="flex flex-col gap-2 mt-2">
-                  {activeTour.selectedGuide && (
-                    <div className="bg-[#253745] rounded-lg px-3 py-2">
-                      <p className="text-sm text-white">
-                        Guide — {activeTour.selectedGuide.firstName}{" "}
-                        {activeTour.selectedGuide.lastName}
-                      </p>
-                    </div>
-                  )}
-
-                  {activeTour.selectedHotels?.map((hotel) => (
-                    <div
-                      key={hotel._id}
-                      className="bg-[#253745] rounded-lg px-3 py-2"
-                    >
-                      <p className="text-sm text-white">
-                        Hotel — {hotel.hotelName} ({hotel.location})
-                      </p>
-                    </div>
-                  ))}
-
-                  {activeTour.selectedTransport && (
-                    <div className="bg-[#253745] rounded-lg px-3 py-2">
-                      <p className="text-sm text-white">
-                        Vehicle — {activeTour.selectedTransport.vehicleBrand}{" "}
-                        {activeTour.selectedTransport.vehicleModel}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={handleDownloadPdf}
-              className="w-full mt-2 flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold text-sm py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
-            >
-              <Download size={14} />
-              Download as PDF
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );
