@@ -1047,23 +1047,27 @@ const TourPreview = () => {
     setTransportBudget(remainingTransports.reduce((sum, t) => sum + t.totalPrice, 0));
     setHotelBudget(remainingHotels.reduce((sum, h) => sum + h.totalPrice, 0));
 
-    if (failedNames.length === 0) {
-      const tripSummary = {
-        destinations,
-        guideBookings: successfulGuides,
-        hotelBookings: successfulHotels,
-        transportBookings: successfulTransports,
-        guideBudget: finalGuideBudget,
-        hotelBudget: finalHotelBudget,
-        transportBudget: finalTransportBudget,
-        totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
-        savedAt: Date.now(),
-      };
-      localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
-      navigate("/tours");
-    } else {
-      setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
-    }
+        if (failedNames.length === 0) {
+          const tripSummary = {
+            destinations,
+            guideBookings: successfulGuides,
+            hotelBookings: successfulHotels,
+            transportBookings: successfulTransports,
+            guideBudget: finalGuideBudget,
+            hotelBudget: finalHotelBudget,
+            transportBudget: finalTransportBudget,
+            totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
+            tripDuration: tripDurationDays,
+            tripStartDate,
+            numberOfGuests: tripGuestCount,
+            startAddress: startCoords?.address || startDistrict,
+            savedAt: Date.now(),
+          };
+          localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
+          navigate("/tours");
+        } else {
+            setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
+      }
   };
 
   return (
