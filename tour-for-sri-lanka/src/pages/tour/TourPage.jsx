@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-import { MapPin, Route, Users, Compass, Download } from "lucide-react";
+import { MapPin, Route, Users, Compass, Download, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { API_BASE_URL } from "../../config/api";
@@ -269,6 +269,8 @@ const TourPage = () => {
   });
 
   const [activeTour, setActiveTour] = useState(null);
+  const [showActiveTourDetails, setShowActiveTourDetails] = useState(false);
+  const detailsRef = useRef(null);
 
   useEffect(() => {
     if (startDistrict) {
@@ -320,6 +322,18 @@ const TourPage = () => {
 
     fetchActiveTour();
   }, []);
+
+  const handleSeeMoreClick = () => {
+    setShowActiveTourDetails((prev) => {
+      const nextState = !prev;
+      if (nextState) {
+        setTimeout(() => {
+          detailsRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+      return nextState;
+    });
+  };
 
   const handleMapConfirm = (location) => {
     setStartLocation(location);
@@ -605,6 +619,39 @@ const TourPage = () => {
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
 
+      {/* Active Tour Top Notification Banner */}
+      {activeTour && (
+        <div className="max-w-4xl mx-auto mb-10 px-4">
+          <div className="bg-[#253745] border border-[#00C896]/30 rounded-xl px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#00C896]/10 flex items-center justify-center flex-shrink-0">
+                <Compass size={18} className="text-[#00C896]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Your Tour</p>
+                <p className="text-xs text-gray-400">
+                  {activeTour.tripStartDate && activeTour.tripEndDate
+                    ? `${formatDate(activeTour.tripStartDate)} — ${formatDate(
+                        activeTour.tripEndDate
+                      )}`
+                    : `${activeTour.destinations?.length || 0} destinations`}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSeeMoreClick}
+              className="text-sm font-semibold text-[#00C896] hover:underline flex items-center gap-1 flex-shrink-0 cursor-pointer"
+            >
+              {showActiveTourDetails ? "See Less" : "See More"}
+              {showActiveTourDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Start New Trip Form Section */}
       <div className="max-w-4xl mx-auto text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 page-title-anim">
           Plan Your Own{" "}
@@ -712,14 +759,14 @@ const TourPage = () => {
         </div>
       </div>
 
-      {/* Active Tour Details Section (Page eke pahalata pennana widihata setup karala thiyenne) */}
-      {activeTour && (
-        <div className="max-w-4xl mx-auto my-12 px-4">
-          <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-6 shadow-xl">
+      {/* Active Tour Expanded Details Section (Appears below form when 'See More' is clicked) */}
+      {activeTour && showActiveTourDetails && (
+        <div ref={detailsRef} className="max-w-4xl mx-auto my-12 px-4 transition-all duration-300">
+          <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-6 shadow-2xl">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-white/10 gap-4">
               <div>
                 <h3 className="text-xl font-bold text-[#00C896] flex items-center gap-2">
-                  <Compass size={22} /> Your Booked Tour
+                  <Compass size={22} /> Your Booked Tour Details
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
                   Trip Reference: TSL-{activeTour._id ? activeTour._id.slice(0, 10).toUpperCase() : ""}
