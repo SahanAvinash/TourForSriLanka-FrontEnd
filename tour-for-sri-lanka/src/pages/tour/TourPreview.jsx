@@ -898,14 +898,19 @@ const TourPreview = () => {
       const tourRes = await axios.post(
         `${API_BASE_URL}/api/tour`,
         {
-          destinations: destinations.map((d, i) => ({
-            id: d.id || `stop-${i}`,
-            name: d.name || d.district || `Stop ${i + 1}`,
-            location: d.location,
-            latitude: d.latitude,
-            longitude: d.longitude,
-            order: i,
-          })),
+          destinations: destinations.map((d, i) => {
+            const dayInfo = getDayInfoForDestination(d, i);
+            return {
+              id: d.id || `stop-${i}`,
+              name: d.name || d.district || `Stop ${i + 1}`,
+              location: d.location,
+              latitude: d.latitude,
+              longitude: d.longitude,
+              order: i,
+              dayNumber: dayInfo.dayNumber,
+              timeSlot: dayInfo.timeSlot
+            };
+          }),
           routeGeometry: JSON.stringify(route),
           totalDistanceKm: route.distanceKm,
           tripStartDate,
