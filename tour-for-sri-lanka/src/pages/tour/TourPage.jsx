@@ -970,39 +970,41 @@ const TourPage = () => {
             {/*
               Simplified summary block — replaces the previous per-item
               "Trip Route" / "Guide Bookings" / "Hotel Bookings" /
-              "Transport Bookings" lists. Just destination count, day
-              count, and the starting point. The itemised breakdown still
-              lives in the downloadable PDF (handleDownloadPdf), untouched.
+              "Transport Bookings" lists. Just destination count, total
+              trip duration, and the starting point. The itemised
+              breakdown still lives in the downloadable PDF
+              (handleDownloadPdf), untouched.
             */}
             <div className="mb-5">
               <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
                 Trip Summary
               </h4>
 
-              <div className="flex flex-col gap-1.5 mt-2 text-sm text-gray-300">
-                <p>
-                  <span className="text-[#00C896] font-semibold">
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <div className="bg-[#253745] rounded-lg px-3 py-2">
+                  <p className="text-[11px] text-gray-400">Destinations</p>
+                  <p className="text-sm font-semibold text-[#00C896]">
                     {activeTour.destinations?.length || 0}
-                  </span>{" "}
-                  destinations
-                  {activeTour.tripDuration ? (
-                    <>
-                      {" "}
-                      over{" "}
-                      <span className="text-[#00C896] font-semibold">
-                        {activeTour.tripDuration}
-                      </span>{" "}
-                      day{Number(activeTour.tripDuration) > 1 ? "s" : ""}
-                    </>
-                  ) : null}
-                </p>
-
-                {activeTour.startAddress && (
-                  <p className="text-xs text-gray-400">
-                    Starting from {activeTour.startAddress}
                   </p>
-                )}
+                </div>
+
+                <div className="bg-[#253745] rounded-lg px-3 py-2">
+                  <p className="text-[11px] text-gray-400">Total Trip Duration</p>
+                  <p className="text-sm font-semibold text-[#00C896]">
+                    {activeTour.tripDuration
+                      ? `${activeTour.tripDuration} day${
+                          Number(activeTour.tripDuration) > 1 ? "s" : ""
+                        }`
+                      : "-"}
+                  </p>
+                </div>
               </div>
+
+              {activeTour.startAddress && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Starting from {activeTour.startAddress}
+                </p>
+              )}
             </div>
 
             <div className="bg-[#11212D] rounded-lg p-4 mt-2">
