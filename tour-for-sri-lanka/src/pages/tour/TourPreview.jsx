@@ -908,6 +908,8 @@ const TourPreview = () => {
           })),
           routeGeometry: JSON.stringify(route),
           totalDistanceKm: route.distanceKm,
+          tripStartDate,
+          tripDurationDays,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
