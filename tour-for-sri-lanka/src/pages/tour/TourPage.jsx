@@ -104,11 +104,6 @@ const formatDate = (date) => {
   });
 };
 
-// Draws a simple, branded "route map" diagram directly on the PDF using each
-// destination's lat/lng — numbered stops connected in visiting order, with a
-// dashed return leg back to the first stop (matching the same visual language
-// used on the live trip map). No external tile images are used, so this never
-// depends on network access, CORS, or load timing when the PDF is generated.
 const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) => {
   const points = (destinations || []).filter(
     (destination) =>
@@ -134,19 +129,16 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) =>
 
   const project = (lat, lng) => {
     const px = boxX + padding + ((lng - minLng) / lngSpan) * innerWidth;
-    // Flip latitude so north stays toward the top of the box
     const py = boxY + padding + (1 - (lat - minLat) / latSpan) * innerHeight;
     return [px, py];
   };
 
-  // Panel background
-  doc.setFillColor(37, 55, 69); // #253745
+  doc.setFillColor(37, 55, 69);
   doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 3, 3, "F");
 
   const coords = points.map((point) => project(point.lat, point.lng));
 
-  // Solid lines in visiting order
-  doc.setDrawColor(0, 200, 150); // #00C896
+  doc.setDrawColor(0, 200, 150);
   doc.setLineWidth(0.7);
   doc.setLineDashPattern([], 0);
 
@@ -154,7 +146,6 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) =>
     doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
   }
 
-  // Dashed return leg back to the start
   doc.setLineDashPattern([2, 1.5], 0);
   doc.line(
     coords[coords.length - 1][0],
@@ -164,7 +155,6 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) =>
   );
   doc.setLineDashPattern([], 0);
 
-  // Numbered markers + short labels
   points.forEach((point, index) => {
     const [px, py] = coords[index];
 
@@ -228,9 +218,7 @@ const FeatureCard = ({ icon, title, description, delay = 0 }) => {
       }}
     >
       {icon}
-
       <h3 className="font-semibold mb-2">{title}</h3>
-
       <p className="text-sm text-gray-400">{description}</p>
     </div>
   );
@@ -241,13 +229,7 @@ const TourPage = () => {
 
   const [startDistrict, setStartDistrict] = useState(() => {
     const saved = sessionStorage.getItem("tourStartDistrict");
-
-    return saved
-      ? {
-          value: saved,
-          label: saved,
-        }
-      : null;
+    return saved ? { value: saved, label: saved } : null;
   });
 
   const [startDate, setStartDate] = useState(
@@ -260,11 +242,8 @@ const TourPage = () => {
 
   const [numberOfGuests, setNumberOfGuests] = useState(() => {
     const saved = sessionStorage.getItem("tourNumberOfGuests");
-
     if (!saved) return null;
-
     const number = Number(saved);
-
     return {
       value: number,
       label: `${number} ${number === 1 ? "Guest" : "Guests"}`,
@@ -286,7 +265,6 @@ const TourPage = () => {
         lng: Number(savedLng),
       };
     }
-
     return null;
   });
 
@@ -313,10 +291,7 @@ const TourPage = () => {
 
   useEffect(() => {
     if (numberOfGuests) {
-      sessionStorage.setItem(
-        "tourNumberOfGuests",
-        String(numberOfGuests.value)
-      );
+      sessionStorage.setItem("tourNumberOfGuests", String(numberOfGuests.value));
     }
   }, [numberOfGuests]);
 
@@ -328,10 +303,6 @@ const TourPage = () => {
     }
   }, [startLocation]);
 
-  // Active tour now comes from the backend (persists across logout/login and
-  // browser changes) instead of a localStorage snapshot taken right after
-  // booking. It stays "active" until its tripEndDate passes (handled by the
-  // backend query in getAllTours).
   useEffect(() => {
     const fetchActiveTour = async () => {
       const token =
@@ -355,9 +326,7 @@ const TourPage = () => {
     setStartLocation(location);
 
     const matchedDistrict = districtOptions.find((district) =>
-      location.address
-        ?.toLowerCase()
-        .includes(district.value.toLowerCase())
+      location.address?.toLowerCase().includes(district.value.toLowerCase())
     );
 
     if (matchedDistrict) {
@@ -456,10 +425,8 @@ const TourPage = () => {
 
     y += 10;
 
-    // Trip overview panel
     const overviewHeight = 30;
-
-    doc.setFillColor(37, 55, 69); // #253745
+    doc.setFillColor(37, 55, 69);
     doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
 
     const overviewRows = [
@@ -533,8 +500,6 @@ const TourPage = () => {
 
     y = doc.lastAutoTable.finalY + 12;
 
-    // Route map — the backend stores latitude/longitude (not lat/lng), so
-    // map field names before handing off to the diagram helper.
     const mappedDestinations = (activeTour.destinations || []).map((d) => ({
       ...d,
       lat: d.latitude,
@@ -694,11 +659,7 @@ const TourPage = () => {
               onClick={() => setShowMapPicker(true)}
               className="w-full flex items-center gap-2 bg-[#253745] border border-[#3a4b58] rounded-md px-3 py-2 text-white hover:border-[#00C896] focus:outline-none focus:border-[#00C896] transition-colors cursor-pointer"
             >
-              <MapPin
-                size={16}
-                className="text-[#00C896] flex-shrink-0"
-              />
-
+              <MapPin size={16} className="text-[#00C896] flex-shrink-0" />
               <span
                 className={
                   startLocation
@@ -718,11 +679,11 @@ const TourPage = () => {
               </p>
             )}
           </div>
+          
           <div className="max-w-sm mx-auto mb-4 text-left">
             <label className="block text-sm text-gray-300 mb-2">
               Trip Start Date
             </label>
-
             <input
               type="date"
               min={getTodayString()}
@@ -739,7 +700,6 @@ const TourPage = () => {
             <label className="block text-sm text-gray-300 mb-2">
               Trip Duration (Days)
             </label>
-
             <input
               type="number"
               min="1"
@@ -757,7 +717,6 @@ const TourPage = () => {
             <label className="block text-sm text-gray-300 mb-2">
               Number of guests
             </label>
-
             <Select
               options={guestOptions}
               value={numberOfGuests}
@@ -771,9 +730,7 @@ const TourPage = () => {
               menuPortalTarget={document.body}
             />
 
-            {error && (
-              <p className="text-red-400 text-sm mt-2">{error}</p>
-            )}
+            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
           </div>
 
           <button
@@ -788,36 +745,21 @@ const TourPage = () => {
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <FeatureCard
-          icon={
-            <MapPin
-              className="mx-auto text-[#00C896] mb-3"
-              size={32}
-            />
-          }
+          icon={<MapPin className="mx-auto text-[#00C896] mb-3" size={32} />}
           title="1. Select Destinations"
           description="Choose as many places as you like, from beaches to ancient cities to wildlife parks."
           delay={0}
         />
 
         <FeatureCard
-          icon={
-            <Route
-              className="mx-auto text-[#00C896] mb-3"
-              size={32}
-            />
-          }
+          icon={<Route className="mx-auto text-[#00C896] mb-3" size={32} />}
           title="2. Get Your Route"
           description="We map out the trip order and show the distance between each stop."
           delay={0.15}
         />
 
         <FeatureCard
-          icon={
-            <Users
-              className="mx-auto text-[#00C896] mb-3"
-              size={32}
-            />
-          }
+          icon={<Users className="mx-auto text-[#00C896] mb-3" size={32} />}
           title="3. Book Locally"
           description="See guides, hotels, and transport available near each destination."
           delay={0.3}
@@ -894,20 +836,43 @@ const TourPage = () => {
               </div>
             </div>
 
+            {/* Day-by-Day Itinerary Section */}
             <div className="mb-5">
               <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
-                Trip Route
+                Trip Itinerary (Day by Day)
               </h4>
 
-              <div className="flex flex-col gap-1.5 mt-2">
-                {activeTour.destinations?.map((destination, index) => (
-                  <div
-                    key={destination.id || `dest-${index}`}
-                    className="text-sm text-gray-300"
-                  >
-                    {index + 1}. {destination.name}{" "}
-                    {destination.location &&
-                      `(${destination.location})`}
+              <div className="flex flex-col gap-3 mt-2">
+                {Object.entries(
+                  (activeTour.destinations || []).reduce((acc, dest) => {
+                    const day = dest.day || 1;
+                    if (!acc[day]) acc[day] = [];
+                    acc[day].push(dest);
+                    return acc;
+                  }, {})
+                ).map(([dayNum, dests]) => (
+                  <div key={`day-${dayNum}`} className="bg-[#253745] rounded-lg p-3">
+                    <h5 className="text-xs font-bold text-[#00C896] mb-2 uppercase tracking-wide">
+                      Day {String(dayNum).padStart(2, "0")}
+                    </h5>
+                    <div className="flex flex-col gap-1.5">
+                      {dests.map((destination, index) => (
+                        <div
+                          key={destination.id || destination._id || `dest-${index}`}
+                          className="text-xs text-gray-300 flex justify-between items-center"
+                        >
+                          <span>
+                            {index + 1}. {destination.name}
+                            {destination.location && ` (${destination.location})`}
+                          </span>
+                          {destination.timeSlot && (
+                            <span className="text-gray-400 text-[11px] bg-[#11212D] px-2 py-0.5 rounded">
+                              {destination.timeSlot}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
