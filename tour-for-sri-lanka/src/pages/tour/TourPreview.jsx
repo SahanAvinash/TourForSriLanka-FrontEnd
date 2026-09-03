@@ -962,13 +962,8 @@ const TourPreview = () => {
             travelerId,
             pickupLocation: item.pickupLocation,
             dropoffLocation: item.dropoffLocation,
-            // Backend's createTransportBooking expects flat pickupLat/pickupLng/
-            // dropoffLat/dropoffLng fields (same shape as booking-estimate),
-            // not the nested { lat, lng } objects the cart stores.
-            pickupLat: item.pickup?.lat,
-            pickupLng: item.pickup?.lng,
-            dropoffLat: item.destination?.lat,
-            dropoffLng: item.destination?.lng,
+            pickup: item.pickup,
+            destination: item.destination,
             pickupDate: item.pickupDate,
             returnDate: item.returnDate,
             numberOfPassengers: item.numberOfGuests,
@@ -1060,13 +1055,6 @@ const TourPreview = () => {
         hotelBudget: finalHotelBudget,
         transportBudget: finalTransportBudget,
         totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
-        // Extra fields the simplified "Your Tour" summary on TourPage needs
-        // (destination count + day count + start point), on top of the
-        // itemised bookings still used by the PDF export.
-        tripDuration: tripDurationDays,
-        tripStartDate,
-        numberOfGuests: tripGuestCount,
-        startAddress: startCoords?.address || startDistrict,
         savedAt: Date.now(),
       };
       localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));

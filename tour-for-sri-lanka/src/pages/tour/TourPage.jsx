@@ -967,45 +967,121 @@ const TourPage = () => {
               </button>
             </div>
 
-            {/*
-              Simplified summary block — replaces the previous per-item
-              "Trip Route" / "Guide Bookings" / "Hotel Bookings" /
-              "Transport Bookings" lists. Just destination count, total
-              trip duration, and the starting point. The itemised
-              breakdown still lives in the downloadable PDF
-              (handleDownloadPdf), untouched.
-            */}
             <div className="mb-5">
               <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
-                Trip Summary
+                Trip Route
               </h4>
 
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                <div className="bg-[#253745] rounded-lg px-3 py-2">
-                  <p className="text-[11px] text-gray-400">Destinations</p>
-                  <p className="text-sm font-semibold text-[#00C896]">
-                    {activeTour.destinations?.length || 0}
-                  </p>
-                </div>
+              <div className="flex flex-col gap-1.5 mt-2">
+                {activeTour.destinations?.map((destination, index) => (
+                  <div
+                    key={destination.id || `dest-${index}`}
+                    className="text-sm text-gray-300"
+                  >
+                    {index + 1}. {destination.name}{" "}
+                    {destination.location &&
+                      `(${destination.location})`}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                <div className="bg-[#253745] rounded-lg px-3 py-2">
-                  <p className="text-[11px] text-gray-400">Total Trip Duration</p>
-                  <p className="text-sm font-semibold text-[#00C896]">
-                    {activeTour.tripDuration
-                      ? `${activeTour.tripDuration} day${
-                          Number(activeTour.tripDuration) > 1 ? "s" : ""
-                        }`
-                      : "-"}
-                  </p>
+            {activeTour.guideBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
+                  Guide Bookings
+                </h4>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.guideBookings.map((guide) => (
+                    <div
+                      key={guide.cartId}
+                      className="bg-[#253745] rounded-lg px-3 py-2"
+                    >
+                      <p className="text-sm text-white">
+                        {guide.displayName}
+                      </p>
+
+                      <p className="text-xs text-gray-400">
+                        {formatDate(guide.date)} · {guide.quantity} day(s) ·{" "}
+                        {guide.numberOfGuests} guest(s)
+                      </p>
+
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">
+                        {guide.currency}{" "}
+                        {Number(guide.totalPrice || 0).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {activeTour.startAddress && (
-                <p className="text-xs text-gray-400 mt-2">
-                  Starting from {activeTour.startAddress}
-                </p>
-              )}
-            </div>
+            {activeTour.hotelBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
+                  Hotel Bookings
+                </h4>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.hotelBookings.map((hotel) => (
+                    <div
+                      key={hotel.cartId}
+                      className="bg-[#253745] rounded-lg px-3 py-2"
+                    >
+                      <p className="text-sm text-white">
+                        {hotel.displayName}
+                      </p>
+
+                      <p className="text-xs text-gray-400">
+                        {formatDate(hotel.checkInDate)} →{" "}
+                        {formatDate(hotel.checkOutDate)} ·{" "}
+                        {hotel.numberOfGuests} guest(s)
+                      </p>
+
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">
+                        LKR{" "}
+                        {Number(hotel.totalPrice || 0).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTour.transportBookings?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-white mb-2 border-b border-white/10 pb-1">
+                  Transport Bookings
+                </h4>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  {activeTour.transportBookings.map((transport) => (
+                    <div
+                      key={transport.cartId}
+                      className="bg-[#253745] rounded-lg px-3 py-2"
+                    >
+                      <p className="text-sm text-white">
+                        {transport.displayName}
+                      </p>
+
+                      <p className="text-xs text-gray-400">
+                        {formatDate(transport.pickupDate)} →{" "}
+                        {formatDate(transport.returnDate)} ·{" "}
+                        {transport.numberOfGuests} pax
+                      </p>
+
+                      <p className="text-xs text-[#00C896] font-semibold mt-1">
+                        LKR{" "}
+                        {Number(
+                          transport.totalPrice || 0
+                        ).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="bg-[#11212D] rounded-lg p-4 mt-2">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
