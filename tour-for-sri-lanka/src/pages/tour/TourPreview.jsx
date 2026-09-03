@@ -962,6 +962,9 @@ const TourPreview = () => {
             travelerId,
             pickupLocation: item.pickupLocation,
             dropoffLocation: item.dropoffLocation,
+            // Backend's createTransportBooking expects flat pickupLat/pickupLng/
+            // dropoffLat/dropoffLng fields (same shape as booking-estimate),
+            // not the nested { lat, lng } objects the cart stores.
             pickupLat: item.pickup?.lat,
             pickupLng: item.pickup?.lng,
             dropoffLat: item.destination?.lat,
@@ -1047,27 +1050,30 @@ const TourPreview = () => {
     setTransportBudget(remainingTransports.reduce((sum, t) => sum + t.totalPrice, 0));
     setHotelBudget(remainingHotels.reduce((sum, h) => sum + h.totalPrice, 0));
 
-        if (failedNames.length === 0) {
-          const tripSummary = {
-            destinations,
-            guideBookings: successfulGuides,
-            hotelBookings: successfulHotels,
-            transportBookings: successfulTransports,
-            guideBudget: finalGuideBudget,
-            hotelBudget: finalHotelBudget,
-            transportBudget: finalTransportBudget,
-            totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
-            tripDuration: tripDurationDays,
-            tripStartDate,
-            numberOfGuests: tripGuestCount,
-            startAddress: startCoords?.address || startDistrict,
-            savedAt: Date.now(),
-          };
-          localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
-          navigate("/tours");
-        } else {
-            setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
-      }
+    if (failedNames.length === 0) {
+      const tripSummary = {
+        destinations,
+        guideBookings: successfulGuides,
+        hotelBookings: successfulHotels,
+        transportBookings: successfulTransports,
+        guideBudget: finalGuideBudget,
+        hotelBudget: finalHotelBudget,
+        transportBudget: finalTransportBudget,
+        totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
+        // Extra fields the simplified "Your Tour" summary on TourPage needs
+        // (destination count + day count + start point), on top of the
+        // itemised bookings still used by the PDF export.
+        tripDuration: tripDurationDays,
+        tripStartDate,
+        numberOfGuests: tripGuestCount,
+        startAddress: startCoords?.address || startDistrict,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
+      navigate("/tours");
+    } else {
+      setStartTourError(`These couldn't be sent, please try again: ${failedNames.join(", ")}`);
+    }
   };
 
   return (
