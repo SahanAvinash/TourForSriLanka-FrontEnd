@@ -429,6 +429,8 @@ const TourPage = () => {
     doc.setFillColor(37, 55, 69);
     doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
 
+    const budgetValue = activeTour.estimatedBudget || activeTour.budget || activeTour.totalCost || activeTour.totalPrice;
+
     const overviewRows = [
       [
         "Trip Start Date",
@@ -442,6 +444,10 @@ const TourPage = () => {
       [
         "Total Distance",
         activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-",
+      ],
+      [
+        "Estimated Budget",
+        budgetValue ? `LKR ${Number(budgetValue).toLocaleString()}` : "-",
       ],
     ];
 
@@ -602,6 +608,8 @@ const TourPage = () => {
     doc.save(`TourForSriLanka-Trip-Summary-${Date.now()}.pdf`);
   };
 
+  const activeTourBudget = activeTour?.estimatedBudget || activeTour?.budget || activeTour?.totalCost || activeTour?.totalPrice;
+
   return (
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
@@ -623,6 +631,7 @@ const TourPage = () => {
                           activeTour.tripEndDate
                         )}`
                       : `${activeTour.destinations?.length || 0} destinations`}
+                    {activeTourBudget && ` • LKR ${Number(activeTourBudget).toLocaleString()}`}
                   </p>
                 </div>
               </div>
@@ -660,7 +669,7 @@ const TourPage = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-[#11212D] rounded-lg p-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 bg-[#11212D] rounded-lg p-4">
                   <div>
                     <span className="text-xs text-gray-400 block mb-1">Trip Start</span>
                     <span className="text-white font-medium text-sm">
@@ -677,6 +686,12 @@ const TourPage = () => {
                     <span className="text-xs text-gray-400 block mb-1">Total Distance</span>
                     <span className="text-white font-medium text-sm">
                       {activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 block mb-1">Estimated Budget</span>
+                    <span className="text-[#00C896] font-bold text-sm">
+                      {activeTourBudget ? `LKR ${Number(activeTourBudget).toLocaleString()}` : "-"}
                     </span>
                   </div>
                 </div>
