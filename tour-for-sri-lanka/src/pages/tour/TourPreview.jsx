@@ -915,6 +915,7 @@ const TourPreview = () => {
           totalDistanceKm: route.distanceKm,
           tripStartDate,
           tripDurationDays,
+          estimateedBudget: guideBudget + transportBudget + hotelBudget,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1040,6 +1041,7 @@ const TourPreview = () => {
             selectedGuide: successfulGuides[0]?.guideId,
             selectedHotels: successfulHotels.map((h) => h.hotelId),
             selectedTransport: successfulTransports[0]?.vehicleId,
+            estimatedBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
