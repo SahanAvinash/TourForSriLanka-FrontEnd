@@ -915,7 +915,7 @@ const TourPreview = () => {
           totalDistanceKm: route.distanceKm,
           tripStartDate,
           tripDurationDays,
-          estimateedBudget: guideBudget + transportBudget + hotelBudget,
+          estimatedBudget: guideBudget + transportBudget + hotelBudget,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1027,6 +1027,7 @@ const TourPreview = () => {
           guideBudget: finalGuideBudget,
           hotelBudget: finalHotelBudget,
           transportBudget: finalTransportBudget,
+          estimatedBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
         });
       } catch (err) {
         console.error("Trip summary email failed:", err.response?.data);
