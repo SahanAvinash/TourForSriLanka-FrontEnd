@@ -10,7 +10,6 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useTrip } from "../../context/TripContext";
-import html2canvas from 'html2canvas'
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -66,13 +65,27 @@ const createStartIcon = () => {
   });
 };
 
+const isValidCoordinate = (coord) =>
+  Array.isArray(coord) &&
+  coord.length >= 2 &&
+  Number.isFinite(Number(coord[0])) &&
+  Number.isFinite(Number(coord[1]));
+
 const getCoordFromStop = (stop) => {
   if (!stop) return null;
-  if (Array.isArray(stop) && stop.length >= 2) return [stop[0], stop[1]];
-  if (stop.lat != null && stop.lng != null) return [stop.lat, stop.lng];
-  if (stop.latitude != null && stop.longitude != null) return [stop.latitude, stop.longitude];
-  if (stop.location?.lat != null && stop.location?.lng != null) return [stop.location.lat, stop.location.lng];
+  if (Array.isArray(stop) && stop.length >= 2) return [Number(stop[0]), Number(stop[1])];
+  if (stop.lat != null && stop.lng != null) return [Number(stop.lat), Number(stop.lng)];
+  if (stop.latitude != null && stop.longitude != null) return [Number(stop.latitude), Number(stop.longitude)];
+  if (stop.location?.lat != null && stop.location?.lng != null) return [Number(stop.location.lat), Number(stop.location.lng)];
   return null;
+};
+
+const safeJsonParse = (value, fallback = null) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
 };
 
 const SRI_LANKA_BOUNDS = [
@@ -202,7 +215,6 @@ const TourPreview = () => {
   const mapWrapperRef = useRef(null);
   const [startingTour, setStartingTour] = useState(false);
   const [startTourError, setStartTourError] = useState("");
-  const [startTourSuccess, setStartTourSuccess] = useState(false);
 
   const calculateReturnDate = (startDate, days) => {
     if (!startDate || !days) return "";
@@ -210,6 +222,16 @@ const TourPreview = () => {
     const date = new Date(startDate);
     date.setDate(date.getDate() + Number(days));
 
+    return date.toISOString().split("T")[0];
+  };
+
+  const calculateTripEndDate = (startDate, days) => {
+    if (!startDate || !days) return "";
+
+    const date = new Date(`${startDate}T00:00:00`);
+    if (Number.isNaN(date.getTime())) return "";
+
+    date.setDate(date.getDate() + Math.max(0, Number(days) - 1));
     return date.toISOString().split("T")[0];
   };
 
@@ -240,11 +262,21 @@ const TourPreview = () => {
         navigate("/tours/plan");
         return;
       }
-      const {
-        selectedDestinations,
-        startDistrict: district,
-        tripDurationDays: savedDuration,
-      } = JSON.parse(saved);
+
+      const parsedTrip = safeJsonParse(saved);
+      const selectedDestinations = Array.isArray(parsedTrip?.selectedDestinations)
+        ? parsedTrip.selectedDestinations
+        : [];
+      const district = parsedTrip?.startDistrict;
+      const savedDuration = parsedTrip?.tripDurationDays;
+
+      if (selectedDestinations.length === 0 || !district) {
+        setError("Your saved trip details are incomplete. Please select your destinations again.");
+        setPhase("error");
+        navigate("/tours/plan");
+        return;
+      }
+
       setStartDistrict(district);
 
       const savedStartDate = sessionStorage.getItem("tourStartDate");
@@ -273,8 +305,20 @@ const TourPreview = () => {
         return;
       }
 
-      const initialDays = Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1);
-      const destinationIds = selectedDestinations.map((d) => d._id);
+      const initialDays = Math.max(
+        1,
+        Number(savedDuration || sessionStorage.getItem("tourTripDuration") || 1)
+      );
+      const destinationIds = selectedDestinations
+        .map((d) => d?._id || d?.id)
+        .filter(Boolean);
+
+      if (destinationIds.length === 0) {
+        setError("No valid destinations were found. Please select your destinations again.");
+        setPhase("error");
+        navigate("/tours/plan");
+        return;
+      }
 
       setTripDurationDays(initialDays);
 
@@ -424,15 +468,22 @@ const TourPreview = () => {
     );
   }
 
-  const { destinations, route, recommendations, itinerary } = tripData || {};
-  const routableStops = route?.routableStops || [];
-  const polylinePositions = route.geometry || [];
-  const returnPolylinePositions = route.returnGeometry || [];
+  const { destinations = [], route = {}, recommendations = [], itinerary = [] } = tripData || {};
+  const routableStops = Array.isArray(route.routableStops) ? route.routableStops : [];
+  const polylinePositions = Array.isArray(route.geometry)
+    ? route.geometry.filter(isValidCoordinate).map((p) => [Number(p[0]), Number(p[1])])
+    : [];
+  const returnPolylinePositions = Array.isArray(route.returnGeometry)
+    ? route.returnGeometry.filter(isValidCoordinate).map((p) => [Number(p[0]), Number(p[1])])
+    : [];
+
+  const startCoordCandidate =
+    startCoords && startCoords.lat != null && startCoords.lng != null
+      ? [Number(startCoords.lat), Number(startCoords.lng)]
+      : null;
 
   const startCoord =
-    (startCoords && startCoords.lat != null && startCoords.lng != null
-      ? [startCoords.lat, startCoords.lng]
-      : null) ||
+    (isValidCoordinate(startCoordCandidate) ? startCoordCandidate : null) ||
     getCoordFromStop(routableStops[0]) ||
     (polylinePositions.length > 0 ? polylinePositions[0] : null);
 
@@ -456,9 +507,14 @@ const TourPreview = () => {
   const legDistances = destinations.map((dest, index) => {
     const prevCoord = index === 0
       ? startCoord
-      : [destinations[index - 1].latitude, destinations[index - 1].longitude];
-    if (!prevCoord || dest.latitude == null || dest.longitude == null) return null;
-    return haversineKm(prevCoord[0], prevCoord[1], dest.latitude, dest.longitude);
+      : [destinations[index - 1]?.latitude, destinations[index - 1]?.longitude];
+    if (!isValidCoordinate(prevCoord) || !isValidCoordinate([dest?.latitude, dest?.longitude])) return null;
+    return haversineKm(
+      Number(prevCoord[0]),
+      Number(prevCoord[1]),
+      Number(dest.latitude),
+      Number(dest.longitude)
+    );
   });
 
   const centerLat = allMapPositions.length > 0
@@ -469,8 +525,10 @@ const TourPreview = () => {
     : 80.7718;
 
   const getRecommendationForLocation = (location) => {
+    if (!location || !Array.isArray(recommendations)) return undefined;
+    const normalizedLocation = String(location).toLowerCase().trim();
     return recommendations.find(
-      (rec) => rec.location?.toLowerCase().trim() === location?.toLowerCase().trim()
+      (rec) => String(rec?.location || "").toLowerCase().trim() === normalizedLocation
     );
   };
 
@@ -598,7 +656,7 @@ const TourPreview = () => {
     });
   };
 
-  const tripDays = destinations.length;
+  const tripDays = Math.max(1, Number(tripDurationDays) || 1);
   const closeTransportModal = () => {
     setActiveTransportModal(null);
     setTransportModalView("list");
@@ -606,7 +664,7 @@ const TourPreview = () => {
     setTransportBookingError("");
     setTransportBookingForm({
       pickupDate: tripStartDate || "",
-      returnDate: calculateReturnDate(tripStartDate, tripDays),
+      returnDate: calculateTripEndDate(tripStartDate, tripDays),
       numberOfGuests: tripGuestCount || 1,
       bags: 0,
     });
@@ -640,7 +698,7 @@ const TourPreview = () => {
     setTransportBookingError("");
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+    const storedUser = safeJsonParse(storedUserRaw);
     const travelerId = storedUser?._id;
 
     if (!token || !travelerId) {
@@ -651,7 +709,19 @@ const TourPreview = () => {
       setTransportBookingError("Please select pickup and return dates");
       return;
     }
-    if (transportBookingForm.numberOfGuests > selectedTransport.passengerCapacity) {
+    if (!selectedTransport) {
+      setTransportBookingError("Please select a vehicle first");
+      return;
+    }
+    if (Number(transportBookingForm.numberOfGuests) < 1 || !Number.isFinite(Number(transportBookingForm.numberOfGuests))) {
+      setTransportBookingError("Passengers must be at least 1");
+      return;
+    }
+    if (Number(transportBookingForm.bags) < 0 || !Number.isFinite(Number(transportBookingForm.bags))) {
+      setTransportBookingError("Bags cannot be negative");
+      return;
+    }
+    if (Number(transportBookingForm.numberOfGuests) > selectedTransport.passengerCapacity) {
       setTransportBookingError("Exceeds vehicle's passenger capacity");
       return;
     }
@@ -695,11 +765,11 @@ const TourPreview = () => {
       pickupLocation: startDistrict,
       dropoffLocation: activeTransportModal.location,
       pickup: startCoords
-        ? { lat: startCoords.lat, lng: startCoords.lng }
-        : { lat: destinations[0].latitude, lng: destinations[0].longitude },
+        ? { lat: Number(startCoords.lat), lng: Number(startCoords.lng) }
+        : { lat: Number(destinations[0].latitude), lng: Number(destinations[0].longitude) },
       destination: {
-        lat: destinations[destinations.length - 1].latitude,
-        lng: destinations[destinations.length - 1].longitude,
+        lat: Number(destinations[destinations.length - 1].latitude),
+        lng: Number(destinations[destinations.length - 1].longitude),
       },
       pickupDate: transportBookingForm.pickupDate,
       returnDate: transportBookingForm.returnDate,
@@ -778,7 +848,7 @@ const TourPreview = () => {
   const handleAddHotelToCart = async () => {
     setHotelBookingError("");
     const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+    const storedUser = safeJsonParse(storedUserRaw);
     const travelerId = storedUser?._id;
 
     if (!travelerId) {
@@ -787,6 +857,14 @@ const TourPreview = () => {
     }
     if (hotelNights <= 0) {
       setHotelBookingError("Check-out date must be after check-in date");
+      return;
+    }
+    if (!selectedRoom) {
+      setHotelBookingError("Please select a room first");
+      return;
+    }
+    if (Number(hotelBookingForm.numberOfGuests) < 1 || !Number.isFinite(Number(hotelBookingForm.numberOfGuests))) {
+      setHotelBookingError("Guests must be at least 1");
       return;
     }
     if (hotelBookingForm.numberOfGuests > selectedRoom.capacity) {
@@ -880,14 +958,11 @@ const TourPreview = () => {
   };
 
   const totalCartItems = cart.guides.length + cart.transports.length + cart.hotels.length;
-  const mapRef = useRef(null)
   const handleStartTour = async () => {
     setStartTourError("");
-    setStartTourSuccess(false);
-
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     const storedUserRaw = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
+    const storedUser = safeJsonParse(storedUserRaw);
     const travelerId = storedUser?._id;
 
     if (!token || !travelerId) {
@@ -1190,18 +1265,26 @@ const TourPreview = () => {
                 </Popup>
               </Marker>
             )}
-            {destinations.map((stop, index) => (
-              <Marker
-                key={stop.id || `stop-${index}`}
-                position={[stop.latitude, stop.longitude]}
-                icon={createNumberedIcon(index + 1)}
-              >
-                <Popup>
-                  <strong>{index + 1}. {stop.name}</strong><br />
-                  {stop.location}
-                </Popup>
-              </Marker>
-            ))}
+            {destinations.map((stop, index) => {
+              const stopPosition = isValidCoordinate([stop?.latitude, stop?.longitude])
+                ? [Number(stop.latitude), Number(stop.longitude)]
+                : null;
+
+              if (!stopPosition) return null;
+
+              return (
+                <Marker
+                  key={stop.id || stop._id || `stop-${index}`}
+                  position={stopPosition}
+                  icon={createNumberedIcon(index + 1)}
+                >
+                  <Popup>
+                    <strong>{index + 1}. {stop.name}</strong><br />
+                    {stop.location}
+                  </Popup>
+                </Marker>
+              );
+            })}
             <Polyline
               positions={safePolylinePossitions}
               pathOptions={{
@@ -1468,12 +1551,6 @@ const TourPreview = () => {
           {startTourError && (
             <p className="text-sm text-red-400 mt-3">{startTourError}</p>
           )}
-          {startTourSuccess && (
-            <p className="text-sm text-[#00C896] mt-3">
-              Tour started! Booking requests were sent to all guides, hotels and vehicle owners in your cart.
-            </p>
-          )}
-
           <button
             onClick={handleStartTour}
             disabled={startingTour}
@@ -1533,7 +1610,7 @@ const TourPreview = () => {
                           setBookingForm({
                             ...bookingForm,
                             durationType: "daily",
-                            quantity: destinations.length,
+                            quantity: tripDays,
                             date: tripStartDate || bookingForm.date,
                             numberOfGuests: tripGuestCount || bookingForm.numberOfGuests,
                           });
@@ -1627,7 +1704,7 @@ const TourPreview = () => {
                         onChange={(e) => setBookingForm({ ...bookingForm, quantity: Number(e.target.value) })}
                         className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Pre-filled based on your {destinations.length}-destination trip — edit if needed.</p>
+                      <p className="text-xs text-gray-500 mt-1">Pre-filled based on your {tripDays}-day trip — edit if needed.</p>
                     </div>
 
                     <div>
@@ -1729,7 +1806,7 @@ const TourPreview = () => {
                           setSelectedTransport(t);
                           setTransportBookingForm({
                             pickupDate: tripStartDate || "",
-                            returnDate: calculateReturnDate(tripStartDate, tripDays),
+                            returnDate: calculateTripEndDate(tripStartDate, tripDays),
                             numberOfGuests: tripGuestCount || 1,
                             bags: 0,
                           });
@@ -1983,7 +2060,11 @@ const TourPreview = () => {
                       <input
                         type="date"
                         value={hotelBookingForm.checkOutDate}
-                        min={hotelBookingForm.checkInDate || undefined}
+                        min={
+                          hotelBookingForm.checkInDate
+                            ? calculateReturnDate(hotelBookingForm.checkInDate, 1)
+                            : undefined
+                        }
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, checkOutDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
                         className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
