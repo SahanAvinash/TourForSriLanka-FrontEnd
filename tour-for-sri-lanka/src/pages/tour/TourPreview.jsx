@@ -17,6 +17,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
+L.Browser.any3d = false
 
 const createNumberedIcon = (number) => {
   return L.divIcon({
