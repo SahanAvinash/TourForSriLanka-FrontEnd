@@ -1003,7 +1003,6 @@ const TourPreview = () => {
   // why that matters and how the race was eliminated.
   const drawMarkersOnCanvas = (canvas) => {
     const map = mapInstanceRef.current;
-    if (!map || !mapWrapperRef.current) return;
 
     const ctx = canvas.getContext("2d");
     const canvasScale = canvas.width / mapWrapperRef.current.clientWidth;
