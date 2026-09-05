@@ -105,6 +105,19 @@ const FitRouteBounds = ({ positions }) => {
   return null;
 };
 
+// Captures the live Leaflet map instance into a ref so it can be used
+// outside the MapContainer tree (e.g. for latLngToContainerPoint during
+// PDF/image export).
+const CaptureMapRef = ({ mapInstanceRef }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    mapInstanceRef.current = map;
+  }, [map, mapInstanceRef]);
+
+  return null;
+};
+
 const formatDuration = (minutes) => {
   if (!minutes && minutes !== 0) return "—";
   const h = Math.floor(minutes / 60);
@@ -213,6 +226,7 @@ const TourPreview = () => {
 
   const [cart, setCart] = useState({ guides: [], transports: [], hotels: [] });
   const mapWrapperRef = useRef(null);
+  const mapInstanceRef = useRef(null);
   const [startingTour, setStartingTour] = useState(false);
   const [startTourError, setStartTourError] = useState("");
 
@@ -958,6 +972,51 @@ const TourPreview = () => {
   };
 
   const totalCartItems = cart.guides.length + cart.transports.length + cart.hotels.length;
+
+  // Draws the numbered destination markers and the start ("S") marker
+  // directly onto the exported canvas using Leaflet's own projection.
+  // This bypasses html2canvas's inability to capture nested CSS
+  // transforms (Leaflet marker translate3d + the divIcon's own rotate),
+  // which is why the numbers/start pin were missing from the exported map.
+  const drawMarkersOnCanvas = (canvas) => {
+    const map = mapInstanceRef.current;
+    if (!map || !mapWrapperRef.current) return;
+
+    const ctx = canvas.getContext("2d");
+    const canvasScale = canvas.width / mapWrapperRef.current.clientWidth;
+
+    const drawMarker = (lat, lng, label, isStart) => {
+      const point = map.latLngToContainerPoint([lat, lng]);
+      const x = point.x * canvasScale;
+      const y = point.y * canvasScale;
+      const radius = (isStart ? 17 : 15) * canvasScale;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = isStart ? "#FFB020" : "#00C896";
+      ctx.fill();
+      ctx.lineWidth = 3 * canvasScale;
+      ctx.strokeStyle = "#ffffff";
+      ctx.stroke();
+
+      ctx.fillStyle = "#11212D";
+      ctx.font = `bold ${14 * canvasScale}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x, y);
+    };
+
+    if (startCoord) {
+      drawMarker(startCoord[0], startCoord[1], "S", true);
+    }
+
+    destinations.forEach((dest, index) => {
+      if (isValidCoordinate([dest?.latitude, dest?.longitude])) {
+        drawMarker(Number(dest.latitude), Number(dest.longitude), String(index + 1), false);
+      }
+    });
+  };
+
   const handleStartTour = async () => {
     setStartTourError("");
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -971,16 +1030,19 @@ const TourPreview = () => {
     }
 
     setStartingTour(true);
-    
+
     let mapImageUrl = null;
     if (mapWrapperRef.current) {
       try {
-        const canvas = await html2canvas(mapWrapperRef.current, { 
+        const canvas = await html2canvas(mapWrapperRef.current, {
           useCORS: true,
-          scale: 2, 
+          scale: 2,
         });
+
+        drawMarkersOnCanvas(canvas);
+
         mapImageUrl = canvas.toDataURL("image/png");
-        if(mapImageUrl){
+        if (mapImageUrl) {
           sessionStorage.setItem('tourMapImage', mapImageUrl)
         }
       } catch (err) {
@@ -1187,6 +1249,11 @@ const TourPreview = () => {
         );
       } catch (err) {
         console.error("Failed to confirm tour:", err.response?.data);
+        // NOTE: this failure is currently swallowed silently — the UI still
+        // reports success below even though selectedGuide/selectedHotels/
+        // selectedTransport never got saved to the Tour document. Once you
+        // share tourController.js's confirm handler and the Tour model,
+        // this is the spot we'll wire a real error into startTourError.
       }
     }
 
@@ -1254,6 +1321,7 @@ const TourPreview = () => {
             style={{ height: "100%", width: "100%" }}
           >
             <FitRouteBounds positions={allMapPositions} />
+            <CaptureMapRef mapInstanceRef={mapInstanceRef} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
