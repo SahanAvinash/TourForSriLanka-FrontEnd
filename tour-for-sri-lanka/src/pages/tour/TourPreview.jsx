@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../../config/api";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar } from "react-icons/fa";
@@ -10,6 +10,7 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useTrip } from "../../context/TripContext";
+import html2canvas from "html2canvas";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -198,6 +199,7 @@ const TourPreview = () => {
   const [hotelBudget, setHotelBudget] = useState(0);
 
   const [cart, setCart] = useState({ guides: [], transports: [], hotels: [] });
+  const mapWrapperRef = useRef(null);
   const [startingTour, setStartingTour] = useState(false);
   const [startTourError, setStartTourError] = useState("");
   const [startTourSuccess, setStartTourSuccess] = useState(false);
@@ -574,6 +576,7 @@ const TourPreview = () => {
       message: bookingForm.message,
       totalPrice,
       currency: selectedGuide.currency,
+      mobile: selectedGuide.mobile,
       displayName: `${selectedGuide.firstName} ${selectedGuide.lastName}`,
     };
 
@@ -708,6 +711,9 @@ const TourPreview = () => {
       numberOfGuests: transportBookingForm.numberOfGuests,
       bags: transportBookingForm.bags,
       totalPrice: estimatedPrice || 0,
+      vehicleBrand: selectedTransport.vehicleBrand,
+      vehicleModel: selectedTransport.vehicleModel,
+      registrationNo: selectedTransport.registrationNo,
       displayName: `${selectedTransport.vehicleBrand} ${selectedTransport.vehicleModel}`,
     };
 
@@ -846,6 +852,9 @@ const TourPreview = () => {
       numberOfGuests: hotelBookingForm.numberOfGuests,
       totalPrice: hotelTotalPrice,
       dayIndex,
+      hotelName: selectedHotel.hotelName,
+      location: selectedHotel.location,
+      roomType: selectedRoom.roomType,
       displayName: `${selectedHotel.hotelName} — ${selectedRoom.roomType}`,
     };
 
@@ -892,7 +901,21 @@ const TourPreview = () => {
     }
 
     setStartingTour(true);
-
+    let routeMapImage = null
+    try {
+      if (mapWrapperRef.current) {
+        const canvas = await html2canvas(mapWrapperRef.current, {
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#11212D",
+          scale: 1.5
+        });
+        routeMapImage = canvas.toDataURL("image/jpeg",0.7);
+      }
+    }catch(err){
+      console.error("Could not capture route map screenshot", err)
+      routeMapImage = null
+    }
     let tourId = null;
     try {
       const tourRes = await axios.post(
@@ -916,6 +939,7 @@ const TourPreview = () => {
           tripStartDate,
           tripDurationDays,
           estimatedBudget: guideBudget + transportBudget + hotelBudget,
+          routeMapImage,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1016,6 +1040,41 @@ const TourPreview = () => {
     const finalHotelBudget = successfulHotels.reduce((sum, h) => sum + h.totalPrice, 0);
     const finalTransportBudget = successfulTransports.reduce((sum, t) => sum + t.totalPrice, 0);
 
+    const guideBookingDetails = successfulGuides[0]
+      ? {
+          name: successfulGuides[0].displayName,
+          mobile: successfulGuides[0].mobile,
+          date: successfulGuides[0].date,
+          quantity: successfulGuides[0].quantity,
+          numberOfGuests: successfulGuides[0].numberOfGuests,
+          totalPrice: successfulGuides[0].totalPrice,
+          currency: successfulGuides[0].currency,
+        }
+      : undefined;
+
+    const hotelBookingDetails = successfulHotels.map((h) => ({
+      hotelName: h.hotelName,
+      location: h.location,
+      roomType: h.roomType,
+      checkInDate: h.checkInDate,
+      checkOutDate: h.checkOutDate,
+      numberOfGuests: h.numberOfGuests,
+      totalPrice: h.totalPrice,
+    }));
+
+    const transportBookingDetails = successfulTransports[0]
+      ? {
+          vehicleBrand: successfulTransports[0].vehicleBrand,
+          vehicleModel: successfulTransports[0].vehicleModel,
+          registrationNo: successfulTransports[0].registrationNo,
+          pickupDate: successfulTransports[0].pickupDate,
+          returnDate: successfulTransports[0].returnDate,
+          numberOfGuests: successfulTransports[0].numberOfGuests,
+          bags: successfulTransports[0].bags,
+          totalPrice: successfulTransports[0].totalPrice,
+        }
+      : undefined;
+
     if (successfulGuides.length > 0 || successfulTransports.length > 0 || successfulHotels.length > 0) {
       try {
         await axios.post(`${API_BASE_URL}/api/tour/send-summary`, {
@@ -1027,7 +1086,6 @@ const TourPreview = () => {
           guideBudget: finalGuideBudget,
           hotelBudget: finalHotelBudget,
           transportBudget: finalTransportBudget,
-          estimatedBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
         });
       } catch (err) {
         console.error("Trip summary email failed:", err.response?.data);
@@ -1043,6 +1101,12 @@ const TourPreview = () => {
             selectedHotels: successfulHotels.map((h) => h.hotelId),
             selectedTransport: successfulTransports[0]?.vehicleId,
             estimatedBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
+            guideBudget: finalGuideBudget,
+            hotelBudget: finalHotelBudget,
+            transportBudget: finalTransportBudget,
+            guideBookingDetails,
+            hotelBookingDetails,
+            transportBookingDetails,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -1104,7 +1168,7 @@ const TourPreview = () => {
           </div>
         </div>
 
-        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
+        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }} ref={mapWrapperRef}>
           <MapContainer
             center={[centerLat, centerLng]}
             zoom={8}
@@ -1852,7 +1916,6 @@ const TourPreview = () => {
                       {hotelRooms.map((r) => (
                         <div key={r._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
                           <img
-                            src={r.image || "/room_placeholder.jpg"}
                             src={r.images?.[0] || "room_placeholder.jpg"}
                             alt={r.roomType}
                             className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
