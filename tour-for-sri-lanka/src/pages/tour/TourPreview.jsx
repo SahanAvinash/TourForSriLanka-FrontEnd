@@ -10,7 +10,6 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useTrip } from "../../context/TripContext";
-import html2canvas from "html2canvas";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -901,21 +900,7 @@ const TourPreview = () => {
     }
 
     setStartingTour(true);
-    let routeMapImage = null
-    try {
-      if (mapWrapperRef.current) {
-        const canvas = await html2canvas(mapWrapperRef.current, {
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: "#11212D",
-          scale: 1.5
-        });
-        routeMapImage = canvas.toDataURL("image/jpeg",0.7);
-      }
-    }catch(err){
-      console.error("Could not capture route map screenshot", err)
-      routeMapImage = null
-    }
+    
     let tourId = null;
     try {
       const tourRes = await axios.post(
@@ -1184,6 +1169,7 @@ const TourPreview = () => {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              crossOrigin={true}
             />
             {startCoord && (
               <Marker position={startCoord} icon={createStartIcon()}>
