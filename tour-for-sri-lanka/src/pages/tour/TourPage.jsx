@@ -155,7 +155,7 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
   }
 
-  // Return leg: last stop back to the actual start point
+  // Return leg: last stop back to the actual start point (or back to stop 1 if no start saved)
   doc.setDrawColor(255, 176, 32);
   doc.setLineDashPattern([2, 1.5], 0);
   doc.line(
@@ -176,10 +176,7 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.setTextColor(17, 33, 45);
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    
-    // Adjust index label depending on whether start point takes index 0
-    const labelText = isStart ? "S" : `${hasValidStart ? index : index + 1}`;
-    doc.text(labelText, px, py + 1.1, { align: "center" });
+    doc.text(isStart ? "S" : `${index}`, px, py + 1.1, { align: "center" });
   });
 
   doc.setFontSize(7);
@@ -530,7 +527,7 @@ const TourPage = () => {
       typeof activeTour.startLocation.latitude === "number" &&
       typeof activeTour.startLocation.longitude === "number"
         ? {lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude}
-        : null;
+        :null 
 
     const hasRouteCoords =
       mappedDestinations.filter(
