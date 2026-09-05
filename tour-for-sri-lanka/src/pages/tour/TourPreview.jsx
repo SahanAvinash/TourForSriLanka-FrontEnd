@@ -940,6 +940,9 @@ const TourPreview = () => {
           tripDurationDays,
           estimatedBudget: guideBudget + transportBudget + hotelBudget,
           routeMapImage,
+          startLocation: startCoords
+            ? {address: startCoords.address, latitude: startCoords.lat, longitude: startCoords.lng}
+            : null
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );

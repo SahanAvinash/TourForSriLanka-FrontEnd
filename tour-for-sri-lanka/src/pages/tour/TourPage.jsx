@@ -104,11 +104,20 @@ const formatDate = (date) => {
   });
 };
 
-const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) => {
-  const points = (destinations || []).filter(
+const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, startPoint) => {
+  const destPoints = (destinations || []).filter(
     (destination) =>
       typeof destination.lat === "number" && typeof destination.lng === "number"
   );
+
+  const hasValidStart =
+    startPoint &&
+    typeof startPoint.lat === "number" &&
+    typeof startPoint.lng === "number";
+
+  const points = hasValidStart
+    ? [{ ...startPoint, isStart: true }, ...destPoints]
+    : destPoints;
 
   if (points.length < 2) return false;
 
@@ -146,6 +155,8 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) =>
     doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
   }
 
+  // Return leg: last stop back to the actual start point (or back to stop 1 if no start saved)
+  doc.setDrawColor(255, 176, 32);
   doc.setLineDashPattern([2, 1.5], 0);
   doc.line(
     coords[coords.length - 1][0],
@@ -157,27 +168,27 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations) =>
 
   points.forEach((point, index) => {
     const [px, py] = coords[index];
+    const isStart = point.isStart;
 
-    doc.setFillColor(0, 200, 150);
-    doc.circle(px, py, 3.4, "F");
+    doc.setFillColor(...(isStart ? [255, 176, 32] : [0, 200, 150]));
+    doc.circle(px, py, isStart ? 3.8 : 3.4, "F");
 
     doc.setTextColor(17, 33, 45);
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    doc.text(`${index + 1}`, px, py + 1.1, { align: "center" });
-
-    const label =
-      point.name && point.name.length > 16
-        ? `${point.name.slice(0, 15)}…`
-        : point.name || "";
-
-    const labelY = py + 7 > boxY + boxHeight - 3 ? py - 5 : py + 7;
-
-    doc.setTextColor(225, 230, 235);
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.text(label, px, labelY, { align: "center" });
+    doc.text(isStart ? "S" : `${index}`, px, py + 1.1, { align: "center" });
   });
+
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(200, 205, 210);
+  doc.text(
+    hasValidStart
+      ? "S = Start point · Numbers match the Trip Route table above"
+      : "Numbers match the Trip Route table above",
+    boxX + 6,
+    boxY + boxHeight - 5
+  );
 
   return true;
 };
@@ -511,6 +522,12 @@ const TourPage = () => {
       lat: d.latitude,
       lng: d.longitude,
     }));
+    const startPoint =
+      activeTour.startLocation &&
+      typeof activeTour.startLocation.latitude === "number" &&
+      typeof activeTour.startLocation.longitude === "number"
+        ? {lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude}
+        :null 
 
     const hasRouteCoords =
       mappedDestinations.filter(
@@ -533,7 +550,7 @@ const TourPage = () => {
       y += 4;
 
       const mapHeight = 70;
-      drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, mappedDestinations);
+      drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, mappedDestinations, startPoint);
 
       y += mapHeight + 12;
     }
