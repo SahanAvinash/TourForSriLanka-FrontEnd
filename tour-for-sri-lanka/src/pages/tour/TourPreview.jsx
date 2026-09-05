@@ -150,7 +150,7 @@ const TourPreview = () => {
   const [modalView, setModalView] = useState("list");
   const [selectedGuide, setSelectedGuide] = useState(null);
   const [bookingError, setBookingError] = useState("");
-  const [checkingGuideAvailability, setCheckingGuideAvailability] = useState(false)
+  const [checkingGuideAvailability, setCheckingGuideAvailability] = useState(false);
   const [bookingForm, setBookingForm] = useState({
     date: "",
     durationType: "daily",
@@ -440,7 +440,7 @@ const TourPreview = () => {
       "TourPreview: no pinned start location found in sessionStorage (tourStartLat/tourStartLng) and no routableStops[0] from the API — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point."
     );
   }
-  const START_MATCH_THRESHOLD_KM = 0.5
+  const START_MATCH_THRESHOLD_KM = 0.5;
   const geometryMatchesStart =
     startCoord &&
     polylinePositions.length > 0 &&
@@ -449,13 +449,13 @@ const TourPreview = () => {
       startCoord[1],
       polylinePositions[0][0],
       polylinePositions[0][1]
-    ) <= START_MATCH_THRESHOLD_KM
+    ) <= START_MATCH_THRESHOLD_KM;
 
-    const safePolylinePossitions = 
-      startCoord && !geometryMatchesStart
-        ? [startCoord, ...polylinePositions]
-        : polylinePositions
-    const allMapPositions = [...safePolylinePossitions, ...returnPolylinePositions]
+  const safePolylinePossitions =
+    startCoord && !geometryMatchesStart
+      ? [startCoord, ...polylinePositions]
+      : polylinePositions;
+  const allMapPositions = [...safePolylinePossitions, ...returnPolylinePositions];
 
   const legDistances = destinations.map((dest, index) => {
     const prevCoord = index === 0
@@ -924,9 +924,9 @@ const TourPreview = () => {
           tripStartDate,
           tripDurationDays,
           estimatedBudget: guideBudget + transportBudget + hotelBudget,
-          routeMapImage,
+          routeMapImage: null, // Fixed here to prevent undefined reference errors
           startLocation: startCoords
-            ? {address: startCoords.address, latitude: startCoords.lat, longitude: startCoords.lng}
+            ? { address: startCoords.address, latitude: startCoords.lat, longitude: startCoords.lng }
             : null
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -935,7 +935,7 @@ const TourPreview = () => {
       clearTrip();
     } catch (err) {
       console.error("Failed to create tour:", err.response?.data);
-      setStartTourError("Failed to start your tour, please try again");
+      setStartTourError(err.response?.data?.message || "Failed to start your tour, please try again");
       setStartingTour(false);
       return;
     }
