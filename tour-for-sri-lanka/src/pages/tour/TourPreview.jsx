@@ -10,6 +10,7 @@ import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useTrip } from "../../context/TripContext";
+import html2canvas from 'html2canvas'
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -879,7 +880,7 @@ const TourPreview = () => {
   };
 
   const totalCartItems = cart.guides.length + cart.transports.length + cart.hotels.length;
-
+  const mapRef = useRef(null)
   const handleStartTour = async () => {
     setStartTourError("");
     setStartTourSuccess(false);
@@ -903,6 +904,9 @@ const TourPreview = () => {
           cacheBust: true,
           pixelRatio: 2 
         });
+        if(mapImageUrl){
+          sessionStorage.setItem('tourMapImage', mapImageUrl)
+        }
       } catch (err) {
         console.error("Could not capture map image:", err);
       }
@@ -1126,6 +1130,7 @@ const TourPreview = () => {
         hotelBudget: finalHotelBudget,
         transportBudget: finalTransportBudget,
         totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
+        routeMapImage: mapImageUrl,
         savedAt: Date.now(),
       };
       localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
