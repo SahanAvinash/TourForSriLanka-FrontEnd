@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../../config/api";
-
+import * as htmlToImage from 'html-to-image'
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
@@ -435,11 +435,6 @@ const TourPreview = () => {
     getCoordFromStop(routableStops[0]) ||
     (polylinePositions.length > 0 ? polylinePositions[0] : null);
 
-  if (!startCoords && !getCoordFromStop(routableStops[0])) {
-    console.warn(
-      "TourPreview: no pinned start location found in sessionStorage (tourStartLat/tourStartLng) and no routableStops[0] from the API — falling back to the first point of route.geometry, which can land on the first destination instead of the real start point."
-    );
-  }
   const START_MATCH_THRESHOLD_KM = 0.5;
   const geometryMatchesStart =
     startCoord &&
@@ -901,6 +896,18 @@ const TourPreview = () => {
 
     setStartingTour(true);
     
+    let mapImageUrl = null;
+    if (mapWrapperRef.current) {
+      try {
+        mapImageUrl = await htmlToImage.toPng(mapWrapperRef.current, { 
+          cacheBust: true,
+          pixelRatio: 2 
+        });
+      } catch (err) {
+        console.error("Could not capture map image:", err);
+      }
+    }
+
     let tourId = null;
     try {
       const tourRes = await axios.post(
@@ -924,7 +931,7 @@ const TourPreview = () => {
           tripStartDate,
           tripDurationDays,
           estimatedBudget: guideBudget + transportBudget + hotelBudget,
-          routeMapImage: null, // Fixed here to prevent undefined reference errors
+          routeMapImage: mapImageUrl,
           startLocation: startCoords
             ? { address: startCoords.address, latitude: startCoords.lat, longitude: startCoords.lng }
             : null
