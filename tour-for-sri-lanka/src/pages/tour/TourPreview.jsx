@@ -93,25 +93,6 @@ const SRI_LANKA_BOUNDS = [
   [10.1, 82.1],
 ];
 
-// FIX: `positions` is recomputed as a brand-new array on every render of
-// TourPreview (filter/map/spread always return new references, even when
-// the underlying data hasn't changed). That means this effect re-fires on
-// every unrelated state change (typing in a booking form, closing a modal,
-// etc.), calling fitBounds again and again.
-//
-// By default Leaflet's fitBounds() ANIMATES the pan/zoom (over ~0.25s).
-// If "Start Tour" is clicked while one of those re-fires is still mid
-// animation, map.latLngToContainerPoint() (used later to draw markers onto
-// the exported screenshot) returns the FINAL/target position, while the
-// html2canvas screenshot captures whatever was on screen at that instant
-// (the transitional, not-yet-settled frame). The two disagree, so the
-// numbered/start markers get drawn at the wrong pixel offset — often
-// outside the captured area entirely, which is why they were "missing"
-// from the PDF's route map.
-//
-// animate: false makes fitBounds apply instantly and synchronously, so by
-// the time handleStartTour runs, the map is guaranteed to already be in
-// its final, settled position — eliminating the race entirely.
 const FitRouteBounds = ({ positions }) => {
   const map = useMap();
 
@@ -124,9 +105,6 @@ const FitRouteBounds = ({ positions }) => {
   return null;
 };
 
-// Captures the live Leaflet map instance into a ref so it can be used
-// outside the MapContainer tree (e.g. for latLngToContainerPoint during
-// PDF/image export).
 const CaptureMapRef = ({ mapInstanceRef }) => {
   const map = useMap();
 
@@ -992,25 +970,16 @@ const TourPreview = () => {
 
   const totalCartItems = cart.guides.length + cart.transports.length + cart.hotels.length;
 
-  // Draws the numbered destination markers and the start ("S") marker
-  // directly onto the exported canvas using Leaflet's own projection.
-  // This bypasses html2canvas's inability to capture nested CSS
-  // transforms (Leaflet marker translate3d + the divIcon's own rotate),
-  // which is why the numbers/start pin were missing from the exported map.
-  //
-  // NOTE: this only produces correct output if the map is NOT mid-animation
-  // when it runs — see the FitRouteBounds fix above (animate: false) for
-  // why that matters and how the race was eliminated.
   const drawMarkersOnCanvas = (canvas) => {
     const map = mapInstanceRef.current;
-    if(!map || !mapWrapperRef.current) return;
+    if (!map || !mapWrapperRef.current) return;
 
     const ctx = canvas.getContext("2d");
-    const clientWidth = mapWrapperRef.current.clientWidth || 1
+    const clientWidth = mapWrapperRef.current.clientWidth || 1;
     const canvasScale = canvas.width / clientWidth;
 
     const drawMarker = (lat, lng, label, isStart) => {
-      try{
+      try {
         const point = map.latLngToContainerPoint([lat, lng]);
         const x = point.x * canvasScale;
         const y = point.y * canvasScale;
@@ -1029,9 +998,10 @@ const TourPreview = () => {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(label, x, y);
-    }catch (err) {
-      console.error("Error drawing marker on canvas:", err);
-    }
+      } catch (err) {
+        console.error("Error drawing marker on canvas:", err);
+      }
+    }; // ✅ Fixed: Added missing closing brace and semicolon for drawMarker
 
     if (startCoord && isValidCoordinate(startCoord)) {
       drawMarker(Number(startCoord[0]), Number(startCoord[1]), "S", true);
@@ -1276,11 +1246,6 @@ const TourPreview = () => {
         );
       } catch (err) {
         console.error("Failed to confirm tour:", err.response?.data);
-        // NOTE: this failure is currently swallowed silently — the UI still
-        // reports success below even though selectedGuide/selectedHotels/
-        // selectedTransport never got saved to the Tour document. Once you
-        // share tourController.js's confirm handler and the Tour model,
-        // this is the spot we'll wire a real error into startTourError.
       }
     }
 
@@ -2216,6 +2181,5 @@ const TourPreview = () => {
     </div>
   );
 };
-}
 
 export default TourPreview;
