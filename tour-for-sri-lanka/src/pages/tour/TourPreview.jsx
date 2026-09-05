@@ -1003,33 +1003,38 @@ const TourPreview = () => {
   // why that matters and how the race was eliminated.
   const drawMarkersOnCanvas = (canvas) => {
     const map = mapInstanceRef.current;
+    if(!map || !mapWrapperRef.current) return;
 
     const ctx = canvas.getContext("2d");
-    const canvasScale = canvas.width / mapWrapperRef.current.clientWidth;
+    const clientWidth = mapWrapperRef.current.clientWidth || 1
+    const canvasScale = canvas.width / clientWidth;
 
     const drawMarker = (lat, lng, label, isStart) => {
-      const point = map.latLngToContainerPoint([lat, lng]);
-      const x = point.x * canvasScale;
-      const y = point.y * canvasScale;
-      const radius = (isStart ? 17 : 15) * canvasScale;
+      try{
+        const point = map.latLngToContainerPoint([lat, lng]);
+        const x = point.x * canvasScale;
+        const y = point.y * canvasScale;
+        const radius = (isStart ? 17 : 15) * canvasScale;
 
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = isStart ? "#FFB020" : "#00C896";
-      ctx.fill();
-      ctx.lineWidth = 3 * canvasScale;
-      ctx.strokeStyle = "#ffffff";
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = isStart ? "#FFB020" : "#00C896";
+        ctx.fill();
+        ctx.lineWidth = 3 * canvasScale;
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
 
-      ctx.fillStyle = "#11212D";
-      ctx.font = `bold ${14 * canvasScale}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(label, x, y);
-    };
+        ctx.fillStyle = "#11212D";
+        ctx.font = `bold ${14 * canvasScale}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label, x, y);
+    }catch (err) {
+      console.error("Error drawing marker on canvas:", err);
+    }
 
-    if (startCoord) {
-      drawMarker(startCoord[0], startCoord[1], "S", true);
+    if (startCoord && isValidCoordinate(startCoord)) {
+      drawMarker(Number(startCoord[0]), Number(startCoord[1]), "S", true);
     }
 
     destinations.forEach((dest, index) => {
