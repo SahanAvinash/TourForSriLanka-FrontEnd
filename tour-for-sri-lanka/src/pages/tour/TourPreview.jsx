@@ -2216,5 +2216,6 @@ const TourPreview = () => {
     </div>
   );
 };
+}
 
 export default TourPreview;
