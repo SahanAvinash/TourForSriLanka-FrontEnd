@@ -1,4 +1,5 @@
 import './App.css'
+import { Route, Routes } from 'react-router-dom';
 import AdminPage from './pages/admin/AdminPage';
 import {BrowserRouter, Route ,Routes} from "react-router-dom"
 import LoginPage from './pages/loginPage';
@@ -46,6 +47,7 @@ import TourPage from './pages/tour/TourPage';
 import TourPreview from './pages/tour/TourPreview';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import { TripProvider } from './context/TripContext';
+
 
 
 function App() {
