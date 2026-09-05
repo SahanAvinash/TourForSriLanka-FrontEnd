@@ -155,7 +155,7 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
   }
 
-  // Return leg: last stop back to the actual start point (or back to stop 1 if no start saved)
+  // Return leg: last stop back to the actual start point
   doc.setDrawColor(255, 176, 32);
   doc.setLineDashPattern([2, 1.5], 0);
   doc.line(
@@ -176,7 +176,9 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.setTextColor(17, 33, 45);
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    doc.text(isStart ? "S" : `${index}`, px, py + 1.1, { align: "center" });
+    
+    const labelText = isStart ? "S" : `${hasValidStart ? index : index + 1}`;
+    doc.text(labelText, px, py + 1.1, { align: "center" });
   });
 
   doc.setFontSize(7);
@@ -359,21 +361,25 @@ const TourPage = () => {
 
     if (!startLocation) {
       setError("Please pick your starting location on the map.");
+      toast.error("Please pick your starting location on the map.");
       return;
     }
 
     if (!startDate) {
       setError("Please select your trip start date.");
+      toast.error("Please select your trip start date.");
       return;
     }
 
     if (!tripDuration || Number(tripDuration) <= 0) {
       setError("Please enter a valid trip duration in days.");
+      toast.error("Please enter a valid trip duration in days.");
       return;
     }
 
     if (!numberOfGuests) {
       setError("Please select the number of guests.");
+      toast.error("Please select the number of guests.");
       return;
     }
 
@@ -527,7 +533,7 @@ const TourPage = () => {
       typeof activeTour.startLocation.latitude === "number" &&
       typeof activeTour.startLocation.longitude === "number"
         ? {lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude}
-        :null 
+        : null;
 
     const hasRouteCoords =
       mappedDestinations.filter(
@@ -895,13 +901,17 @@ const TourPage = () => {
               menuPortalTarget={document.body}
             />
 
-            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-2.5 rounded-md mt-3 text-center">
+                {error}
+              </div>
+            )}
           </div>
 
           <button
             type="button"
             onClick={handleStart}
-            className="bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:opacity-90 transition"
+            className="bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:opacity-90 transition cursor-pointer mt-2"
           >
             Start Planning
           </button>
