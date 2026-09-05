@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../../config/api";
-import * as htmlToImage from 'html-to-image'
+import html2canvas from "html2canvas";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
@@ -976,10 +976,11 @@ const TourPreview = () => {
     let mapImageUrl = null;
     if (mapWrapperRef.current) {
       try {
-        mapImageUrl = await htmlToImage.toPng(mapWrapperRef.current, { 
-          cacheBust: true,
-          pixelRatio: 2 
+        const canvas = await html2canvas(mapWrapperRef.current, { 
+          useCORS: true,
+          scale: 2, 
         });
+        mapImageUrl = canvas.toDataURL("image/png");
         if(mapImageUrl){
           sessionStorage.setItem('tourMapImage', mapImageUrl)
         }
