@@ -542,24 +542,30 @@ const TourPage = () => {
           typeof destination.lng === "number"
       ).length >= 2;
 
-    if (hasRouteCoords) {
-      if (y > 210) {
-        doc.addPage();
-        y = 20;
-      }
+    if (activeTour.routeMapImage) {
+  if (y > 200) {
+    doc.addPage();
+    y = 20;
+  }
 
-      doc.setTextColor(...dark);
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-      doc.text("Route Map", 14, y);
+  doc.setTextColor(...dark);
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.text("Route Map", 14, y);
 
-      y += 4;
+  y += 4;
 
-      const mapHeight = 70;
-      drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, mappedDestinations, startPoint);
+  const mapWidth = pageWidth - 28;
+  const mapHeight = 90;
 
-      y += mapHeight + 12;
-    }
+  try {
+    doc.addImage(activeTour.routeMapImage, "PNG", 14, y + 2, mapWidth, mapHeight);
+  } catch (err) {
+    console.error("Failed to embed route map image in PDF:", err);
+  }
+
+  y += mapHeight + 12;
+}
 
     if (y > 240) {
       doc.addPage();
