@@ -1,5 +1,4 @@
 import './App.css'
-import { Route, Routes } from 'react-router-dom';
 import AdminPage from './pages/admin/AdminPage';
 import {BrowserRouter, Route ,Routes} from "react-router-dom"
 import LoginPage from './pages/loginPage';
