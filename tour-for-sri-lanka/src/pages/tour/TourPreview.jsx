@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../../config/api";
-import html2canvas from "html2canvas";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
@@ -102,16 +101,6 @@ const FitRouteBounds = ({ positions }) => {
       map.fitBounds(bounds, { padding: [40, 40], animate: false });
     }
   }, [positions, map]);
-  return null;
-};
-
-const CaptureMapRef = ({ mapInstanceRef }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    mapInstanceRef.current = map;
-  }, [map, mapInstanceRef]);
-
   return null;
 };
 
@@ -222,8 +211,6 @@ const TourPreview = () => {
   const [hotelBudget, setHotelBudget] = useState(0);
 
   const [cart, setCart] = useState({ guides: [], transports: [], hotels: [] });
-  const mapWrapperRef = useRef(null);
-  const mapInstanceRef = useRef(null);
   const [startingTour, setStartingTour] = useState(false);
   const [startTourError, setStartTourError] = useState("");
 
@@ -970,50 +957,6 @@ const TourPreview = () => {
 
   const totalCartItems = cart.guides.length + cart.transports.length + cart.hotels.length;
 
-  const drawMarkersOnCanvas = (canvas) => {
-    const map = mapInstanceRef.current;
-    if (!map || !mapWrapperRef.current) return;
-
-    const ctx = canvas.getContext("2d");
-    const clientWidth = mapWrapperRef.current.clientWidth || 1;
-    const canvasScale = canvas.width / clientWidth;
-
-    const drawMarker = (lat, lng, label, isStart) => {
-      try {
-        const point = map.latLngToContainerPoint([lat, lng]);
-        const x = point.x * canvasScale;
-        const y = point.y * canvasScale;
-        const radius = (isStart ? 17 : 15) * canvasScale;
-
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = isStart ? "#FFB020" : "#00C896";
-        ctx.fill();
-        ctx.lineWidth = 3 * canvasScale;
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
-
-        ctx.fillStyle = "#11212D";
-        ctx.font = `bold ${14 * canvasScale}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(label, x, y);
-      } catch (err) {
-        console.error("Error drawing marker on canvas:", err);
-      }
-    }; // ✅ Fixed: Added missing closing brace and semicolon for drawMarker
-
-    if (startCoord && isValidCoordinate(startCoord)) {
-      drawMarker(Number(startCoord[0]), Number(startCoord[1]), "S", true);
-    }
-
-    destinations.forEach((dest, index) => {
-      if (isValidCoordinate([dest?.latitude, dest?.longitude])) {
-        drawMarker(Number(dest.latitude), Number(dest.longitude), String(index + 1), false);
-      }
-    });
-  };
-
   const handleStartTour = async () => {
     setStartTourError("");
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -1028,26 +971,8 @@ const TourPreview = () => {
 
     setStartingTour(true);
 
-    let mapImageUrl = null;
-    if (mapWrapperRef.current) {
-      try {
-        const canvas = await html2canvas(mapWrapperRef.current, {
-          useCORS: true,
-          scale: 2,
-        });
-
-        drawMarkersOnCanvas(canvas);
-
-        mapImageUrl = canvas.toDataURL("image/png");
-        if (mapImageUrl) {
-          sessionStorage.setItem('tourMapImage', mapImageUrl)
-        }
-      } catch (err) {
-        console.error("Could not capture map image:", err);
-      }
-    }
-
     let tourId = null;
+    let createdTour = null;
     try {
       const tourRes = await axios.post(
         `${API_BASE_URL}/api/tour`,
@@ -1061,7 +986,7 @@ const TourPreview = () => {
               latitude: d.latitude,
               longitude: d.longitude,
               order: i,
-              dayNumber: dayInfo.dayNumber,
+              day: dayInfo.dayNumber,
               timeSlot: dayInfo.timeSlot
             };
           }),
@@ -1070,7 +995,6 @@ const TourPreview = () => {
           tripStartDate,
           tripDurationDays,
           estimatedBudget: guideBudget + transportBudget + hotelBudget,
-          routeMapImage: mapImageUrl,
           startLocation: startCoords
             ? { address: startCoords.address, latitude: startCoords.lat, longitude: startCoords.lng }
             : null
@@ -1078,6 +1002,7 @@ const TourPreview = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       tourId = tourRes.data._id;
+      createdTour = tourRes.data.tour;
       clearTrip();
     } catch (err) {
       console.error("Failed to create tour:", err.response?.data);
@@ -1122,25 +1047,25 @@ const TourPreview = () => {
     for (const item of cart.transports) {
       try {
         await axios.post(
-            `${API_BASE_URL}/api/transport/bookings`,
-            {
-              vehicleId: item.vehicleId,
-              travelerId,
-              pickupLocation: item.pickupLocation,
-              dropoffLocation: item.dropoffLocation,
-              pickupLat: item.pickup.lat,
-              pickupLng: item.pickup.lng,
-              dropoffLat: item.destination.lat,
-              dropoffLng: item.destination.lng,
-              pickupDate: item.pickupDate,
-              returnDate: item.returnDate,
-              numberOfPassengers: item.numberOfGuests,
-              bags: item.bags,
-              isReturnTrip: true,
-              tourId,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          `${API_BASE_URL}/api/transport/bookings`,
+          {
+            vehicleId: item.vehicleId,
+            travelerId,
+            pickupLocation: item.pickupLocation,
+            dropoffLocation: item.dropoffLocation,
+            pickupLat: item.pickup.lat,
+            pickupLng: item.pickup.lng,
+            dropoffLat: item.destination.lat,
+            dropoffLng: item.destination.lng,
+            pickupDate: item.pickupDate,
+            returnDate: item.returnDate,
+            numberOfPassengers: item.numberOfGuests,
+            bags: item.bags,
+            isReturnTrip: true,
+            tourId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         successfulTransports.push(item);
       } catch (err) {
         console.error("Transport booking failed:", err.response?.data);
@@ -1265,7 +1190,7 @@ const TourPreview = () => {
         hotelBudget: finalHotelBudget,
         transportBudget: finalTransportBudget,
         totalBudget: finalGuideBudget + finalHotelBudget + finalTransportBudget,
-        routeMapImage: mapImageUrl,
+        routeMapImage: createdTour?.routeMapImage || null,
         savedAt: Date.now(),
       };
       localStorage.setItem("activeTourSummary", JSON.stringify(tripSummary));
@@ -1303,7 +1228,7 @@ const TourPreview = () => {
           </div>
         </div>
 
-        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }} ref={mapWrapperRef}>
+        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
           <MapContainer
             center={[centerLat, centerLng]}
             zoom={8}
@@ -1313,7 +1238,6 @@ const TourPreview = () => {
             style={{ height: "100%", width: "100%" }}
           >
             <FitRouteBounds positions={allMapPositions} />
-            <CaptureMapRef mapInstanceRef={mapInstanceRef} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

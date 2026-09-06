@@ -155,7 +155,6 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.line(coords[i][0], coords[i][1], coords[i + 1][0], coords[i + 1][1]);
   }
 
-  // Return leg: last stop back to the actual start point
   doc.setDrawColor(255, 176, 32);
   doc.setLineDashPattern([2, 1.5], 0);
   doc.line(
@@ -176,7 +175,7 @@ const drawRouteDiagram = (doc, boxX, boxY, boxWidth, boxHeight, destinations, st
     doc.setTextColor(17, 33, 45);
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    
+
     const labelText = isStart ? "S" : `${hasValidStart ? index : index + 1}`;
     doc.text(labelText, px, py + 1.1, { align: "center" });
   });
@@ -532,7 +531,7 @@ const TourPage = () => {
       activeTour.startLocation &&
       typeof activeTour.startLocation.latitude === "number" &&
       typeof activeTour.startLocation.longitude === "number"
-        ? {lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude}
+        ? { lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude }
         : null;
 
     const hasRouteCoords =
@@ -542,7 +541,7 @@ const TourPage = () => {
           typeof destination.lng === "number"
       ).length >= 2;
 
-    if (activeTour.routeMapImage) {
+    if (hasRouteCoords) {
       if (y > 210) {
         doc.addPage();
         y = 20;
@@ -555,7 +554,6 @@ const TourPage = () => {
 
       y += 4;
 
-      const mapWidth = pageWidth - 28;
       const mapHeight = 90;
       drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, mappedDestinations, startPoint);
 
@@ -638,7 +636,6 @@ const TourPage = () => {
     <div className="min-h-screen bg-[#11212D] text-white pt-28">
       <Navbar />
 
-      {/* Active Tour Dropdown Accordion Section */}
       {activeTour && (
         <div className="max-w-4xl mx-auto mb-10 px-4">
           <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-xl p-5 shadow-lg transition-all duration-300">
@@ -670,7 +667,6 @@ const TourPage = () => {
               </button>
             </div>
 
-            {/* Dropdown Content inside the banner */}
             {showActiveTourDetails && (
               <div className="mt-5 pt-5 border-t border-white/10 transition-all duration-300">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-white/10 gap-4">
@@ -720,7 +716,6 @@ const TourPage = () => {
                   </div>
                 </div>
 
-                {/* Day-by-Day Itinerary Section */}
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider">
                     Trip Itinerary (Day by Day)
@@ -762,7 +757,6 @@ const TourPage = () => {
                   </div>
                 </div>
 
-                {/* Bookings Section */}
                 {(activeTour.selectedGuide ||
                   activeTour.selectedHotels?.length > 0 ||
                   activeTour.selectedTransport) && (
@@ -807,7 +801,6 @@ const TourPage = () => {
         </div>
       )}
 
-      {/* Start New Trip Form Section */}
       <div className="max-w-4xl mx-auto text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 page-title-anim">
           Plan Your Own{" "}
@@ -851,7 +844,7 @@ const TourPage = () => {
               </p>
             )}
           </div>
-          
+
           <div className="max-w-sm mx-auto mb-4 text-left">
             <label className="block text-sm text-gray-300 mb-2">
               Trip Start Date
