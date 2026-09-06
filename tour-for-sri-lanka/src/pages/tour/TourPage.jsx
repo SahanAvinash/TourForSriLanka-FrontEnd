@@ -398,169 +398,155 @@ const TourPage = () => {
   };
 
   const handleDownloadPdf = () => {
-    if (!activeTour) return;
+  if (!activeTour) return;
 
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const accent = [0, 200, 150];
-    const dark = [17, 33, 45];
-    let y = 0;
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const accent = [0, 200, 150];
+  const dark = [17, 33, 45];
+  let y = 0;
 
-    const tripReference = `TSL-${activeTour._id || Date.now()}`
-      .toString()
-      .slice(0, 18)
-      .toUpperCase();
+  const tripReference = `TSL-${activeTour._id || Date.now()}`
+    .toString()
+    .slice(0, 18)
+    .toUpperCase();
 
-    doc.setFillColor(...accent);
-    doc.rect(0, 0, pageWidth, 32, "F");
+  doc.setFillColor(...accent);
+  doc.rect(0, 0, pageWidth, 32, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("Tour For Sri Lanka", 14, 14);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text("Your Trip Summary", 14, 23);
+
+  y = 42;
+
+  doc.setTextColor(120, 120, 120);
+  doc.setFontSize(9);
+  doc.text(`Trip Reference: ${tripReference}`, 14, y);
+  doc.text(
+    `Generated on ${new Date().toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })}`,
+    pageWidth - 14,
+    y,
+    { align: "right" }
+  );
+
+  y += 10;
+
+  const overviewHeight = 30;
+  doc.setFillColor(37, 55, 69);
+  doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
+
+  const budgetValue = activeTour.estimatedBudget || activeTour.budget || activeTour.totalCost || activeTour.totalPrice;
+
+  const overviewRows = [
+    [
+      "Trip Start Date",
+      activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-",
+    ],
+    [
+      "Trip End Date",
+      activeTour.tripEndDate ? formatDate(activeTour.tripEndDate) : "-",
+    ],
+    ["Destinations", `${activeTour.destinations?.length || 0}`],
+    [
+      "Total Distance",
+      activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-",
+    ],
+    [
+      "Estimated Budget",
+      budgetValue ? `LKR ${Number(budgetValue).toLocaleString()}` : "-",
+    ],
+  ];
+
+  const columnWidth = (pageWidth - 28 - 24) / overviewRows.length;
+
+  overviewRows.forEach(([label, value], index) => {
+    const columnX = 20 + index * columnWidth;
+
+    doc.setTextColor(160, 170, 180);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text(label, columnX, y + 11);
 
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
+    doc.setFontSize(10.5);
     doc.setFont("helvetica", "bold");
-    doc.text("Tour For Sri Lanka", 14, 14);
+    doc.text(value, columnX, y + 21, { maxWidth: columnWidth - 4 });
+  });
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text("Your Trip Summary", 14, 23);
+  y += overviewHeight + 12;
 
-    y = 42;
+  doc.setTextColor(...dark);
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.text("Trip Route", 14, y);
 
-    doc.setTextColor(120, 120, 120);
-    doc.setFontSize(9);
-    doc.text(`Trip Reference: ${tripReference}`, 14, y);
-    doc.text(
-      `Generated on ${new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })}`,
-      pageWidth - 14,
-      y,
-      { align: "right" }
-    );
+  y += 3;
 
-    y += 10;
+  const routeRows = (activeTour.destinations || []).map(
+    (destination, index) => [
+      `${index + 1}`,
+      destination.name || "-",
+      destination.location || "-",
+    ]
+  );
 
-    const overviewHeight = 30;
-    doc.setFillColor(37, 55, 69);
-    doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
+  autoTable(doc, {
+    startY: y + 4,
+    head: [["#", "Destination", "Location"]],
+    body: routeRows,
+    theme: "striped",
+    headStyles: {
+      fillColor: accent,
+      textColor: 255,
+      fontStyle: "bold",
+    },
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+    },
+    margin: {
+      left: 14,
+      right: 14,
+    },
+  });
 
-    const budgetValue = activeTour.estimatedBudget || activeTour.budget || activeTour.totalCost || activeTour.totalPrice;
+  y = doc.lastAutoTable.finalY + 12;
 
-    const overviewRows = [
-      [
-        "Trip Start Date",
-        activeTour.tripStartDate ? formatDate(activeTour.tripStartDate) : "-",
-      ],
-      [
-        "Trip End Date",
-        activeTour.tripEndDate ? formatDate(activeTour.tripEndDate) : "-",
-      ],
-      ["Destinations", `${activeTour.destinations?.length || 0}`],
-      [
-        "Total Distance",
-        activeTour.totalDistanceKm ? `${activeTour.totalDistanceKm} km` : "-",
-      ],
-      [
-        "Estimated Budget",
-        budgetValue ? `LKR ${Number(budgetValue).toLocaleString()}` : "-",
-      ],
-    ];
+  const mappedDestinations = (activeTour.destinations || []).map((d) => ({
+    ...d,
+    lat: d.latitude,
+    lng: d.longitude,
+  }));
+  const startPoint =
+    activeTour.startLocation &&
+    typeof activeTour.startLocation.latitude === "number" &&
+    typeof activeTour.startLocation.longitude === "number"
+      ? { lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude }
+      : null;
 
-    const columnWidth = (pageWidth - 28 - 24) / overviewRows.length;
+  const hasRouteCoords =
+    mappedDestinations.filter(
+      (destination) =>
+        typeof destination.lat === "number" &&
+        typeof destination.lng === "number"
+    ).length >= 2;
 
-    overviewRows.forEach(([label, value], index) => {
-      const columnX = 20 + index * columnWidth;
+  const hasRouteImage =
+    typeof activeTour.routeMapImage === "string" &&
+    activeTour.routeMapImage.startsWith("data:image");
 
-      doc.setTextColor(160, 170, 180);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text(label, columnX, y + 11);
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10.5);
-      doc.setFont("helvetica", "bold");
-      doc.text(value, columnX, y + 21, { maxWidth: columnWidth - 4 });
-    });
-
-    y += overviewHeight + 12;
-
-    doc.setTextColor(...dark);
-    doc.setFontSize(13);
-    doc.setFont("helvetica", "bold");
-    doc.text("Trip Route", 14, y);
-
-    y += 3;
-
-    const routeRows = (activeTour.destinations || []).map(
-      (destination, index) => [
-        `${index + 1}`,
-        destination.name || "-",
-        destination.location || "-",
-      ]
-    );
-
-    autoTable(doc, {
-      startY: y + 4,
-      head: [["#", "Destination", "Location"]],
-      body: routeRows,
-      theme: "striped",
-      headStyles: {
-        fillColor: accent,
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 4,
-      },
-      margin: {
-        left: 14,
-        right: 14,
-      },
-    });
-
-    y = doc.lastAutoTable.finalY + 12;
-
-    const mappedDestinations = (activeTour.destinations || []).map((d) => ({
-      ...d,
-      lat: d.latitude,
-      lng: d.longitude,
-    }));
-    const startPoint =
-      activeTour.startLocation &&
-      typeof activeTour.startLocation.latitude === "number" &&
-      typeof activeTour.startLocation.longitude === "number"
-        ? { lat: activeTour.startLocation.latitude, lng: activeTour.startLocation.longitude }
-        : null;
-
-    const hasRouteCoords =
-      mappedDestinations.filter(
-        (destination) =>
-          typeof destination.lat === "number" &&
-          typeof destination.lng === "number"
-      ).length >= 2;
-
-    if (hasRouteCoords) {
-      if (y > 210) {
-        doc.addPage();
-        y = 20;
-      }
-
-      doc.setTextColor(...dark);
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-      doc.text("Route Map", 14, y);
-
-      y += 4;
-
-      const mapHeight = 90;
-      drawRouteDiagram(doc, 14, y + 2, pageWidth - 28, mapHeight, mappedDestinations, startPoint);
-
-      y += mapHeight + 12;
-    }
-
-    if (y > 240) {
+  if (hasRouteImage || hasRouteCoords) {
+    if (y > 210) {
       doc.addPage();
       y = 20;
     }
@@ -568,67 +554,99 @@ const TourPage = () => {
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
-    doc.text("Bookings", 14, y);
+    doc.text("Route Map", 14, y);
 
-    y += 6;
+    y += 4;
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(60, 60, 60);
+    const mapWidth = pageWidth - 28;
+    const mapHeight = 90;
 
-    if (activeTour.selectedGuide) {
-      doc.text(
-        `Guide: ${activeTour.selectedGuide.firstName || ""} ${
-          activeTour.selectedGuide.lastName || ""
-        }`.trim(),
-        14,
-        y
-      );
+    let imageDrawn = false;
+    if (hasRouteImage) {
+      try {
+        doc.addImage(activeTour.routeMapImage, "PNG", 14, y + 2, mapWidth, mapHeight);
+        imageDrawn = true;
+      } catch (err) {
+        console.error("Failed to embed route map image, falling back to diagram:", err);
+      }
+    }
+
+    if (!imageDrawn) {
+      drawRouteDiagram(doc, 14, y + 2, mapWidth, mapHeight, mappedDestinations, startPoint);
+    }
+
+    y += mapHeight + 12;
+  }
+
+  if (y > 240) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setTextColor(...dark);
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.text("Bookings", 14, y);
+
+  y += 6;
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(60, 60, 60);
+
+  if (activeTour.selectedGuide) {
+    doc.text(
+      `Guide: ${activeTour.selectedGuide.firstName || ""} ${
+        activeTour.selectedGuide.lastName || ""
+      }`.trim(),
+      14,
+      y
+    );
+    y += 7;
+  }
+
+  if (activeTour.selectedHotels?.length > 0) {
+    activeTour.selectedHotels.forEach((hotel) => {
+      doc.text(`Hotel: ${hotel.hotelName || "-"} (${hotel.location || "-"})`, 14, y);
       y += 7;
-    }
+    });
+  }
 
-    if (activeTour.selectedHotels?.length > 0) {
-      activeTour.selectedHotels.forEach((hotel) => {
-        doc.text(`Hotel: ${hotel.hotelName || "-"} (${hotel.location || "-"})`, 14, y);
-        y += 7;
-      });
-    }
+  if (activeTour.selectedTransport) {
+    doc.text(
+      `Vehicle: ${activeTour.selectedTransport.vehicleBrand || ""} ${
+        activeTour.selectedTransport.vehicleModel || ""
+      }`.trim(),
+      14,
+      y
+    );
+    y += 7;
+  }
 
-    if (activeTour.selectedTransport) {
-      doc.text(
-        `Vehicle: ${activeTour.selectedTransport.vehicleBrand || ""} ${
-          activeTour.selectedTransport.vehicleModel || ""
-        }`.trim(),
-        14,
-        y
-      );
-      y += 7;
-    }
+  if (
+    !activeTour.selectedGuide &&
+    !activeTour.selectedHotels?.length &&
+    !activeTour.selectedTransport
+  ) {
+    doc.text("No guide, hotel or vehicle booked yet.", 14, y);
+    y += 7;
+  }
 
-    if (
-      !activeTour.selectedGuide &&
-      !activeTour.selectedHotels?.length &&
-      !activeTour.selectedTransport
-    ) {
-      doc.text("No guide, hotel or vehicle booked yet.", 14, y);
-      y += 7;
-    }
+  const pageCount = doc.internal.getNumberOfPages();
 
-    const pageCount = doc.internal.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page++) {
+    doc.setPage(page);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(
+      "Tour For Sri Lanka — Booking requests are subject to confirmation by guides, hotels and vehicle owners.",
+      14,
+      290
+    );
+  }
 
-    for (let page = 1; page <= pageCount; page++) {
-      doc.setPage(page);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        "Tour For Sri Lanka — Booking requests are subject to confirmation by guides, hotels and vehicle owners.",
-        14,
-        290
-      );
-    }
-
-    doc.save(`TourForSriLanka-Trip-Summary-${Date.now()}.pdf`);
-  };
+  doc.save(`TourForSriLanka-Trip-Summary-${Date.now()}.pdf`);
+};
 
   const activeTourBudget = activeTour?.estimatedBudget || activeTour?.budget || activeTour?.totalCost || activeTour?.totalPrice;
 
