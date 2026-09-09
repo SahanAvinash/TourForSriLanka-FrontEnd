@@ -2,7 +2,7 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar, FaHourglassHalf } from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -530,6 +530,10 @@ const TourPreview = () => {
     );
   };
 
+  // Carries the full time breakdown per stop (arrival/departure, visit time,
+  // drive time, buffer time) when the backend provides it (Full Route option).
+  // Other options only send a plain timeSlot string, so those fields stay
+  // undefined and the UI below quietly falls back to just the time range.
   const destinationDayInfo = new Map();
   (itinerary || []).forEach((day) => {
     day.destinations.forEach((d, idxInDay) => {
@@ -537,6 +541,13 @@ const TourPreview = () => {
         dayNumber: day.dayNumber,
         timeSlot: d.timeSlot,
         isDayEnd: idxInDay === day.destinations.length - 1,
+        arrivalTime: d.arrivalTime,
+        departureTime: d.departureTime,
+        visitMinutes: d.visitMinutes,
+        driveMinutes: d.driveMinutes,
+        bufferMinutes: d.bufferMinutes,
+        travelMinutes: d.travelMinutes,
+        isOvernightStart: d.isOvernightStart,
       });
     });
   });
@@ -544,7 +555,18 @@ const TourPreview = () => {
   const getDayInfoForDestination = (dest, index) => {
     const info = destinationDayInfo.get(String(dest._id || dest.id));
     if (info) return info;
-    return { dayNumber: index + 1, timeSlot: null, isDayEnd: true };
+    return {
+      dayNumber: index + 1,
+      timeSlot: null,
+      isDayEnd: true,
+      arrivalTime: null,
+      departureTime: null,
+      visitMinutes: null,
+      driveMinutes: null,
+      bufferMinutes: null,
+      travelMinutes: null,
+      isOvernightStart: false,
+    };
   };
 
   const getMinCheckInDate = (dayIndex) => {
@@ -1399,6 +1421,11 @@ const TourPreview = () => {
               const destRec = getRecommendationForLocation(dest.location);
               const destHotels = destRec?.hotels || [];
               const legDistance = legDistances[index];
+
+              // Prefer the backend's real drive/buffer minutes for this leg
+              // (Full Route option); otherwise there's nothing precise to show.
+              const hasTimeBreakdown = dayInfo.driveMinutes != null || dayInfo.bufferMinutes != null;
+
               return (
                 <React.Fragment key={dest.id || `stop-${index}`}>
                   {isNewDay && (
@@ -1409,13 +1436,36 @@ const TourPreview = () => {
                       <div className="flex-1 h-px bg-[#00C896]/30" />
                     </div>
                   )}
-                  <div className="flex flex-col items-center">
-                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
-                    <span className="text-[10px] text-[#00C896] font-medium bg-[#11212D] px-2 py-0.5 rounded-full border border-[#00C896]/30 my-0.5 whitespace-nowrap">
-                      {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
-                    </span>
-                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
+
+                  <div className="flex flex-col items-center gap-1 py-0.5">
+                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
+                    <div className="flex items-center gap-2 bg-[#11212D] border border-[#00C896]/25 rounded-full px-3 py-1 text-[10px] text-gray-400 whitespace-nowrap">
+                      <span className="flex items-center gap-1 text-[#00C896] font-semibold">
+                        <FaRulerHorizontal size={9} />
+                        {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
+                      </span>
+                      {dayInfo.driveMinutes != null && (
+                        <>
+                          <span className="text-gray-600">·</span>
+                          <span className="flex items-center gap-1">
+                            <FaCar size={9} />
+                            {dayInfo.driveMinutes}m drive
+                          </span>
+                        </>
+                      )}
+                      {dayInfo.bufferMinutes != null && (
+                        <>
+                          <span className="text-gray-600">·</span>
+                          <span className="flex items-center gap-1 text-[#FFB020]">
+                            <FaClock size={9} />
+                            +{dayInfo.bufferMinutes}m buffer
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
                   </div>
+
                   <div className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
                     <div>
                       <span className="font-medium flex items-center gap-2">
@@ -1425,7 +1475,21 @@ const TourPreview = () => {
                         {dest.name}
                       </span>
                       {dayInfo.timeSlot && (
-                        <p className="text-[11px] text-gray-500 mt-1 ml-8">{dayInfo.timeSlot}</p>
+                        <div className="flex items-center gap-3 flex-wrap text-[11px] text-gray-500 mt-1 ml-8">
+                          <span className="flex items-center gap-1">
+                            <FaClock className="text-[#00C896]" size={10} />
+                            {dayInfo.timeSlot}
+                          </span>
+                          {dayInfo.visitMinutes != null && (
+                            <span className="flex items-center gap-1">
+                              <FaHourglassHalf className="text-[#00C896]" size={10} />
+                              {formatDuration(dayInfo.visitMinutes)} visit
+                            </span>
+                          )}
+                          {dayInfo.isOvernightStart && (
+                            <span className="text-[#FFB020] font-medium">Fresh start after overnight stay</span>
+                          )}
+                        </div>
                       )}
                     </div>
 
