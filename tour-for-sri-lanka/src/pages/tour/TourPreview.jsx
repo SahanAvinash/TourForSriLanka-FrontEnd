@@ -1427,29 +1427,28 @@ const TourPreview = () => {
 
                   <div className="flex flex-col items-center gap-1 py-0.5">
                     <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
-                    <div className="flex items-center gap-2 bg-[#11212D] border border-[#00C896]/25 rounded-full px-3 py-1 text-[10px] text-gray-400 whitespace-nowrap">
+                    <div className="flex items-center gap-2.5 bg-[#11212D] border border-[#00C896]/30 rounded-full px-3.5 py-1.5 text-[11px] text-gray-300 whitespace-nowrap shadow-sm">
+                      {/* Distance - Green Color */}
                       <span className="flex items-center gap-1 text-[#00C896] font-semibold">
-                        <FaRulerHorizontal size={9} />
+                        <FaRulerHorizontal size={10} />
                         {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
                       </span>
-                      {dayInfo.driveMinutes != null && (
-                        <>
-                          <span className="text-gray-600">·</span>
-                          <span className="flex items-center gap-1">
-                            <FaCar size={9} />
-                            {dayInfo.driveMinutes}m drive
-                          </span>
-                        </>
-                      )}
-                      {dayInfo.bufferMinutes != null && (
-                        <>
-                          <span className="text-gray-600">·</span>
-                          <span className="flex items-center gap-1 text-[#FFB020]">
-                            <FaClock size={9} />
-                            +{dayInfo.bufferMinutes}m buffer
-                          </span>
-                        </>
-                      )}
+                      
+                      <span className="text-gray-600">·</span>
+                      
+                      {/* Driving Time - Green Color */}
+                      <span className="flex items-center gap-1 text-[#00C896] font-semibold">
+                        <FaCar size={10} />
+                        {dayInfo.driveMinutes != null ? formatDuration(dayInfo.driveMinutes) : "—"} Driving
+                      </span>
+
+                      <span className="text-gray-600">·</span>
+
+                      {/* Ready Time (15 min) - Green Color */}
+                      <span className="flex items-center gap-1 text-[#00C896] font-semibold">
+                        <FaClock size={10} />
+                        Ready: 15m
+                      </span>
                     </div>
                     <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
                   </div>
