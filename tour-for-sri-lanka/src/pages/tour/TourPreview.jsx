@@ -2062,7 +2062,7 @@ const TourPreview = () => {
         )}
       </div>
       <Footer />
-    </div>
+    </div> 
   );
 };
 
