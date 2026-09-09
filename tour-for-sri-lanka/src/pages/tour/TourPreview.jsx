@@ -216,19 +216,15 @@ const TourPreview = () => {
 
   const calculateReturnDate = (startDate, days) => {
     if (!startDate || !days) return "";
-
     const date = new Date(startDate);
     date.setDate(date.getDate() + Number(days));
-
     return date.toISOString().split("T")[0];
   };
 
   const calculateTripEndDate = (startDate, days) => {
     if (!startDate || !days) return "";
-
     const date = new Date(`${startDate}T00:00:00`);
     if (Number.isNaN(date.getTime())) return "";
-
     date.setDate(date.getDate() + Math.max(0, Number(days) - 1));
     return date.toISOString().split("T")[0];
   };
@@ -244,7 +240,7 @@ const TourPreview = () => {
         startLat: startCoordsOverride?.lat,
         startLng: startCoordsOverride?.lng,
       });
-      setRouteOptions(res.data.options);
+      setRouteOptions(res.data.options || res.data);
       setPhase("route-options");
     } catch (err) {
       console.error("generate-trip failed:", err.response?.data || err.message);
@@ -530,10 +526,6 @@ const TourPreview = () => {
     );
   };
 
-  // Carries the full time breakdown per stop (arrival/departure, visit time,
-  // drive time, buffer time) when the backend provides it (Full Route option).
-  // Other options only send a plain timeSlot string, so those fields stay
-  // undefined and the UI below quietly falls back to just the time range.
   const destinationDayInfo = new Map();
   (itinerary || []).forEach((day) => {
     day.destinations.forEach((d, idxInDay) => {
@@ -1422,10 +1414,6 @@ const TourPreview = () => {
               const destHotels = destRec?.hotels || [];
               const legDistance = legDistances[index];
 
-              // Prefer the backend's real drive/buffer minutes for this leg
-              // (Full Route option); otherwise there's nothing precise to show.
-              const hasTimeBreakdown = dayInfo.driveMinutes != null || dayInfo.bufferMinutes != null;
-
               return (
                 <React.Fragment key={dest.id || `stop-${index}`}>
                   {isNewDay && (
@@ -1617,7 +1605,7 @@ const TourPreview = () => {
         </div>
 
         {activeGuideModal && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-9999 px-4" onClick={closeModal}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeModal}>
             <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-[#00C896]">
@@ -1822,7 +1810,7 @@ const TourPreview = () => {
         )}
 
         {activeTransportModal && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-9999 px-4" onClick={closeTransportModal}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeTransportModal}>
             <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-[#00C896]">
@@ -1976,7 +1964,7 @@ const TourPreview = () => {
         )}
 
         {activeHotelModal && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-9999 px-4" onClick={closeHotelModal}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeHotelModal}>
             <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-[#00C896]">
