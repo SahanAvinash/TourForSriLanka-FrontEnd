@@ -1799,7 +1799,7 @@ const TourPreview = () => {
                         onClick={handleAddGuideToCart}
                         disabled={checkingGuideAvailability || !bookingForm.date || bookingForm.numberOfGuests > selectedGuide.maximumGuests}
                         className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
+                    >
                         {checkingGuideAvailability ? "Checking availability..." : "Add to Bookings"}
                     </button>
                   </div>
@@ -1814,7 +1814,7 @@ const TourPreview = () => {
             <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-[#00C896]">
-                  {transportModalView === "list" ? `Vehicles — ${activeTransportModal.location}` : "Add a Vehicle to Cart"}
+                  {transportModalView === "list" ? `Transport — ${activeTransportModal.location}` : "Book Vehicle"}
                 </h3>
                 <button onClick={closeTransportModal} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
               </div>
@@ -1822,35 +1822,23 @@ const TourPreview = () => {
               {transportModalView === "list" && (
                 <div className="flex flex-col gap-3">
                   {activeTransportModal.transports.map((t) => (
-                    <div key={t._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
-                      <img
-                        src={t.addVehiclePhotos?.[0] || "/vehicle_placeholder.jpg"}
-                        alt={`${t.vehicleBrand} ${t.vehicleModel}`}
-                        className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-                      />
+                    <div key={t._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
-                          <span className="truncate min-w-0 flex-1">{t.vehicleBrand} {t.vehicleModel}</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-white font-semibold text-sm truncate">{t.vehicleBrand} {t.vehicleModel}</h4>
                           {bookedTransportIds.has(t._id) && (
-                            <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
+                            <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added to cart" />
                           )}
-                        </h4>
-                        <p className="text-gray-400 text-[11px] mt-[2px]">{t.vehicleType} · {t.passengerCapacity} pax</p>
-                        <p className="text-[#00C896] font-bold text-[13px] mt-[4px]">LKR {t.ratePerKm}/km</p>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Capacity: {t.passengerCapacity} passengers</p>
                       </div>
                       <button
                         onClick={() => {
                           setSelectedTransport(t);
-                          setTransportBookingForm({
-                            pickupDate: tripStartDate || "",
-                            returnDate: calculateTripEndDate(tripStartDate, tripDays),
-                            numberOfGuests: tripGuestCount || 1,
-                            bags: 0,
-                          });
                           setTransportModalView("book");
                           fetchTransportEstimate(t._id);
                         }}
-                        className="border border-[#00C896] text-[#00C896] px-[14px] py-[7px] rounded-full text-[12px] hover:bg-[#00C896] hover:text-white transition-all duration-300 flex-shrink-0"
+                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
                       >
                         Book
                       </button>
@@ -1864,14 +1852,7 @@ const TourPreview = () => {
                   <button onClick={() => setTransportModalView("list")} className="text-xs text-gray-400 mb-3">
                     ← Back to vehicles
                   </button>
-
-                  <div className="flex items-center gap-3 mb-4">
-                    <img src={selectedTransport.addVehiclePhotos?.[0]} className="w-12 h-12 rounded-full object-cover" />
-                    <div>
-                      <p className="font-medium">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
-                      <p className="text-xs text-gray-400">{selectedTransport.registrationNo}</p>
-                    </div>
-                  </div>
+                  <p className="text-sm font-semibold mb-3">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
 
                   <div className="flex flex-col gap-3">
                     <div>
@@ -1879,28 +1860,21 @@ const TourPreview = () => {
                       <input
                         type="date"
                         value={transportBookingForm.pickupDate}
-                        readOnly={!!tripStartDate}
-                        onChange={(e) => {
-                          if (!tripStartDate) setTransportBookingForm({ ...transportBookingForm, pickupDate: e.target.value });
-                        }}
+                        onChange={(e) => setTransportBookingForm({ ...transportBookingForm, pickupDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className={`w-full rounded-md px-3 py-2 text-sm outline-none text-white ${
-                          tripStartDate ? "bg-[#1a2530] border border-white/5 cursor-not-allowed" : "bg-[#253745]"
-                        }`}
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
-
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Return Date</label>
                       <input
                         type="date"
                         value={transportBookingForm.returnDate}
-                        readOnly
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
+                        onChange={(e) => setTransportBookingForm({ ...transportBookingForm, returnDate: e.target.value })}
+                        style={{ colorScheme: "dark" }}
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Vehicle returns you to {startCoords?.address || startDistrict} — price includes the full round trip.</p>
                     </div>
-
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Passengers (max {selectedTransport.passengerCapacity})</label>
                       <input
@@ -1908,53 +1882,38 @@ const TourPreview = () => {
                         min="1"
                         max={selectedTransport.passengerCapacity}
                         value={transportBookingForm.numberOfGuests}
-                        readOnly={!!tripGuestCount}
-                        onChange={(e) => {
-                          if (!tripGuestCount) setTransportBookingForm({ ...transportBookingForm, numberOfGuests: Number(e.target.value) });
-                        }}
-                        className={`w-full rounded-md px-3 py-2 text-sm outline-none text-white ${
-                          tripGuestCount ? "bg-[#1a2530] border border-white/5 cursor-not-allowed" : "bg-[#253745]"
-                        }`}
+                        onChange={(e) => setTransportBookingForm({ ...transportBookingForm, numberOfGuests: Number(e.target.value) })}
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
-                      {transportBookingForm.numberOfGuests > selectedTransport.passengerCapacity && (
-                        <p className="text-xs text-red-400 mt-1">Exceeds vehicle's passenger capacity.</p>
-                      )}
                     </div>
-
                     <div>
-                      <label className="text-xs text-gray-400 block mb-1">Bags (max {selectedTransport.luggageCapacity})</label>
+                      <label className="text-xs text-gray-400 block mb-1">Bags</label>
                       <input
                         type="number"
                         min="0"
-                        max={selectedTransport.luggageCapacity}
                         value={transportBookingForm.bags}
                         onChange={(e) => setTransportBookingForm({ ...transportBookingForm, bags: Number(e.target.value) })}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                      <span className="text-sm text-gray-400">
-                        Est. distance {estimateLoading ? "..." : estimatedDistance ? `(${estimatedDistance} km)` : ""}
-                      </span>
-                      <span className="text-lg font-semibold text-[#00C896]">
+                    <div className="bg-[#1a2530] rounded-lg p-3 flex justify-between items-center text-sm">
+                      <span className="text-gray-400">Estimated Total</span>
+                      <span className="font-bold text-[#00C896]">
                         {estimateLoading ? "Calculating..." : estimatedPrice != null ? `LKR ${estimatedPrice.toLocaleString()}` : "—"}
                       </span>
                     </div>
-                    {estimateError && <p className="text-xs text-red-400 -mt-1">{estimateError}</p>}
-                    {transportBookingError && <p className="text-xs text-red-400 -mt-1">{transportBookingError}</p>}
+
+                    {transportBookingError && (
+                      <p className="text-xs text-red-400">{transportBookingError}</p>
+                    )}
 
                     <button
                       onClick={handleAddTransportToCart}
-                      disabled={
-                        estimateLoading ||
-                        !transportBookingForm.pickupDate ||
-                        !transportBookingForm.returnDate ||
-                        transportBookingForm.numberOfGuests > selectedTransport.passengerCapacity
-                      }
-                      className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={estimateLoading || estimatedPrice == null}
+                      className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50"
                     >
-                      {estimateLoading ? "Checking..." : "Add to Bookings"}
+                      Add Vehicle to Cart
                     </button>
                   </div>
                 </div>
@@ -1968,99 +1927,72 @@ const TourPreview = () => {
             <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-[#00C896]">
-                  {hotelModalView === "list"
-                    ? `Hotels — ${activeHotelModal.location}`
-                    : hotelModalView === "rooms"
-                    ? `Rooms — ${selectedHotel?.hotelName}`
-                    : "Add a Room to Cart"}
+                  {hotelModalView === "list" ? `Hotels — ${activeHotelModal.location}` : "Select Room"}
                 </h3>
                 <button onClick={closeHotelModal} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
               </div>
 
               {hotelModalView === "list" && (
                 <div className="flex flex-col gap-3">
-                    {activeHotelModal.hotels.length === 0 ? (
-                    <p className="text-gray-400 text-sm text-center py-6">No hotels available in this location.</p>
-                    ) : (
-                    activeHotelModal.hotels.map((h) => (
-                        <div key={h._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
-                        <img
-                            src={h.images?.[0] || "/hotel_placeholder.jpg"}
-                            alt={h.hotelName}
-                            className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
-                            <div className="flex items-center gap-1 text-gray-400 text-[11px] mt-[4px]">
-                            <FaMapMarkerAlt className="text-[#00C896] text-[12px]" />
-                            <span className="truncate">{h.location}</span>
-                            </div>
+                  {activeHotelModal.hotels.map((h) => (
+                    <div key={h._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
+                          {bookedRoomIds.size > 0 && (
+                            <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added" />
+                          )}
                         </div>
-                        <button
-                            onClick={() => {
-                            setSelectedHotel(h);
-                            setHotelModalView("rooms");
-                            fetchRoomsForHotel(h._id);
-                            }}
-                            className="border border-[#00C896] text-[#00C896] px-[14px] py-[7px] rounded-full text-[12px] hover:bg-[#00C896] hover:text-white transition-all duration-300 flex-shrink-0"
-                        >
-                            View Rooms
-                        </button>
-                        </div>
-                    ))
-                    )}
+                        <p className="text-xs text-gray-400 mt-1">{h.location}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedHotel(h);
+                          setHotelModalView("rooms");
+                          fetchRoomsForHotel(h._id);
+                        }}
+                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
+                      >
+                        Rooms
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                )}
+              )}
+
               {hotelModalView === "rooms" && selectedHotel && (
                 <div>
-                  <button
-                    onClick={() => { setHotelModalView("list"); setSelectedHotel(null); setHotelRooms([]); }}
-                    className="text-xs text-gray-400 mb-3"
-                  >
+                  <button onClick={() => setHotelModalView("list")} className="text-xs text-gray-400 mb-3">
                     ← Back to hotels
                   </button>
+                  <p className="text-sm font-semibold mb-3">{selectedHotel.hotelName} — Rooms</p>
 
                   {roomsLoading ? (
-                    <p className="text-gray-400 text-sm">Loading rooms...</p>
-                  ) : roomsError ? (
-                    <p className="text-red-400 text-sm">{roomsError}</p>
+                    <p className="text-xs text-gray-400 text-center py-4">Loading rooms...</p>
                   ) : hotelRooms.length === 0 ? (
-                    <p className="text-gray-400 text-sm">No rooms available for this hotel.</p>
+                    <p className="text-xs text-gray-400 text-center py-4">No rooms available for this hotel.</p>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      {hotelRooms.map((r) => (
-                        <div key={r._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
-                          <img
-                            src={r.images?.[0] || "room_placeholder.jpg"}
-                            alt={r.roomType}
-                            className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
-                              <span className="truncate min-w-0 flex-1">{r.roomType} · Room {r.roomNumber}</span>
-                              {bookedRoomIds.has(r._id) && (
-                                <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
-                              )}
-                            </h4>
-                            <p className="text-gray-400 text-[11px] mt-[2px]">Up to {r.capacity} guests</p>
-                            <p className="text-[#00C896] font-bold text-[13px] mt-[4px]">LKR {r.pricePerNight}/night</p>
+                      {hotelRooms.map((room) => (
+                        <div
+                          key={room._id}
+                          onClick={() => {
+                            setSelectedRoom(room);
+                            setHotelModalView("book");
+                            const minIn = getMinCheckInDate(activeHotelModal.dayIndex);
+                            setHotelBookingForm({
+                              checkInDate: minIn,
+                              checkOutDate: calculateReturnDate(minIn, 1),
+                              numberOfGuests: tripGuestCount || 1,
+                            });
+                          }}
+                          className="bg-[#1a2530] rounded-xl p-3 cursor-pointer hover:bg-[#2f4655] transition-colors flex justify-between items-center"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-white">{room.roomType}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">Capacity: {room.capacity} guests</p>
                           </div>
-                          <button
-                            onClick={() => {
-                              setSelectedRoom(r);
-                              const dayIndex = activeHotelModal?.dayIndex ?? 0;
-                              const minCheckIn = getMinCheckInDate(dayIndex);
-                              setHotelBookingForm({
-                                checkInDate: minCheckIn,
-                                checkOutDate: calculateReturnDate(minCheckIn, 1),
-                                numberOfGuests: tripGuestCount || 1,
-                              });
-                              setHotelModalView("book");
-                            }}
-                            className="border border-[#00C896] text-[#00C896] px-[14px] py-[7px] rounded-full text-[12px] hover:bg-[#00C896] hover:text-white transition-all duration-300 flex-shrink-0"
-                          >
-                            Book
-                          </button>
+                          <span className="text-sm font-bold text-[#00C896]">LKR {room.pricePerNight?.toLocaleString()}/night</span>
                         </div>
                       ))}
                     </div>
@@ -2073,6 +2005,7 @@ const TourPreview = () => {
                   <button onClick={() => setHotelModalView("rooms")} className="text-xs text-gray-400 mb-3">
                     ← Back to rooms
                   </button>
+                  <p className="text-sm font-semibold mb-3">{selectedRoom.roomType} ({selectedHotel.hotelName})</p>
 
                   <div className="flex flex-col gap-3">
                     <div>
@@ -2080,34 +2013,21 @@ const TourPreview = () => {
                       <input
                         type="date"
                         value={hotelBookingForm.checkInDate}
-                        min={getMinCheckInDate(activeHotelModal?.dayIndex ?? 0) || undefined}
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, checkInDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
-                        {(activeHotelModal?.dayIndex ?? 0) === 0
-                          ? "Can't check in before your trip start date."
-                          : "Can't check in before you check out of your previous hotel."}
-                      </p>
                     </div>
-
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Check-out Date</label>
                       <input
                         type="date"
                         value={hotelBookingForm.checkOutDate}
-                        min={
-                          hotelBookingForm.checkInDate
-                            ? calculateReturnDate(hotelBookingForm.checkInDate, 1)
-                            : undefined
-                        }
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, checkOutDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
-
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Guests (max {selectedRoom.capacity})</label>
                       <input
@@ -2116,35 +2036,24 @@ const TourPreview = () => {
                         max={selectedRoom.capacity}
                         value={hotelBookingForm.numberOfGuests}
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, numberOfGuests: Number(e.target.value) })}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
-                      {hotelBookingForm.numberOfGuests > selectedRoom.capacity && (
-                        <p className="text-xs text-red-400 mt-1">Exceeds room's guest capacity.</p>
-                      )}
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                      <span className="text-sm text-gray-400">
-                        {hotelNights > 0 ? `${hotelNights} night${hotelNights > 1 ? "s" : ""}` : "—"}
-                      </span>
-                      <span className="text-lg font-semibold text-[#00C896]">
-                        LKR {hotelTotalPrice.toLocaleString()}
-                      </span>
+                    <div className="bg-[#1a2530] rounded-lg p-3 flex justify-between items-center text-sm">
+                      <span className="text-gray-400">{hotelNights} night(s) total</span>
+                      <span className="font-bold text-[#00C896]">LKR {hotelTotalPrice.toLocaleString()}</span>
                     </div>
-                    {hotelBookingError && <p className="text-xs text-red-400 -mt-1">{hotelBookingError}</p>}
+
+                    {hotelBookingError && (
+                      <p className="text-xs text-red-400">{hotelBookingError}</p>
+                    )}
 
                     <button
-                        onClick={handleAddHotelToCart}
-                        disabled={
-                            roomsLoading ||
-                            !hotelBookingForm.checkInDate ||
-                            !hotelBookingForm.checkOutDate ||
-                            hotelNights <= 0 ||
-                            hotelBookingForm.numberOfGuests > selectedRoom.capacity
-                        }
-                        className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                        {roomsLoading ? "Checking..." : "Add to Cart"}
+                      onClick={handleAddHotelToCart}
+                      className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386]"
+                    >
+                      Add Room to Cart
                     </button>
                   </div>
                 </div>
@@ -2153,7 +2062,7 @@ const TourPreview = () => {
           </div>
         )}
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
