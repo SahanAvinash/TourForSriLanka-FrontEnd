@@ -192,7 +192,8 @@ export default function BookingPage() {
         });
 
         const res = await fetch(
-          `${API_BASE_URL}/api/transport/booking-estimate?${params}`
+          `${API_BASE_URL}/api/transport/booking-estimate?${params}`,
+          {method : "POST"}
         );
 
         const data = await res.json();
