@@ -2,7 +2,7 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar, FaHourglassHalf, FaStopwatch } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar, FaHourglassHalf } from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -383,7 +383,7 @@ const TourPreview = () => {
               const Icon = meta.icon;
 
               return (
-                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col h-full border border-[#00C896]/20 shadow-xl">
+                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col h-full">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className="text-[#00C896]" size={18} />
                     <h3 className="text-[#00C896] font-semibold">{option.label}</h3>
@@ -438,7 +438,7 @@ const TourPreview = () => {
                     onClick={() => handleSelectRouteOption(key)}
                     className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
                   >
-                    <Route size={12} /> Choose this trip
+                    <FaRoute size={12} /> Choose this trip
                   </button>
                 </div>
               );
@@ -537,7 +537,7 @@ const TourPreview = () => {
         departureTime: d.departureTime,
         visitMinutes: d.visitMinutes,
         driveMinutes: d.driveMinutes,
-        bufferMinutes: d.bufferMinutes || 15, // Ensuring 15min default buffer/prep time
+        bufferMinutes: d.bufferMinutes,
         travelMinutes: d.travelMinutes,
         isOvernightStart: d.isOvernightStart,
       });
@@ -546,16 +546,16 @@ const TourPreview = () => {
 
   const getDayInfoForDestination = (dest, index) => {
     const info = destinationDayInfo.get(String(dest._id || dest.id));
-    if (info) return { ...info, bufferMinutes: info.bufferMinutes || 15 };
+    if (info) return info;
     return {
       dayNumber: index + 1,
       timeSlot: null,
       isDayEnd: true,
       arrivalTime: null,
       departureTime: null,
-      visitMinutes: 60,
-      driveMinutes: 30,
-      bufferMinutes: 15, // Default 15min preparation buffer time
+      visitMinutes: null,
+      driveMinutes: null,
+      bufferMinutes: null,
       travelMinutes: null,
       isOvernightStart: false,
     };
@@ -1217,15 +1217,15 @@ const TourPreview = () => {
   return (
     <div className="min-h-screen bg-[#11212D] text-white">
       <Navbar />
-      <div className="px-6 py-10 max-w-6xl mx-auto">
+      <div className="px-6 py-10">
         <div className="tour-preview-title-anim">
-          <h1 className="text-3xl font-bold mb-2">Your Supiri Trip Route</h1>
+          <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
           <p className="text-gray-400 mb-2">
             Total distance (round trip):{" "}
             <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
             {typeof route.durationMin === "number" && (
               <>
-                {" "}· Total Driving time:{" "}
+                {" "}· Driving time:{" "}
                 <span className="text-[#00C896] font-semibold">{formatDuration(route.durationMin)}</span>
               </>
             )}
@@ -1242,7 +1242,7 @@ const TourPreview = () => {
           </div>
         </div>
 
-        <div className="tour-preview-map-anim relative z-0 rounded-2xl overflow-hidden mb-8 border border-[#00C896]/30 shadow-2xl" style={{ height: "450px" }}>
+        <div className="tour-preview-map-anim relative z-0 rounded-xl overflow-hidden mb-8" style={{ height: "450px" }}>
           <MapContainer
             center={[centerLat, centerLng]}
             zoom={8}
@@ -1305,93 +1305,99 @@ const TourPreview = () => {
         </div>
 
         <div className="tour-preview-order-anim mb-8">
-          <h2 className="text-2xl font-bold mb-1 text-white">Trip Schedule & Timeline</h2>
-          <p className="text-xs text-gray-400 mb-4">
-            Every stop includes driving time, visit/waiting time, and an explicit **+15m preparation/buffer time** for getting ready.
+          <h2 className="text-xl font-semibold mb-1">Trip Order</h2>
+          <p className="text-xs text-gray-400 mb-3">
+            Tap Guides, Hotels or Transport on any stop to add a booking to your cart.
           </p>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {(() => {
               const startRec = getRecommendationForLocation(startDistrict);
               const startGuides = startRec?.guides || [];
               const startHotels = startRec?.hotels || [];
               const startTransports = startRec?.transports || [];
               return (
-                <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl p-5 shadow-xl">
+                <div className="bg-[#253745] rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="flex items-center gap-2 font-bold text-base">
-                      <span className="text-[11px] uppercase tracking-wider text-[#11212D] bg-[#00C896] px-2.5 py-1 rounded-full font-extrabold flex-shrink-0">
-                        Start Point
+                    <span className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                        Start
                       </span>
                       {startCoords?.address || startDistrict}
                     </span>
-                    <span className="text-xs text-gray-400 bg-[#253745] px-3 py-1 rounded-full">
-                      Total Route: {route.distanceKm} km
+                    <span className="text-sm text-gray-400">
+                      Total : {route.distanceKm} km
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div
-                      className="bg-[#253745]/70 rounded-xl p-3.5 cursor-pointer hover:bg-[#2f4655] transition-all border border-white/5 hover:border-[#00C896]/40"
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
                       onClick={() =>
                         startRec && setActiveGuideModal({ location: startRec.location, guides: startGuides })
                       }
                     >
-                      <p className="text-[11px] text-gray-400 mb-1">Book an experienced guide for your trip.</p>
-                      <p className="text-sm font-semibold mb-1 flex items-center gap-1.5 text-[#00C896]">
-                        <FaUserTie size={12} />
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        You can book a guide if you wish. Your guide will accompany you throughout your entire trip.
+                      </p>
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaUserTie className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Guides ({startGuides.length})
                         {startGuides.some((g) => bookedGuideIds.has(g._id)) && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
                         )}
                       </p>
                       {startGuides.slice(0, 2).map((g) => (
-                        <p key={g._id} className="text-xs text-gray-300 truncate">{g.firstName} {g.lastName}</p>
+                        <p key={g._id} className="text-xs text-gray-400 truncate">{g.firstName} {g.lastName}</p>
                       ))}
                       {startGuides.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startGuides.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1">+{startGuides.length - 2} more · click to view</p>
                       )}
                     </div>
                     <div
-                      className="bg-[#253745]/70 rounded-xl p-3.5 cursor-pointer hover:bg-[#2f4655] transition-all border border-white/5 hover:border-[#00C896]/40"
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
                       onClick={() =>
                         startRec &&
                         setActiveHotelModal({ location: startRec.location, hotels: startHotels, dayIndex: 0 })
                       }
                     >
-                      <p className="text-[11px] text-gray-400 mb-1">Find ideal accommodations for your stay.</p>
-                      <p className="text-sm font-semibold mb-1 flex items-center gap-1.5 text-[#00C896]">
-                        <FaHotel size={12} />
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        If you need accommodation at your destination, you can book a hotel that suits your needs.
+                      </p>
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Hotels ({startHotels.length})
                         {hotelStayDates[0] && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
                         )}
                       </p>
                       {startHotels.slice(0, 2).map((h) => (
-                        <p key={h._id} className="text-xs text-gray-300 truncate">{h.hotelName}</p>
+                        <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
                       ))}
                       {startHotels.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startHotels.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1">+{startHotels.length - 2} more · click to view</p>
                       )}
                     </div>
                     <div
-                      className="bg-[#253745]/70 rounded-xl p-3.5 cursor-pointer hover:bg-[#2f4655] transition-all border border-white/5 hover:border-[#00C896]/40"
+                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
                       onClick={() =>
                         startRec &&
                         setActiveTransportModal({ location: startRec.location, transports: startTransports })
                       }
                     >
-                      <p className="text-[11px] text-gray-400 mb-1">Book comfortable vehicle transport.</p>
-                      <p className="text-sm font-semibold mb-1 flex items-center gap-1.5 text-[#00C896]">
-                        <FaCar size={12} />
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        You can book a vehicle if you wish. Your driver will be available throughout your entire trip.
+                      </p>
+                      <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                        <FaCar className="text-[#00C896] text-[12px] flex-shrink-0" />
                         Transport ({startTransports.length})
                         {startTransports.some((t) => bookedTransportIds.has(t._id)) && (
                           <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
                         )}
                       </p>
                       {startTransports.slice(0, 2).map((t) => (
-                        <p key={t._id} className="text-xs text-gray-300 truncate">{t.vehicleBrand} {t.vehicleModel}</p>
+                        <p key={t._id} className="text-xs text-gray-400 truncate">{t.vehicleBrand} {t.vehicleModel}</p>
                       ))}
                       {startTransports.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startTransports.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1">+{startTransports.length - 2} more · click to view</p>
                       )}
                     </div>
                   </div>
@@ -1411,91 +1417,96 @@ const TourPreview = () => {
               return (
                 <React.Fragment key={dest.id || `stop-${index}`}>
                   {isNewDay && (
-                    <div className="flex items-center gap-3 mt-6 mb-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#11212D] bg-[#00C896] px-4 py-1.5 rounded-full whitespace-nowrap shadow-lg">
+                    <div className="flex items-center gap-3 mt-5 mb-1">
+                      <span className="text-xs font-bold uppercase tracking-wide text-[#11212D] bg-[#00C896] px-4 py-1.5 rounded-full whitespace-nowrap shadow-md">
                         Day {String(dayIndex).padStart(2, "0")}
                       </span>
                       <div className="flex-1 h-px bg-[#00C896]/30" />
                     </div>
                   )}
 
-                  <div className="flex flex-col items-center gap-1 py-1">
-                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
-                    <div className="flex items-center gap-3 bg-[#1B2B34] border border-[#00C896]/30 rounded-full px-4 py-1.5 text-xs text-gray-300 shadow-md flex-wrap justify-center">
-                      <span className="flex items-center gap-1.5 text-[#00C896] font-bold">
-                        <FaRulerHorizontal size={11} />
+                  <div className="flex flex-col items-center gap-1 py-0.5">
+                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
+                    <div className="flex items-center gap-2 bg-[#11212D] border border-[#00C896]/25 rounded-full px-3 py-1 text-[10px] text-gray-400 whitespace-nowrap">
+                      <span className="flex items-center gap-1 text-[#00C896] font-semibold">
+                        <FaRulerHorizontal size={9} />
                         {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
                       </span>
-                      <span className="text-gray-500">·</span>
-                      <span className="flex items-center gap-1.5 text-white font-medium">
-                        <FaCar size={11} className="text-[#00C896]" />
-                        Driving: {formatDuration(dayInfo.driveMinutes || 35)}
-                      </span>
-                      <span className="text-gray-500">·</span>
-                      <span className="flex items-center gap-1.5 text-[#FFB020] font-semibold bg-[#FFB020]/10 px-2.5 py-0.5 rounded-full border border-[#FFB020]/30">
-                        <FaStopwatch size={11} />
-                        +15m Prep Time
-                      </span>
+                      {dayInfo.driveMinutes != null && (
+                        <>
+                          <span className="text-gray-600">·</span>
+                          <span className="flex items-center gap-1">
+                            <FaCar size={9} />
+                            {dayInfo.driveMinutes}m drive
+                          </span>
+                        </>
+                      )}
+                      {dayInfo.bufferMinutes != null && (
+                        <>
+                          <span className="text-gray-600">·</span>
+                          <span className="flex items-center gap-1 text-[#FFB020]">
+                            <FaClock size={9} />
+                            +{dayInfo.bufferMinutes}m buffer
+                          </span>
+                        </>
+                      )}
                     </div>
-                    <div className="w-px h-4 border-l-2 border-dashed border-[#00C896]/40" />
+                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
                   </div>
 
-                  <div className="bg-[#1B2B34] border border-[#00C896]/20 rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center shadow-xl">
+                  <div className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
                     <div>
-                      <div className="flex items-center gap-2.5 mb-2">
-                        <span className="w-7 h-7 rounded-full bg-[#00C896] text-[#11212D] text-xs font-black flex items-center justify-center flex-shrink-0 shadow-md">
+                      <span className="font-medium flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
                           {index + 1}
                         </span>
-                        <h3 className="font-bold text-lg text-white">{dest.name}</h3>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 flex-wrap text-xs text-gray-300 mt-2 ml-9">
-                        {dayInfo.timeSlot && (
-                          <span className="flex items-center gap-1 bg-[#253745] px-2.5 py-1 rounded-md">
-                            <FaClock className="text-[#00C896]" size={11} />
+                        {dest.name}
+                      </span>
+                      {dayInfo.timeSlot && (
+                        <div className="flex items-center gap-3 flex-wrap text-[11px] text-gray-500 mt-1 ml-8">
+                          <span className="flex items-center gap-1">
+                            <FaClock className="text-[#00C896]" size={10} />
                             {dayInfo.timeSlot}
                           </span>
-                        )}
-                        <span className="flex items-center gap-1 bg-[#253745] px-2.5 py-1 rounded-md text-gray-200">
-                          <FaHourglassHalf className="text-[#00C896]" size={11} />
-                          Waiting / Visit: {formatDuration(dayInfo.visitMinutes || 60)}
-                        </span>
-                      </div>
-                      {dayInfo.isOvernightStart && (
-                        <p className="text-xs text-[#FFB020] font-medium mt-2 ml-9">✨ Fresh start after overnight stay</p>
+                          {dayInfo.visitMinutes != null && (
+                            <span className="flex items-center gap-1">
+                              <FaHourglassHalf className="text-[#00C896]" size={10} />
+                              {formatDuration(dayInfo.visitMinutes)} visit
+                            </span>
+                          )}
+                          {dayInfo.isOvernightStart && (
+                            <span className="text-[#FFB020] font-medium">Fresh start after overnight stay</span>
+                          )}
+                        </div>
                       )}
                     </div>
 
                     {dayInfo.isDayEnd ? (
                       <div
-                        className="bg-[#253745] border border-white/5 rounded-xl p-4 cursor-pointer hover:border-[#00C896]/50 transition-all shadow-md group"
+                        className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
                         onClick={() =>
                           destRec &&
                           setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
                         }
                       >
-                        <div className="flex justify-between items-center mb-1">
-                          <p className="text-sm font-semibold text-white flex items-center gap-2 group-hover:text-[#00C896] transition-colors">
-                            <FaHotel className="text-[#00C896] text-sm flex-shrink-0" />
-                            Overnight Stay Hotels ({destHotels.length})
-                          </p>
+                        <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                          <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
+                          Hotels ({destHotels.length})
                           {hotelStayDates[dayIndex] && (
-                            <FaCheckCircle className="text-[#00C896] text-[14px]" title="Added to cart" />
+                            <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
                           )}
-                        </div>
-                        <p className="text-[11px] text-gray-400 mb-2">Book your hotel stop here for relaxation.</p>
+                        </p>
                         {destHotels.slice(0, 2).map((h) => (
-                          <p key={h._id} className="text-xs text-gray-300 truncate">• {h.hotelName}</p>
+                          <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
                         ))}
                         {destHotels.length > 2 && (
-                          <p className="text-xs text-[#00C896] mt-1 font-medium">+{destHotels.length - 2} more hotels available</p>
+                          <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
                         )}
                       </div>
                     ) : (
-                      <div className="bg-[#253745]/40 rounded-xl p-4 text-right border border-white/5">
-                        <p className="text-xs text-gray-400 italic">Same-day transit stop</p>
-                        <p className="text-xs text-[#00C896] font-medium mt-1">Ready for next destination $\rightarrow$</p>
-                      </div>
+                      <p className="text-xs text-gray-500 italic md:text-right">
+                        Same-day stop — continuing to the next destination
+                      </p>
                     )}
                   </div>
                 </React.Fragment>
@@ -1505,49 +1516,49 @@ const TourPreview = () => {
         </div>
 
         {totalCartItems > 0 && (
-          <div className="tour-preview-cart-anim mt-10 bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2.5 mb-4">
-              <FaShoppingCart className="text-[#00C896]" /> Your Booking Cart ({totalCartItems})
+          <div className="tour-preview-cart-anim mt-10 bg-[#253745] rounded-xl p-5">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+              <FaShoppingCart className="text-[#00C896]" /> Your Cart
             </h3>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {cart.guides.map((item) => (
-                <div key={item.cartId} className="flex justify-between items-center bg-[#253745] rounded-xl px-4 py-3 gap-3 border border-white/5">
+                <div key={item.cartId} className="flex justify-between items-center bg-[#1a2530] rounded-lg px-3 py-2 gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">Guide — {item.displayName}</p>
+                    <p className="text-sm text-white truncate">Guide — {item.displayName}</p>
                     <p className="text-xs text-gray-400">{item.date} · {item.quantity} day(s) · {item.numberOfGuests} guest(s)</p>
                   </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <span className="text-sm text-[#00C896] font-bold">{item.currency} {item.totalPrice.toLocaleString()}</span>
-                    <button onClick={() => removeGuideFromCart(item.cartId)} className="text-gray-400 hover:text-red-400 transition-colors p-1.5" title="Remove">
-                      <FaTrash size={13} />
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-sm text-[#00C896] font-semibold">{item.currency} {item.totalPrice.toLocaleString()}</span>
+                    <button onClick={() => removeGuideFromCart(item.cartId)} className="text-gray-400 hover:text-red-400" title="Remove">
+                      <FaTrash size={12} />
                     </button>
                   </div>
                 </div>
               ))}
               {cart.transports.map((item) => (
-                <div key={item.cartId} className="flex justify-between items-center bg-[#253745] rounded-xl px-4 py-3 gap-3 border border-white/5">
+                <div key={item.cartId} className="flex justify-between items-center bg-[#1a2530] rounded-lg px-3 py-2 gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">Vehicle — {item.displayName}</p>
+                    <p className="text-sm text-white truncate">Vehicle — {item.displayName}</p>
                     <p className="text-xs text-gray-400">{item.pickupDate} → {item.returnDate} · {item.numberOfGuests} pax</p>
                   </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <span className="text-sm text-[#00C896] font-bold">LKR {item.totalPrice.toLocaleString()}</span>
-                    <button onClick={() => removeTransportFromCart(item.cartId)} className="text-gray-400 hover:text-red-400 transition-colors p-1.5" title="Remove">
-                      <FaTrash size={13} />
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-sm text-[#00C896] font-semibold">LKR {item.totalPrice.toLocaleString()}</span>
+                    <button onClick={() => removeTransportFromCart(item.cartId)} className="text-gray-400 hover:text-red-400" title="Remove">
+                      <FaTrash size={12} />
                     </button>
                   </div>
                 </div>
               ))}
               {cart.hotels.map((item) => (
-                <div key={item.cartId} className="flex justify-between items-center bg-[#253745] rounded-xl px-4 py-3 gap-3 border border-white/5">
+                <div key={item.cartId} className="flex justify-between items-center bg-[#1a2530] rounded-lg px-3 py-2 gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">Hotel — {item.displayName}</p>
+                    <p className="text-sm text-white truncate">Hotel — {item.displayName}</p>
                     <p className="text-xs text-gray-400">{item.checkInDate} → {item.checkOutDate} · {item.numberOfGuests} guest(s)</p>
                   </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <span className="text-sm text-[#00C896] font-bold">LKR {item.totalPrice.toLocaleString()}</span>
-                    <button onClick={() => removeHotelFromCart(item.cartId)} className="text-gray-400 hover:text-red-400 transition-colors p-1.5" title="Remove">
-                      <FaTrash size={13} />
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-sm text-[#00C896] font-semibold">LKR {item.totalPrice.toLocaleString()}</span>
+                    <button onClick={() => removeHotelFromCart(item.cartId)} className="text-gray-400 hover:text-red-400" title="Remove">
+                      <FaTrash size={12} />
                     </button>
                   </div>
                 </div>
@@ -1556,16 +1567,16 @@ const TourPreview = () => {
           </div>
         )}
 
-        <div className="tour-preview-budget-anim mt-6 bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xl">
+        <div className="tour-preview-budget-anim mt-6 bg-[#253745] rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h3 className="text-xl font-bold text-white">Estimated Trip Budget</h3>
-            <p className="text-xs text-gray-400 mt-1">Calculated based on your selected cart items</p>
+            <h3 className="text-lg font-semibold text-white">Estimated Trip Budget</h3>
+            <p className="text-xs text-gray-400 mt-1">Based on items in your cart</p>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-3xl font-extrabold text-[#00C896]">
+            <span className="text-2xl font-bold text-[#00C896]">
               LKR {(guideBudget + transportBudget + hotelBudget).toLocaleString()}
             </span>
-            <div className="text-xs text-gray-400 mt-1.5 flex gap-4 flex-wrap justify-end font-medium">
+            <div className="text-xs text-gray-400 mt-1 flex gap-3 flex-wrap justify-end">
               <span>Guides: LKR {guideBudget.toLocaleString()}</span>
               <span>Hotels: LKR {hotelBudget.toLocaleString()}</span>
               <span>Transport: LKR {transportBudget.toLocaleString()}</span>
@@ -1573,62 +1584,62 @@ const TourPreview = () => {
           </div>
         </div>
 
-        <div className="tour-preview-cta-anim mt-8">
+        <div className="tour-preview-cta-anim">
           {startTourError && (
-            <p className="text-sm text-red-400 mb-3">{startTourError}</p>
+            <p className="text-sm text-red-400 mt-3">{startTourError}</p>
           )}
           <button
             onClick={handleStartTour}
             disabled={startingTour}
-            className="w-full sm:w-auto flex items-center justify-center gap-2.5 bg-[#00C896] text-[#11212D] font-bold px-10 py-3.5 rounded-full hover:bg-[#00b386] transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-base"
+            className="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold px-8 py-3 rounded-full hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaPlay size={14} />
-            {startingTour ? "Starting Tour..." : totalCartItems === 0 ? "Start Tour (no bookings yet)" : "Start Tour Now"}
+            <FaPlay size={12} />
+            {startingTour ? "Starting Tour..." : totalCartItems === 0 ? "Start Tour (no bookings)" : "Start Tour"}
           </button>
 
           {totalCartItems === 0 && !startingTour && (
-            <p className="text-xs text-gray-500 mt-2.5">
-              No guide, hotel or vehicle added yet — don't worry, you can start the tour and book them anytime later!
+            <p className="text-xs text-gray-500 mt-2">
+              No guide, hotel or vehicle added yet — that's fine, you can start the tour and add these anytime later.
             </p>
           )}
         </div>
 
         {activeGuideModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4" onClick={closeModal}>
-            <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeModal}>
+            <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-[#00C896]">
-                  {modalView === "list" ? `Guides — ${activeGuideModal.location}` : "Add Guide to Cart"}
+                <h3 className="text-lg font-semibold text-[#00C896]">
+                  {modalView === "list" ? `Guides — ${activeGuideModal.location}` : "Add a Guide to Cart"}
                 </h3>
-                <button onClick={closeModal} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                <button onClick={closeModal} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
               </div>
 
               {modalView === "list" && (
                 <div className="flex flex-col gap-3">
                   {activeGuideModal.guides.map((g) => (
-                    <div key={g._id} className="bg-[#253745] border border-white/5 rounded-2xl p-3.5 flex items-center gap-3.5">
+                    <div key={g._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
                       <img
                         src={g.profilePic || "/guide_placeholder.jpg"}
                         alt={`${g.firstName} ${g.lastName}`}
-                        className="w-14 h-14 rounded-xl object-cover flex-shrink-0 border border-white/10"
+                        className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-white font-bold text-sm flex items-center gap-1 min-w-0">
+                          <h4 className="text-white font-semibold text-sm flex items-center gap-1 min-w-0">
                             <span className="truncate min-w-0 flex-1">{g.firstName} {g.lastName}</span>
                             {bookedGuideIds.has(g._id) && (
                               <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
                             )}
                           </h4>
-                          <span className="text-[10px] text-[#00C896] bg-[#00C896]/10 px-2.5 py-0.5 rounded-full whitespace-nowrap font-medium">
-                            {g.yearsOfExperience}+ yrs exp
+                          <span className="text-[10px] text-[#00C896] bg-[#00C896]/10 px-[8px] py-[2px] rounded-full whitespace-nowrap">
+                            {g.yearsOfExperience}+ yrs
                           </span>
                         </div>
-                        <div className="flex items-center gap-1 text-gray-400 text-xs mt-1">
-                          <FaMapMarkerAlt className="text-[#00C896] text-xs" />
+                        <div className="flex items-center gap-1 text-gray-400 text-[11px] mt-[4px]">
+                          <FaMapMarkerAlt className="text-[#00C896] text-[12px]" />
                           <span className="truncate">{g.district}</span>
                         </div>
-                        <p className="text-[#00C896] font-bold text-xs mt-1">{g.currency} {g.pricePerDay}/day</p>
+                        <p className="text-[#00C896] font-bold text-[13px] mt-[4px]">{g.currency} {g.pricePerDay}/day</p>
                       </div>
                       <button
                         onClick={() => {
@@ -1642,7 +1653,7 @@ const TourPreview = () => {
                           });
                           setModalView("book");
                         }}
-                        className="border border-[#00C896] text-[#00C896] px-4 py-2 rounded-full text-xs font-semibold hover:bg-[#00C896] hover:text-[#11212D] transition-all flex-shrink-0"
+                        className="border border-[#00C896] text-[#00C896] px-[14px] py-[7px] rounded-full text-[12px] hover:bg-[#00C896] hover:text-white transition-all duration-300 flex-shrink-0"
                       >
                         Book
                       </button>
@@ -1655,21 +1666,21 @@ const TourPreview = () => {
                 <div>
                   <button
                     onClick={() => { setModalView("list"); setShowPhoneNumber(false); }}
-                    className="text-xs text-gray-400 mb-3 hover:text-white"
+                    className="text-xs text-gray-400 mb-3"
                   >
-                    ← Back to guides list
+                    ← Back to guides
                   </button>
 
-                  <div className="flex items-center gap-3.5 mb-4 relative bg-[#253745] p-3.5 rounded-xl border border-white/5">
-                    <img src={selectedGuide.profilePic} className="w-12 h-12 rounded-full object-cover border border-white/10" />
+                  <div className="flex items-center gap-3 mb-4 relative">
+                    <img src={selectedGuide.profilePic} className="w-12 h-12 rounded-full object-cover" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-white">{selectedGuide.firstName} {selectedGuide.lastName}</p>
-                      <p className="text-xs text-gray-400">{selectedGuide.yearsOfExperience} years experience</p>
+                      <p className="font-medium">{selectedGuide.firstName} {selectedGuide.lastName}</p>
+                      <p className="text-xs text-gray-400">{selectedGuide.yearsOfExperience} yrs experience</p>
                     </div>
                     <button
                       onClick={() => setShowPhoneNumber((prev) => !prev)}
                       title="Show phone number"
-                      className="w-9 h-9 flex items-center justify-center rounded-full border border-[#00C896] text-[#00C896] hover:bg-[#00C896] hover:text-[#11212D] transition-colors flex-shrink-0"
+                      className="w-9 h-9 flex items-center justify-center rounded-full border border-[#00C896] text-[#00C896] hover:bg-[#00C896] hover:text-white transition-colors flex-shrink-0"
                     >
                       <FaPhoneAlt size={13} />
                     </button>
@@ -1677,21 +1688,22 @@ const TourPreview = () => {
                     {showPhoneNumber && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setShowPhoneNumber(false)} />
-                        <div className="absolute right-0 top-14 z-50 bg-[#1a2530] border border-[#00C896]/30 rounded-xl shadow-2xl p-3.5 w-56">
+                        <div className="absolute right-0 top-11 z-50 bg-[#1a2530] border border-[#00C896]/30 rounded-lg shadow-lg p-3 w-52">
                           <p className="text-[11px] text-gray-400 mb-2">{selectedGuide.firstName}'s mobile number</p>
                           <a
                             href={`tel:${selectedGuide.mobile}`}
-                            className="flex items-center justify-center gap-2 bg-[#11212D] rounded-lg py-2.5 text-sm text-[#00C896] font-bold hover:bg-[#00C896]/10 transition-colors"
+                            className="flex items-center justify-center gap-2 bg-[#11212D] rounded-md py-2 text-sm text-[#00C896] font-medium hover:bg-[#00C896]/10 transition-colors"
                           >
-                            <FaPhoneAlt size={12} />
+                            <FaPhoneAlt size={11} />
                             {selectedGuide.mobile}
                           </a>
+                          <p className="text-[10px] text-gray-500 mt-1.5 text-center">Tap number to call</p>
                         </div>
                       </>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3.5">
+                  <div className="flex flex-col gap-3">
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Date</label>
                       <input
@@ -1701,13 +1713,21 @@ const TourPreview = () => {
                           if (!tripStartDate) setBookingForm({ ...bookingForm, date: e.target.value });
                         }}
                         readOnly={!!tripStartDate}
+                        onKeyDown={(e) => {
+                          if (tripStartDate) e.preventDefault();
+                        }}
                         style={{ colorScheme: "dark" }}
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-sm outline-none text-white ${
+                        className={`w-full rounded-md px-3 py-2 text-sm outline-none text-white ${
                           tripStartDate
-                            ? "bg-[#253745] border border-white/5 cursor-not-allowed opacity-80"
-                            : "bg-[#253745] border border-white/10"
+                            ? "bg-[#1a2530] border border-white/5 cursor-not-allowed"
+                            : "bg-[#253745]"
                         }`}
                       />
+                      {tripStartDate && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Locked to your trip start date. Go back to the Tour Planner page to change it.
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -1719,8 +1739,9 @@ const TourPreview = () => {
                         min="1"
                         value={bookingForm.quantity}
                         onChange={(e) => setBookingForm({ ...bookingForm, quantity: Number(e.target.value) })}
-                        className="w-full bg-[#253745] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm outline-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none"
                       />
+                      <p className="text-xs text-gray-500 mt-1">Pre-filled based on your {tripDays}-day trip — edit if needed.</p>
                     </div>
 
                     <div>
@@ -1734,12 +1755,25 @@ const TourPreview = () => {
                           if (!tripGuestCount) setBookingForm({ ...bookingForm, numberOfGuests: Number(e.target.value) });
                         }}
                         readOnly={!!tripGuestCount}
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-sm outline-none text-white ${
+                        onKeyDown={(e) => {
+                          if (tripGuestCount) e.preventDefault();
+                        }}
+                        className={`w-full rounded-md px-3 py-2 text-sm outline-none text-white ${
                           tripGuestCount
-                            ? "bg-[#253745] border border-white/5 cursor-not-allowed opacity-80"
-                            : "bg-[#253745] border border-white/10"
+                            ? "bg-[#1a2530] border border-white/5 cursor-not-allowed"
+                            : "bg-[#253745]"
                         }`}
                       />
+                      {tripGuestCount && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Locked to your trip guest count. Go back to the Tour Planner page to change it.
+                        </p>
+                      )}
+                      {bookingForm.numberOfGuests > selectedGuide.maximumGuests && (
+                        <p className="text-xs text-red-400 mt-1">
+                          Exceeds guide's maximum capacity. Please reduce the number of guests.
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -1748,25 +1782,25 @@ const TourPreview = () => {
                         value={bookingForm.message}
                         onChange={(e) => setBookingForm({ ...bookingForm, message: e.target.value })}
                         rows={2}
-                        className="w-full bg-[#253745] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm outline-none resize-none text-white"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none resize-none"
                       />
                     </div>
 
-                    <div className="flex justify-between items-center pt-3 border-t border-white/10">
-                      <span className="text-sm text-gray-400">Total Price</span>
-                      <span className="text-xl font-extrabold text-[#00C896]">
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                      <span className="text-sm text-gray-400">Total</span>
+                      <span className="text-lg font-semibold text-[#00C896]">
                         {selectedGuide.currency} {totalPrice.toLocaleString()}
                       </span>
                     </div>
                     {bookingError && (
-                      <p className="text-xs text-red-400">{bookingError}</p>
+                      <p className="text-xs text-red-400 -mt-1">{bookingError}</p>
                     )}
                     <button
                         onClick={handleAddGuideToCart}
                         disabled={checkingGuideAvailability || !bookingForm.date || bookingForm.numberOfGuests > selectedGuide.maximumGuests}
-                        className="w-full bg-[#00C896] text-[#11212D] font-bold py-3 rounded-xl hover:bg-[#00b386] transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm mt-1"
+                        className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {checkingGuideAvailability ? "Checking availability..." : "Add Guide to Cart"}
+                        {checkingGuideAvailability ? "Checking availability..." : "Add to Bookings"}
                     </button>
                   </div>
                 </div>
@@ -1776,27 +1810,27 @@ const TourPreview = () => {
         )}
 
         {activeTransportModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4" onClick={closeTransportModal}>
-            <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeTransportModal}>
+            <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-[#00C896]">
+                <h3 className="text-lg font-semibold text-[#00C896]">
                   {transportModalView === "list" ? `Transport — ${activeTransportModal.location}` : "Book Vehicle"}
                 </h3>
-                <button onClick={closeTransportModal} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                <button onClick={closeTransportModal} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
               </div>
 
               {transportModalView === "list" && (
                 <div className="flex flex-col gap-3">
                   {activeTransportModal.transports.map((t) => (
-                    <div key={t._id} className="bg-[#253745] border border-white/5 rounded-2xl p-4 flex items-center gap-3.5">
+                    <div key={t._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-white font-bold text-sm truncate">{t.vehicleBrand} {t.vehicleModel}</h4>
+                          <h4 className="text-white font-semibold text-sm truncate">{t.vehicleBrand} {t.vehicleModel}</h4>
                           {bookedTransportIds.has(t._id) && (
                             <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added to cart" />
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">Passenger Capacity: {t.passengerCapacity} seats</p>
+                        <p className="text-xs text-gray-400 mt-1">Capacity: {t.passengerCapacity} passengers</p>
                       </div>
                       <button
                         onClick={() => {
@@ -1804,7 +1838,7 @@ const TourPreview = () => {
                           setTransportModalView("book");
                           fetchTransportEstimate(t._id);
                         }}
-                        className="border border-[#00C896] text-[#00C896] px-4 py-2 rounded-full text-xs font-semibold hover:bg-[#00C896] hover:text-[#11212D] transition-all flex-shrink-0"
+                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
                       >
                         Book
                       </button>
@@ -1815,12 +1849,12 @@ const TourPreview = () => {
 
               {transportModalView === "book" && selectedTransport && (
                 <div>
-                  <button onClick={() => setTransportModalView("list")} className="text-xs text-gray-400 mb-3 hover:text-white">
-                    ← Back to vehicles list
+                  <button onClick={() => setTransportModalView("list")} className="text-xs text-gray-400 mb-3">
+                    ← Back to vehicles
                   </button>
-                  <p className="text-sm font-bold mb-4 text-white bg-[#253745] p-3 rounded-xl border border-white/5">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
+                  <p className="text-sm font-semibold mb-3">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
 
-                  <div className="flex flex-col gap-3.5">
+                  <div className="flex flex-col gap-3">
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Pickup Date</label>
                       <input
@@ -1828,7 +1862,7 @@ const TourPreview = () => {
                         value={transportBookingForm.pickupDate}
                         onChange={(e) => setTransportBookingForm({ ...transportBookingForm, pickupDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
                     <div>
@@ -1838,7 +1872,7 @@ const TourPreview = () => {
                         value={transportBookingForm.returnDate}
                         onChange={(e) => setTransportBookingForm({ ...transportBookingForm, returnDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
                     <div>
@@ -1849,7 +1883,7 @@ const TourPreview = () => {
                         max={selectedTransport.passengerCapacity}
                         value={transportBookingForm.numberOfGuests}
                         onChange={(e) => setTransportBookingForm({ ...transportBookingForm, numberOfGuests: Number(e.target.value) })}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
                     <div>
@@ -1859,13 +1893,13 @@ const TourPreview = () => {
                         min="0"
                         value={transportBookingForm.bags}
                         onChange={(e) => setTransportBookingForm({ ...transportBookingForm, bags: Number(e.target.value) })}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
 
-                    <div className="bg-[#253745] border border-white/5 rounded-xl p-3.5 flex justify-between items-center text-sm">
-                      <span className="text-gray-400">Estimated Total Price</span>
-                      <span className="font-bold text-[#00C896] text-base">
+                    <div className="bg-[#1a2530] rounded-lg p-3 flex justify-between items-center text-sm">
+                      <span className="text-gray-400">Estimated Total</span>
+                      <span className="font-bold text-[#00C896]">
                         {estimateLoading ? "Calculating..." : estimatedPrice != null ? `LKR ${estimatedPrice.toLocaleString()}` : "—"}
                       </span>
                     </div>
@@ -1877,7 +1911,7 @@ const TourPreview = () => {
                     <button
                       onClick={handleAddTransportToCart}
                       disabled={estimateLoading || estimatedPrice == null}
-                      className="w-full bg-[#00C896] text-[#11212D] font-bold py-3 rounded-xl hover:bg-[#00b386] transition-all shadow-lg disabled:opacity-50 text-sm mt-1"
+                      className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] disabled:opacity-50"
                     >
                       Add Vehicle to Cart
                     </button>
@@ -1889,22 +1923,22 @@ const TourPreview = () => {
         )}
 
         {activeHotelModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-4" onClick={closeHotelModal}>
-            <div className="bg-[#1B2B34] border border-[#00C896]/30 rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] px-4" onClick={closeHotelModal}>
+            <div className="bg-[#1B2B34] rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-[#00C896]">
-                  {hotelModalView === "list" ? `Hotels — ${activeHotelModal.location}` : hotelModalView === "rooms" ? "Select Room" : "Book Room"}
+                <h3 className="text-lg font-semibold text-[#00C896]">
+                  {hotelModalView === "list" ? `Hotels — ${activeHotelModal.location}` : "Select Room"}
                 </h3>
-                <button onClick={closeHotelModal} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                <button onClick={closeHotelModal} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
               </div>
 
               {hotelModalView === "list" && (
                 <div className="flex flex-col gap-3">
                   {activeHotelModal.hotels.map((h) => (
-                    <div key={h._id} className="bg-[#253745] border border-white/5 rounded-2xl p-4 flex items-center gap-3.5">
+                    <div key={h._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-white font-bold text-sm truncate">{h.hotelName}</h4>
+                          <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
                           {bookedRoomIds.size > 0 && (
                             <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added" />
                           )}
@@ -1917,7 +1951,7 @@ const TourPreview = () => {
                           setHotelModalView("rooms");
                           fetchRoomsForHotel(h._id);
                         }}
-                        className="border border-[#00C896] text-[#00C896] px-4 py-2 rounded-full text-xs font-semibold hover:bg-[#00C896] hover:text-[#11212D] transition-all flex-shrink-0"
+                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
                       >
                         Rooms
                       </button>
@@ -1928,15 +1962,15 @@ const TourPreview = () => {
 
               {hotelModalView === "rooms" && selectedHotel && (
                 <div>
-                  <button onClick={() => setHotelModalView("list")} className="text-xs text-gray-400 mb-3 hover:text-white">
-                    ← Back to hotels list
+                  <button onClick={() => setHotelModalView("list")} className="text-xs text-gray-400 mb-3">
+                    ← Back to hotels
                   </button>
-                  <p className="text-sm font-bold mb-3 text-white">{selectedHotel.hotelName} — Available Rooms</p>
+                  <p className="text-sm font-semibold mb-3">{selectedHotel.hotelName} — Rooms</p>
 
                   {roomsLoading ? (
-                    <p className="text-xs text-gray-400 text-center py-6">Loading rooms...</p>
+                    <p className="text-xs text-gray-400 text-center py-4">Loading rooms...</p>
                   ) : hotelRooms.length === 0 ? (
-                    <p className="text-xs text-gray-400 text-center py-6">No rooms available for this hotel.</p>
+                    <p className="text-xs text-gray-400 text-center py-4">No rooms available for this hotel.</p>
                   ) : (
                     <div className="flex flex-col gap-3">
                       {hotelRooms.map((room) => (
@@ -1952,13 +1986,13 @@ const TourPreview = () => {
                               numberOfGuests: tripGuestCount || 1,
                             });
                           }}
-                          className="bg-[#253745] border border-white/5 rounded-2xl p-4 cursor-pointer hover:border-[#00C896]/50 transition-all flex justify-between items-center shadow-md"
+                          className="bg-[#1a2530] rounded-xl p-3 cursor-pointer hover:bg-[#2f4655] transition-colors flex justify-between items-center"
                         >
                           <div>
-                            <p className="text-sm font-bold text-white">{room.roomType}</p>
+                            <p className="text-sm font-medium text-white">{room.roomType}</p>
                             <p className="text-xs text-gray-400 mt-0.5">Capacity: {room.capacity} guests</p>
                           </div>
-                          <span className="text-sm font-extrabold text-[#00C896]">LKR {room.pricePerNight?.toLocaleString()}/night</span>
+                          <span className="text-sm font-bold text-[#00C896]">LKR {room.pricePerNight?.toLocaleString()}/night</span>
                         </div>
                       ))}
                     </div>
@@ -1968,12 +2002,12 @@ const TourPreview = () => {
 
               {hotelModalView === "book" && selectedRoom && (
                 <div>
-                  <button onClick={() => setHotelModalView("rooms")} className="text-xs text-gray-400 mb-3 hover:text-white">
-                    ← Back to rooms list
+                  <button onClick={() => setHotelModalView("rooms")} className="text-xs text-gray-400 mb-3">
+                    ← Back to rooms
                   </button>
-                  <p className="text-sm font-bold mb-4 text-white bg-[#253745] p-3 rounded-xl border border-white/5">{selectedRoom.roomType} ({selectedHotel.hotelName})</p>
+                  <p className="text-sm font-semibold mb-3">{selectedRoom.roomType} ({selectedHotel.hotelName})</p>
 
-                  <div className="flex flex-col gap-3.5">
+                  <div className="flex flex-col gap-3">
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Check-in Date</label>
                       <input
@@ -1981,7 +2015,7 @@ const TourPreview = () => {
                         value={hotelBookingForm.checkInDate}
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, checkInDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
                     <div>
@@ -1991,7 +2025,7 @@ const TourPreview = () => {
                         value={hotelBookingForm.checkOutDate}
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, checkOutDate: e.target.value })}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
                     <div>
@@ -2002,13 +2036,13 @@ const TourPreview = () => {
                         max={selectedRoom.capacity}
                         value={hotelBookingForm.numberOfGuests}
                         onChange={(e) => setHotelBookingForm({ ...hotelBookingForm, numberOfGuests: Number(e.target.value) })}
-                        className="w-full bg-[#253745] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
                       />
                     </div>
 
-                    <div className="bg-[#253745] border border-white/5 rounded-xl p-3.5 flex justify-between items-center text-sm">
+                    <div className="bg-[#1a2530] rounded-lg p-3 flex justify-between items-center text-sm">
                       <span className="text-gray-400">{hotelNights} night(s) total</span>
-                      <span className="font-extrabold text-[#00C896] text-base">LKR {hotelTotalPrice.toLocaleString()}</span>
+                      <span className="font-bold text-[#00C896]">LKR {hotelTotalPrice.toLocaleString()}</span>
                     </div>
 
                     {hotelBookingError && (
@@ -2017,7 +2051,7 @@ const TourPreview = () => {
 
                     <button
                       onClick={handleAddHotelToCart}
-                      className="w-full bg-[#00C896] text-[#11212D] font-bold py-3 rounded-xl hover:bg-[#00b386] transition-all shadow-lg text-sm mt-1"
+                      className="w-full bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386]"
                     >
                       Add Room to Cart
                     </button>
