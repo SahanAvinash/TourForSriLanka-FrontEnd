@@ -422,6 +422,12 @@ const TourPage = () => {
   };
 
   const handleDownloadPdf = (tour) => {
+    console.log("--- PDF DEBUG ---");
+    console.log("Tour Object:", tour);
+    console.log("Guide Details:", tour?.guideBookingDetails);
+    console.log("Hotel Details:", tour?.hotelBookingDetails);
+    console.log("Transport Details:", tour?.transportBookingDetails);
+    console.log("-------------------");
     if (!tour) return;
 
     const doc = new jsPDF();
