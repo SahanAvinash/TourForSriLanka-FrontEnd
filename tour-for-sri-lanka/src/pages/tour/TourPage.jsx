@@ -435,6 +435,7 @@ const TourPage = () => {
       .slice(0, 18)
       .toUpperCase();
 
+    // Header Banner
     doc.setFillColor(...accent);
     doc.rect(0, 0, pageWidth, 32, "F");
 
@@ -465,6 +466,7 @@ const TourPage = () => {
 
     y += 10;
 
+    // Overview Box
     const overviewHeight = 30;
     doc.setFillColor(37, 55, 69);
     doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
@@ -509,7 +511,7 @@ const TourPage = () => {
 
     y += overviewHeight + 12;
 
-    // --- DAY BY DAY TRIP ROUTE ---
+    // --- DAY BY DAY TRIP ITINERARY ---
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -568,7 +570,8 @@ const TourPage = () => {
 
     y += 4;
 
-    if (y > 230) {
+    // --- BOOKINGS SECTION (Enhanced Table) ---
+    if (y > 220) {
       doc.addPage();
       y = 20;
     }
@@ -576,52 +579,86 @@ const TourPage = () => {
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
-    doc.text("Bookings", 14, y);
+    doc.text("Bookings & Requests", 14, y);
 
-    y += 6;
+    y += 4;
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(60, 60, 60);
+    const bookingRows = [];
 
     if (tour.selectedGuide) {
-      doc.text(
-        `Guide: ${tour.selectedGuide.firstName || ""} ${
-          tour.selectedGuide.lastName || ""
-        }`.trim(),
-        14,
-        y
-      );
-      y += 7;
+      const guideName = `${tour.selectedGuide.firstName || ""} ${tour.selectedGuide.lastName || ""}`.trim();
+      const guideMobile = tour.selectedGuide.mobile ? `Mobile: ${tour.selectedGuide.mobile}` : "";
+      const guideDetails = tour.guideBookingDetails ? `Notes: ${tour.guideBookingDetails}` : "";
+      
+      const detailsText = [guideName, guideMobile, guideDetails].filter(Boolean).join("\n");
+      const gBudget = tour.guideBudget ? `LKR ${Number(tour.guideBudget).toLocaleString()}` : "-";
+
+      bookingRows.push(["Tour Guide", detailsText, gBudget]);
     }
 
     if (tour.selectedHotels?.length > 0) {
-      tour.selectedHotels.forEach((hotel) => {
-        doc.text(`Hotel: ${hotel.hotelName || "-"} (${hotel.location || "-"})`, 14, y);
-        y += 7;
+      tour.selectedHotels.forEach((hotel, idx) => {
+        const hName = hotel.hotelName || "-";
+        const hLoc = hotel.location ? `Location: ${hotel.location}` : "";
+        const hDetails = tour.hotelBookingDetails ? `Notes: ${tour.hotelBookingDetails}` : "";
+        
+        const detailsText = [`Hotel: ${hName}`, hLoc, hDetails].filter(Boolean).join("\n");
+        const hBudget = tour.hotelBudget ? `LKR ${Number(tour.hotelBudget).toLocaleString()}` : "-";
+
+        bookingRows.push([
+          `Hotel ${tour.selectedHotels.length > 1 ? `#${idx + 1}` : ""}`.trim(),
+          detailsText,
+          hBudget
+        ]);
       });
     }
 
     if (tour.selectedTransport) {
-      doc.text(
-        `Vehicle: ${tour.selectedTransport.vehicleBrand || ""} ${
-          tour.selectedTransport.vehicleModel || ""
-        }`.trim(),
-        14,
-        y
-      );
-      y += 7;
+      const vName = `${tour.selectedTransport.vehicleBrand || ""} ${tour.selectedTransport.vehicleModel || ""}`.trim();
+      const regNo = tour.selectedTransport.registrationNo ? `Reg No: ${tour.selectedTransport.registrationNo}` : "";
+      const tDetails = tour.transportBookingDetails ? `Notes: ${tour.transportBookingDetails}` : "";
+
+      const detailsText = [`Vehicle: ${vName}`, regNo, tDetails].filter(Boolean).join("\n");
+      const tBudget = tour.transportBudget ? `LKR ${Number(tour.transportBudget).toLocaleString()}` : "-";
+
+      bookingRows.push(["Transport / Vehicle", detailsText, tBudget]);
     }
 
-    if (
-      !tour.selectedGuide &&
-      !tour.selectedHotels?.length &&
-      !tour.selectedTransport
-    ) {
-      doc.text("No guide, hotel or vehicle booked yet.", 14, y);
-      y += 7;
+    if (bookingRows.length > 0) {
+      autoTable(doc, {
+        startY: y,
+        head: [["Category", "Booking Details / Request Notes", "Budget"]],
+        body: bookingRows,
+        theme: "striped",
+        headStyles: {
+          fillColor: accent,
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 9.5,
+          cellPadding: 4,
+        },
+        columnStyles: {
+          0: { cellWidth: 45 },
+          1: { cellWidth: 95 },
+          2: { cellWidth: 42 },
+        },
+        margin: {
+          left: 14,
+          right: 14,
+        },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    } else {
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      doc.text("No guide, hotel or vehicle booked yet.", 14, y + 6);
+      y += 15;
     }
 
+    // Footer page numbers & notes
     const pageCount = doc.internal.getNumberOfPages();
 
     for (let page = 1; page <= pageCount; page++) {
