@@ -577,6 +577,7 @@ const TourPage = () => {
     y += 4;
 
     // --- BOOKINGS & REQUESTS SECTION (Fixed with fallback support) ---
+    // --- BOOKINGS & REQUESTS SECTION ---
     if (y > 220) {
       doc.addPage();
       y = 20;
@@ -591,52 +592,44 @@ const TourPage = () => {
 
     const bookingRows = [];
 
-    // 1. Guide Booking Details
-    const guideData = tour.guideBookingDetails || tour.selectedGuide;
-    if (guideData && (guideData.name || guideData.firstName || tour.guideBudget > 0)) {
-      const gName = guideData.name 
-        ? `Guide Name: ${guideData.name}` 
-        : (guideData.firstName ? `Guide Name: ${guideData.firstName} ${guideData.lastName || ""}` : "");
-      const gMobile = guideData.mobile || guideData.phone ? `Mobile: ${guideData.mobile || guideData.phone}` : "";
-      const gDate = guideData.date ? `Date: ${guideData.date} (${guideData.quantity || 1} days, ${guideData.numberOfGuests || 1} Guests)` : "";
-      
-      const detailsText = [gName, gMobile, gDate].filter(Boolean).join("\n") || "Guide selected";
-      const gPrice = guideData.totalPrice || tour.guideBudget;
-      const gBudget = gPrice ? `LKR ${Number(gPrice).toLocaleString()}` : "-";
+    // 1. Guide Details (Supporting selectedGuide & guideBookingDetails)
+    const guide = tour.selectedGuide || tour.guideBookingDetails;
+    if (guide) {
+      const gName = `Guide Name: ${guide.firstName || ""} ${guide.lastName || ""} ${guide.name || ""}`.trim();
+      const gMobile = guide.mobile || guide.phone ? `Mobile: ${guide.mobile || guide.phone}` : "";
+      const detailsText = [gName, gMobile].filter(Boolean).join("\n") || "Guide booked";
+      const gBudget = guide.totalPrice ? `LKR ${Number(guide.totalPrice).toLocaleString()}` : (tour.guideBudget ? `LKR ${Number(tour.guideBudget).toLocaleString()}` : "-");
 
       bookingRows.push(["Tour Guide", detailsText, gBudget]);
     }
 
-    // 2. Hotel Booking Details
-    const hotelList = tour.hotelBookingDetails || tour.selectedHotels;
-    if (hotelList && hotelList.length > 0) {
-      hotelList.forEach((hotel, idx) => {
-        const hName = hotel.hotelName || hotel.name ? `Hotel: ${hotel.hotelName || hotel.name}` : "";
+    // 2. Hotel Details (Supporting selectedHotels & hotelBookingDetails)
+    const hotels = tour.selectedHotels || tour.hotelBookingDetails;
+    if (hotels && hotels.length > 0) {
+      hotels.forEach((hotel, idx) => {
+        const hName = `Hotel: ${hotel.hotelName || hotel.name || ""}`;
         const hLoc = hotel.location ? `Location: ${hotel.location}` : "";
         const hRoom = hotel.roomType ? `Room Type: ${hotel.roomType}` : "";
-        const hDates = (hotel.checkInDate && hotel.checkOutDate) ? `Stay: ${hotel.checkInDate} to ${hotel.checkOutDate}` : "";
         
-        const detailsText = [hName, hLoc, hRoom, hDates].filter(Boolean).join("\n") || "Hotel selected";
+        const detailsText = [hName, hLoc, hRoom].filter(Boolean).join("\n") || "Hotel booked";
         const hBudget = hotel.totalPrice ? `LKR ${Number(hotel.totalPrice).toLocaleString()}` : (tour.hotelBudget ? `LKR ${Number(tour.hotelBudget).toLocaleString()}` : "-");
 
         bookingRows.push([
-          `Hotel ${hotelList.length > 1 ? `#${idx + 1}` : ""}`.trim(),
+          `Hotel ${hotels.length > 1 ? `#${idx + 1}` : ""}`.trim(),
           detailsText,
           hBudget
         ]);
       });
     }
 
-    // 3. Transport Booking Details
-    const transportData = tour.transportBookingDetails || tour.selectedTransport;
-    if (transportData && (transportData.vehicleBrand || transportData.vehicleModel || tour.transportBudget > 0)) {
-      const vName = `Vehicle: ${transportData.vehicleBrand || ""} ${transportData.vehicleModel || ""}`.trim();
-      const regNo = transportData.registrationNo ? `Reg No: ${transportData.registrationNo}` : "";
-      const tDates = (transportData.pickupDate && transportData.returnDate) ? `Period: ${transportData.pickupDate} to ${transportData.returnDate}` : "";
-      const tGuests = transportData.numberOfGuests ? `Guests: ${transportData.numberOfGuests} | Bags: ${transportData.bags || 0}` : "";
-
-      const detailsText = [vName, regNo, tDates, tGuests].filter(Boolean).join("\n") || "Transport selected";
-      const tPrice = transportData.totalPrice || tour.transportBudget;
+    // 3. Transport Details (Supporting selectedTransport & transportBookingDetails)
+    const transport = tour.selectedTransport || tour.transportBookingDetails;
+    if (transport) {
+      const vName = `Vehicle: ${transport.vehicleBrand || ""} ${transport.vehicleModel || ""}`.trim();
+      const regNo = transport.registrationNo ? `Reg No: ${transport.registrationNo}` : "";
+      
+      const detailsText = [vName, regNo].filter(Boolean).join("\n") || "Transport booked";
+      const tPrice = transport.totalPrice || tour.transportBudget;
       const tBudget = tPrice ? `LKR ${Number(tPrice).toLocaleString()}` : "-";
 
       bookingRows.push(["Transport / Vehicle", detailsText, tBudget]);
