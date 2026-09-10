@@ -424,9 +424,9 @@ const TourPage = () => {
   const handleDownloadPdf = (tour) => {
     console.log("--- PDF DEBUG ---");
     console.log("Tour Object:", tour);
-    console.log("Guide Details:", tour?.guideBookingDetails);
-    console.log("Hotel Details:", tour?.hotelBookingDetails);
-    console.log("Transport Details:", tour?.transportBookingDetails);
+    console.log("Guide Details:", tour?.guideBookingDetails || tour?.selectedGuide);
+    console.log("Hotel Details:", tour?.hotelBookingDetails || tour?.selectedHotels);
+    console.log("Transport Details:", tour?.transportBookingDetails || tour?.selectedTransport);
     console.log("-------------------");
     if (!tour) return;
 
@@ -576,7 +576,7 @@ const TourPage = () => {
 
     y += 4;
 
-    // --- BOOKINGS & REQUESTS SECTION (Mapped with Schema) ---
+    // --- BOOKINGS & REQUESTS SECTION (Fixed with fallback support) ---
     if (y > 220) {
       doc.addPage();
       y = 20;
@@ -592,32 +592,35 @@ const TourPage = () => {
     const bookingRows = [];
 
     // 1. Guide Booking Details
-    if (tour.guideBookingDetails && (tour.guideBookingDetails.name || tour.guideBudget > 0)) {
-      const g = tour.guideBookingDetails;
-      const gName = g.name ? `Guide Name: ${g.name}` : "";
-      const gMobile = g.mobile ? `Mobile: ${g.mobile}` : "";
-      const gDate = g.date ? `Date: ${g.date} (${g.quantity || 1} days, ${g.numberOfGuests || 1} Guests)` : "";
+    const guideData = tour.guideBookingDetails || tour.selectedGuide;
+    if (guideData && (guideData.name || guideData.firstName || tour.guideBudget > 0)) {
+      const gName = guideData.name 
+        ? `Guide Name: ${guideData.name}` 
+        : (guideData.firstName ? `Guide Name: ${guideData.firstName} ${guideData.lastName || ""}` : "");
+      const gMobile = guideData.mobile || guideData.phone ? `Mobile: ${guideData.mobile || guideData.phone}` : "";
+      const gDate = guideData.date ? `Date: ${guideData.date} (${guideData.quantity || 1} days, ${guideData.numberOfGuests || 1} Guests)` : "";
       
-      const detailsText = [gName, gMobile, gDate].filter(Boolean).join("\n");
-      const gPrice = g.totalPrice || tour.guideBudget;
+      const detailsText = [gName, gMobile, gDate].filter(Boolean).join("\n") || "Guide selected";
+      const gPrice = guideData.totalPrice || tour.guideBudget;
       const gBudget = gPrice ? `LKR ${Number(gPrice).toLocaleString()}` : "-";
 
       bookingRows.push(["Tour Guide", detailsText, gBudget]);
     }
 
-    // 2. Hotel Booking Details (Array)
-    if (tour.hotelBookingDetails && tour.hotelBookingDetails.length > 0) {
-      tour.hotelBookingDetails.forEach((hotel, idx) => {
-        const hName = hotel.hotelName ? `Hotel: ${hotel.hotelName}` : "";
+    // 2. Hotel Booking Details
+    const hotelList = tour.hotelBookingDetails || tour.selectedHotels;
+    if (hotelList && hotelList.length > 0) {
+      hotelList.forEach((hotel, idx) => {
+        const hName = hotel.hotelName || hotel.name ? `Hotel: ${hotel.hotelName || hotel.name}` : "";
         const hLoc = hotel.location ? `Location: ${hotel.location}` : "";
         const hRoom = hotel.roomType ? `Room Type: ${hotel.roomType}` : "";
         const hDates = (hotel.checkInDate && hotel.checkOutDate) ? `Stay: ${hotel.checkInDate} to ${hotel.checkOutDate}` : "";
         
-        const detailsText = [hName, hLoc, hRoom, hDates].filter(Boolean).join("\n");
+        const detailsText = [hName, hLoc, hRoom, hDates].filter(Boolean).join("\n") || "Hotel selected";
         const hBudget = hotel.totalPrice ? `LKR ${Number(hotel.totalPrice).toLocaleString()}` : (tour.hotelBudget ? `LKR ${Number(tour.hotelBudget).toLocaleString()}` : "-");
 
         bookingRows.push([
-          `Hotel ${tour.hotelBookingDetails.length > 1 ? `#${idx + 1}` : ""}`.trim(),
+          `Hotel ${hotelList.length > 1 ? `#${idx + 1}` : ""}`.trim(),
           detailsText,
           hBudget
         ]);
@@ -625,15 +628,15 @@ const TourPage = () => {
     }
 
     // 3. Transport Booking Details
-    if (tour.transportBookingDetails && (tour.transportBookingDetails.vehicleBrand || tour.transportBudget > 0)) {
-      const t = tour.transportBookingDetails;
-      const vName = `Vehicle: ${t.vehicleBrand || ""} ${t.vehicleModel || ""}`.trim();
-      const regNo = t.registrationNo ? `Reg No: ${t.registrationNo}` : "";
-      const tDates = (t.pickupDate && t.returnDate) ? `Period: ${t.pickupDate} to ${t.returnDate}` : "";
-      const tGuests = t.numberOfGuests ? `Guests: ${t.numberOfGuests} | Bags: ${t.bags || 0}` : "";
+    const transportData = tour.transportBookingDetails || tour.selectedTransport;
+    if (transportData && (transportData.vehicleBrand || transportData.vehicleModel || tour.transportBudget > 0)) {
+      const vName = `Vehicle: ${transportData.vehicleBrand || ""} ${transportData.vehicleModel || ""}`.trim();
+      const regNo = transportData.registrationNo ? `Reg No: ${transportData.registrationNo}` : "";
+      const tDates = (transportData.pickupDate && transportData.returnDate) ? `Period: ${transportData.pickupDate} to ${transportData.returnDate}` : "";
+      const tGuests = transportData.numberOfGuests ? `Guests: ${transportData.numberOfGuests} | Bags: ${transportData.bags || 0}` : "";
 
-      const detailsText = [vName, regNo, tDates, tGuests].filter(Boolean).join("\n");
-      const tPrice = t.totalPrice || tour.transportBudget;
+      const detailsText = [vName, regNo, tDates, tGuests].filter(Boolean).join("\n") || "Transport selected";
+      const tPrice = transportData.totalPrice || tour.transportBudget;
       const tBudget = tPrice ? `LKR ${Number(tPrice).toLocaleString()}` : "-";
 
       bookingRows.push(["Transport / Vehicle", detailsText, tBudget]);
