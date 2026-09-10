@@ -2072,20 +2072,28 @@ const TourPreview = () => {
                       <input
                         type="date"
                         value={transportBookingForm.pickupDate}
-                        onChange={(e) => setTransportBookingForm({ ...transportBookingForm, pickupDate: e.target.value })}
+                        readOnly
+                        onKeyDown={(e) => e.preventDefault()}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
+                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none bg-[#1a2530] border border-white/5 cursor-not-allowed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Locked to your trip start date. Go back to the Tour Planner page to change it.
+                      </p>
                     </div>
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Return Date</label>
                       <input
                         type="date"
                         value={transportBookingForm.returnDate}
-                        onChange={(e) => setTransportBookingForm({ ...transportBookingForm, returnDate: e.target.value })}
+                        readOnly
+                        onKeyDown={(e) => e.preventDefault()}
                         style={{ colorScheme: "dark" }}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm text-white outline-none"
+                        className="w-full bg-[#1a2530] rounded-md px-3 py-2 text-sm text-white outline-none border border-white/5 cursor-not-allowed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Locked to your trip end date. Go back to the Tour Planner page to change it.
+                      </p>
                     </div>
                     <div>
                       <label className="text-xs text-gray-400 block mb-1">Passengers (max {selectedTransport.passengerCapacity})</label>
