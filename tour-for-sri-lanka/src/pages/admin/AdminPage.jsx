@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { MdDashboard, MdHotel, MdDirectionsCar, MdPerson, MdMenu, MdClose } from "react-icons/md";
-import { FaSignOutAlt } from "react-icons/fa";
-import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { MdHotel, MdDirectionsCar, MdPerson, MdMenu, MdClose } from "react-icons/md";
+import { FaSignOutAlt, FaMapMarkedAlt, FaLayerGroup } from "react-icons/fa";
+import { Link, Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import AdminHotels from "./AdminHotels";
 import AdminTransport from "./AdminTransport";
 import AdminGuides from "./AdminGuides";
@@ -16,16 +16,15 @@ export default function AdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { path: "/admin", label: "Dashboard", icon: MdDashboard, match: (p) => p === "/admin" },
-    { path: "/admin/tours", label: "Tours", icon: MdDashboard, match: (p) => p.startsWith("/admin/tours") },
+    { path: "/admin/tours", label: "Tours", icon: FaMapMarkedAlt, match: (p) => p.startsWith("/admin/tours") },
     { path: "/admin/hotels", label: "Hotels", icon: MdHotel, match: (p) => p.startsWith("/admin/hotels") },
     { path: "/admin/transport", label: "Transport", icon: MdDirectionsCar, match: (p) => p.startsWith("/admin/transport") },
     { path: "/admin/guides", label: "Guides", icon: MdPerson, match: (p) => p.startsWith("/admin/guides") },
-    { path: "/admin/categories", label: "Categories", icon: MdDashboard, match: (p) => p.startsWith("/admin/categories") },
+    { path: "/admin/categories", label: "Categories", icon: FaLayerGroup, match: (p) => p.startsWith("/admin/categories") },
   ];
 
   const activeNavItem = navItems.find((item) => item.match(location.pathname));
-  const pageTitle = activeNavItem ? activeNavItem.label : "Dashboard";
+  const pageTitle = activeNavItem ? activeNavItem.label : "Tours";
 
   function getLinkClass(isActive) {
     return `admin-nav-item-anim w-[220px] h-[45px] text-[15px] flex items-center rounded-[20px] relative transition-all duration-300 shrink-0 ${
@@ -45,7 +44,6 @@ export default function AdminPage() {
 
   return (
     <div className="w-full h-dvh bg-gradient-to-r from-[#06141B] to-[#253745] overflow-hidden">
-      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -53,13 +51,11 @@ export default function AdminPage() {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`admin-sidebar-anim w-[260px] md:w-[300px] h-dvh bg-[#253745] md:opacity-[80%] fixed md:absolute left-0 top-0 z-50 flex flex-col transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        {/* Scrollable nav section */}
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
           <div className="h-[70px] md:h-[80px] flex items-center justify-between px-6 shrink-0">
             <img src={logo} alt="Tours For Sri Lanka" className="h-10 md:h-12 object-contain"/>
@@ -90,7 +86,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Logout Button - always pinned to bottom, never clipped */}
         <div className="shrink-0 p-6 border-t border-[#4A5C6A]">
           <button
             onClick={handleLogout}
@@ -102,7 +97,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Top Navbar */}
       <div className="admin-navbar-anim md:ml-[300px] h-[70px] md:h-[80px] bg-[#253745] opacity-[80%] flex items-center gap-3 px-4 md:px-8">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -115,9 +109,9 @@ export default function AdminPage() {
         </span>
       </div>
 
-      {/* Main Content */}
       <div className="admin-content-anim md:ml-[300px] w-full md:w-[calc(100vw-300px)] h-[calc(100dvh-70px)] md:h-[calc(100dvh-80px)] p-4 md:p-8 overflow-y-auto">
-        <Routes path="/*">
+        <Routes>
+          <Route path="/" element={<Navigate to="/admin/tours" replace />} />
           <Route path="/tours" element={<AdminTours />} />
           <Route path="/categories" element={<AdminCategories />} />
           <Route path="/categories/:categoryId" element={<AdminCategoryDestinations />} />
