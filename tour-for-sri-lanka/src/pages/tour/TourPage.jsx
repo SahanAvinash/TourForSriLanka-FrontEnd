@@ -586,7 +586,6 @@ const TourPage = () => {
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
-    doc.text("Bookings & Requests", 14, y);
 
     y += 4;
 
