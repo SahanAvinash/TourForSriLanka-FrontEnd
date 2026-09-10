@@ -991,7 +991,7 @@ const TourPage = () => {
       </div>
 
       {showMapPicker && (
-        <MapPickerModal
+        <MapPickerModal 
           initialPosition={
             startLocation
               ? {
