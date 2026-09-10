@@ -42,6 +42,33 @@ const districtOptions = [
   label: district,
 }));
 
+// Escape any regex-special characters in a district name before it goes
+// into a RegExp constructor (defensive — none of the current district
+// names contain special characters, but this keeps it safe).
+const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Match the picked address against districtOptions using whole-word
+// boundaries instead of a plain substring check. A plain
+// address.includes("galle") was wrongly matching "Galle" inside
+// "Tangalle Road" even when the address clearly said "Matara District".
+// We first look for the exact "<District> District" phrase (how
+// Nominatim formats Sri Lankan addresses), then fall back to a
+// whole-word match anywhere else in the address.
+const findDistrictMatch = (address) => {
+  if (!address) return null;
+
+  const strictMatch = districtOptions.find((district) =>
+    new RegExp(`\\b${escapeRegExp(district.value)}\\s+District\\b`, "i").test(address)
+  );
+  if (strictMatch) return strictMatch;
+
+  return (
+    districtOptions.find((district) =>
+      new RegExp(`\\b${escapeRegExp(district.value)}\\b`, "i").test(address)
+    ) || null
+  );
+};
+
 const guestOptions = Array.from({ length: 10 }, (_, index) => index + 1).map(
   (number) => ({
     value: number,
@@ -337,9 +364,7 @@ const TourPage = () => {
   const handleMapConfirm = (location) => {
     setStartLocation(location);
 
-    const matchedDistrict = districtOptions.find((district) =>
-      location.address?.toLowerCase().includes(district.value.toLowerCase())
-    );
+    const matchedDistrict = findDistrictMatch(location.address);
 
     if (matchedDistrict) {
       setStartDistrict(matchedDistrict);
