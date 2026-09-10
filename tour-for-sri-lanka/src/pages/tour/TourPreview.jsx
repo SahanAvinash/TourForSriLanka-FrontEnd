@@ -2034,6 +2034,12 @@ const TourPreview = () => {
                       <button
                         onClick={() => {
                           setSelectedTransport(t);
+                          setTransportBookingForm({
+                            pickupDate: tripStartDate || "",
+                            returnDate: calculateTripEndDate(tripStartDate, tripDays),
+                            numberOfGuests: tripGuestCount || 1,
+                            bags: 0,
+                          });
                           setTransportModalView("book");
                           fetchTransportEstimate(t._id);
                         }}
