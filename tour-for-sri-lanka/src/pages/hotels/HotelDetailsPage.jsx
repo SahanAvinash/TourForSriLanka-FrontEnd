@@ -649,7 +649,7 @@ export default function HotelDetailsPage() {
               <div className="min-w-0 w-full">
                 <div className="flex items-center gap-[8px] sm:gap-[10px]">
                   <h1 className="text-white font-bold text-[20px] sm:text-[23px] md:text-[26px] leading-tight truncate">
-                    {hotel.hotelName}
+                    {hotel.name}
                   </h1>
 
                   {hotel.isApproved && (
@@ -657,6 +657,7 @@ export default function HotelDetailsPage() {
                       className="text-[#00C896] text-[16px] sm:text-[18px] shrink-0"
                       title="Verified Hotel"
                     />
+                    
                   )}
                 </div>
 
