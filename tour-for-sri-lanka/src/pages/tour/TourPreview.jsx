@@ -1415,7 +1415,9 @@ const TourPreview = () => {
               const startRec = getRecommendationForLocation(startDistrict);
               const startGuides = startRec?.guides || [];
               const startHotels = startRec?.hotels || [];
-              const startTransports = startRec?.transports || [];
+              const startTransports = (startRec?.transports || []).filter(
+                (t) => !tripGuestCount || Number(t.passengerCapacity) >= tripGuestCount
+              );
               return (
                 <div className="bg-[#253745] border border-white/5 rounded-xl p-4 shadow-md">
                   <div className="flex justify-between items-center mb-3">
