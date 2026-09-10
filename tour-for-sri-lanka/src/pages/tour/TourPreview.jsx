@@ -180,6 +180,7 @@ const TourPreview = () => {
   const [tripGuestCount, setTripGuestCount] = useState(null);
 
   const [tripDurationDays, setTripDurationDays] = useState(1);
+  const [originalTripDurationDays, setOriginalTripDurationDays] = useState(1)
 
   const [activeGuideModal, setActiveGuideModal] = useState(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
@@ -338,6 +339,7 @@ const TourPreview = () => {
       }
 
       setTripDurationDays(initialDays);
+      setOriginalTripDurationDays(initialDays);
 
       await buildRoute(destinationIds, district, initialDays, startCoordsForRoute);
     };
@@ -730,7 +732,7 @@ const TourPreview = () => {
     });
   };
 
-  const tripDays = Math.max(1, Number(tripDurationDays) || 1);
+  const tripDays = Math.max(1, Number(originalTripDurationDays) || 1);
   const closeTransportModal = () => {
     setActiveTransportModal(null);
     setTransportModalView("list");
