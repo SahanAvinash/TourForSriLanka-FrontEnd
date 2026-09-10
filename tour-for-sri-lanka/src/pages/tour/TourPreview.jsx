@@ -2,7 +2,27 @@ import { API_BASE_URL } from "../../config/api";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import { FaMapMarkerAlt, FaPhoneAlt, FaCheckCircle, FaShoppingCart, FaTrash, FaPlay, FaRoute, FaClock, FaRulerHorizontal, FaMapMarkedAlt, FaUserTie, FaHotel, FaCar, FaHourglassHalf } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaCheckCircle,
+  FaShoppingCart,
+  FaTrash,
+  FaPlay,
+  FaRoute,
+  FaClock,
+  FaRulerHorizontal,
+  FaMapMarkedAlt,
+  FaUserTie,
+  FaHotel,
+  FaCar,
+  FaHourglassHalf,
+  FaSun,
+  FaCalendarAlt,
+  FaCompass,
+  FaArrowRight,
+  FaInfoCircle,
+} from "react-icons/fa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -129,14 +149,17 @@ const haversineKm = (lat1, lng1, lat2, lng2) => {
 const ROUTE_OPTION_META = {
   shortestDistance: {
     icon: FaRulerHorizontal,
+    highlightText: "Complete Itinerary",
     tagline: "All your selected destinations — we calculate how many days you'll need.",
   },
   fastestRoute: {
     icon: FaClock,
+    highlightText: "Time Optimized",
     tagline: "Trims destinations that don't fit your days, then optimizes the fastest order.",
   },
   bestOverall: {
     icon: FaMapMarkedAlt,
+    highlightText: "Curated Mix",
     tagline: "A fresh, varied trip built from destinations across Sri Lanka, sized to fit your days comfortably.",
   },
 };
@@ -324,7 +347,13 @@ const TourPreview = () => {
 
   const handleSelectRouteOption = (optionKey) => {
     if (!routeOptions || !routeOptions[optionKey]) return;
-    setTripData(routeOptions[optionKey]);
+    const option = routeOptions[optionKey];
+    setTripData(option);
+
+    const actualDays = option.itinerary?.length || option.estimatedDays
+    if(actualDays){
+      setTripDurationDays(actualDays);
+    }
     setPhase("ready");
   };
 
@@ -370,10 +399,15 @@ const TourPreview = () => {
       <div className="min-h-screen bg-[#11212D] text-white">
         <Navbar />
         <div className="px-6 py-10 max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-2">Choose Your Trip Style</h1>
-          <p className="text-gray-400 mb-8">
-            We've put together a few different ways to run this trip — pick the one that fits you best.
-          </p>
+          <div className="mb-8">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#00C896]/10 text-[#00C896] border border-[#00C896]/20 mb-3">
+              <FaCompass size={12} /> Step 2: Route Strategy
+            </span>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Choose Your Trip Style</h1>
+            <p className="text-gray-400 max-w-2xl text-sm leading-relaxed">
+              We've analyzed your selected destinations and created 3 tailored travel routes. Select the one that matches your pace and schedule best.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {optionKeys.map((key) => {
@@ -381,73 +415,101 @@ const TourPreview = () => {
               if (!option) return null;
               const meta = ROUTE_OPTION_META[key];
               const Icon = meta.icon;
+              const isFull = key === "shortestDistance";
 
               return (
-                <div key={key} className="bg-[#253745] rounded-xl p-5 flex flex-col h-full">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon className="text-[#00C896]" size={18} />
-                    <h3 className="text-[#00C896] font-semibold">{option.label}</h3>
+                <div
+                  key={key}
+                  className="bg-gradient-to-b from-[#253745] to-[#1a2530] border border-white/10 hover:border-[#00C896]/50 rounded-2xl p-6 flex flex-col h-full shadow-lg hover:shadow-2xl hover:shadow-[#00C896]/10 transition-all duration-300 relative group"
+                >
+                  {/* Top Badge */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-[#00C896]/15 text-[#00C896] border border-[#00C896]/30">
+                      {meta.highlightText}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-[#11212D] border border-white/5 flex items-center justify-center text-[#00C896] group-hover:scale-110 transition-transform">
+                      <Icon size={16} />
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-400 mb-4">{meta.tagline}</p>
 
-                  {key === "shortestDistance" && option.itinerary && (
-                    <div className="mb-4 bg-[#1a2530] rounded-lg p-3">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Estimated trip length</span>
-                        <span className="font-semibold text-[#00C896]">
-                          {option.estimatedDays || option.itinerary.length} day
+                  <h3 className="text-xl font-bold text-white mb-1.5">{option.label}</h3>
+                  <p className="text-xs text-gray-400 mb-5 leading-relaxed min-h-[36px]">{meta.tagline}</p>
+
+                  {/* Estimated Days Highlight */}
+                  {isFull && option.itinerary && (
+                    <div className="mb-4 bg-[#11212D]/80 border border-[#00C896]/20 rounded-xl p-3.5">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400 font-medium flex items-center gap-1.5">
+                          <FaCalendarAlt className="text-[#00C896]" size={12} /> Estimated Trip Days
+                        </span>
+                        <span className="font-bold text-[#00C896] text-base">
+                          {option.estimatedDays || option.itinerary.length} Day
                           {(option.estimatedDays || option.itinerary.length) > 1 ? "s" : ""}
                         </span>
                       </div>
-                      <p className="text-[11px] text-gray-500 mt-2">
-                        Calculated from typical visit times for all {option.destinations.length} selected destinations.
+                      <p className="text-[11px] text-gray-400 mt-1.5">
+                        Calculated from visit times for all {option.destinations.length} selected stops.
                       </p>
                     </div>
                   )}
 
                   {key === "fastestRoute" && option.excludedCount > 0 && (
-                    <p className="text-[11px] text-yellow-400 mb-3">
-                      {option.excludedCount} destination{option.excludedCount > 1 ? "s" : ""} trimmed to fit {tripDurationDays} day{tripDurationDays > 1 ? "s" : ""}
-                    </p>
+                    <div className="mb-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 text-xs text-yellow-300 flex items-center gap-2">
+                      <FaInfoCircle className="flex-shrink-0" size={13} />
+                      <span>{option.excludedCount} stop{option.excludedCount > 1 ? "s" : ""} trimmed to fit your {tripDurationDays}-day schedule comfortably.</span>
+                    </div>
                   )}
 
-                  <div className="flex flex-col gap-2 mb-4 bg-[#1a2530] rounded-lg p-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Destinations</span>
-                      <span className="font-semibold">{option.destinations.length}</span>
+                  {/* Key Stats Pill Grid */}
+                  <div className="grid grid-cols-3 gap-2 mb-5 bg-[#11212D]/60 p-3 rounded-xl border border-white/5">
+                    <div className="flex flex-col items-center text-center p-1">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-400 mb-0.5">Stops</span>
+                      <span className="font-bold text-white text-sm">{option.destinations.length}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Total distance</span>
-                      <span className="font-semibold">{option.route.distanceKm} km</span>
+                    <div className="flex flex-col items-center text-center p-1 border-x border-white/5">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-400 mb-0.5">Distance</span>
+                      <span className="font-bold text-white text-sm">{option.route.distanceKm} km</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Driving time</span>
-                      <span className="font-semibold">{formatDuration(option.route.durationMin)}</span>
+                    <div className="flex flex-col items-center text-center p-1">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-400 mb-0.5">Driving</span>
+                      <span className="font-bold text-[#00C896] text-sm">{formatDuration(option.route.durationMin)}</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 mb-4 flex-1 min-h-0 overflow-y-auto">
+                  {/* Destination List */}
+                  <div className="flex flex-col gap-2 mb-6 flex-1 min-h-[140px] max-h-[220px] overflow-y-auto pr-1">
+                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Route Itinerary:</span>
                     {option.destinations.map((d, i) => (
-                      <div key={d._id || i} className="text-xs text-gray-300 truncate flex-shrink-0 leading-5">
-                        {i + 1}. {d.name}
+                      <div key={d._id || i} className="flex items-center gap-2 text-xs text-gray-300 bg-[#11212D]/40 px-2.5 py-1.5 rounded-lg border border-white/5">
+                        <span className="w-5 h-5 rounded-full bg-[#00C896]/15 text-[#00C896] text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                          {i + 1}
+                        </span>
+                        <span className="truncate font-medium">{d.name}</span>
+                        {d.location && <span className="text-[10px] text-gray-500 ml-auto flex-shrink-0">{d.location}</span>}
                       </div>
                     ))}
                   </div>
 
                   <button
                     onClick={() => handleSelectRouteOption(key)}
-                    className="w-full flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-semibold py-2.5 rounded-md hover:bg-[#00b386] transition-colors"
+                    className="w-full mt-auto flex items-center justify-center gap-2 bg-[#00C896] text-[#11212D] font-bold py-3 px-4 rounded-xl hover:bg-[#00E5AC] transition-all duration-200 shadow-md shadow-[#00C896]/20 hover:shadow-lg hover:shadow-[#00C896]/30 group-hover:translate-y-[-1px]"
                   >
-                    <FaRoute size={12} /> Choose this trip
+                    <FaRoute size={13} /> Choose {option.label}
+                    <FaArrowRight size={11} className="ml-1" />
                   </button>
                 </div>
               );
             })}
           </div>
 
-          <button onClick={() => navigate("/tours/plan")} className="mt-8 text-gray-400 text-sm hover:text-white">
-            ← Change your destinations instead
-          </button>
+          <div className="mt-10 flex items-center justify-between border-t border-white/5 pt-6">
+            <button
+              onClick={() => navigate("/tours/plan")}
+              className="inline-flex items-center gap-2 text-gray-400 text-sm hover:text-white transition-colors"
+            >
+              ← Change your destinations instead
+            </button>
+          </div>
         </div>
         <Footer />
       </div>
@@ -1218,27 +1280,61 @@ const TourPreview = () => {
     <div className="min-h-screen bg-[#11212D] text-white">
       <Navbar />
       <div className="px-6 py-10">
-        <div className="tour-preview-title-anim">
-          <h1 className="text-2xl font-bold mb-2">Your Trip Route</h1>
-          <p className="text-gray-400 mb-2">
-            Total distance (round trip):{" "}
-            <span className="text-[#00C896] font-semibold">{route.distanceKm} km</span>
-            {typeof route.durationMin === "number" && (
-              <>
-                {" "}· Driving time:{" "}
-                <span className="text-[#00C896] font-semibold">{formatDuration(route.durationMin)}</span>
-              </>
+        <div className="tour-preview-title-anim mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#00C896]/10 text-[#00C896] border border-[#00C896]/20 mb-2">
+                <FaCompass size={11} /> Optimized Tour Itinerary
+              </span>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight">Your Trip Route & Schedule</h1>
+            </div>
+            {routeOptions && (
+              <button
+                onClick={() => setPhase("route-options")}
+                className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-[#253745] hover:bg-[#2e4354] text-gray-300 hover:text-white border border-white/5 transition-colors cursor-pointer"
+              >
+                <FaRoute size={12} className="text-[#00C896]" /> Switch Route Style
+              </button>
             )}
-          </p>
-          <div className="flex gap-5 mb-6 text-sm text-gray-400">
-            <span className="flex items-center gap-2">
-              <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#00C896" }}></span>
-              Outbound ({route.outboundDistanceKm} km)
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="inline-block w-4 h-1 rounded-full" style={{ backgroundColor: "#FFB020" }}></span>
-              Return to start ({route.returnDistanceKm} km)
-            </span>
+          </div>
+
+          {/* Key Metrics Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-[#253745]/70 border border-white/5 rounded-xl p-3.5 flex flex-col">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <FaRulerHorizontal className="text-[#00C896]" size={10} /> Total Round-Trip
+              </span>
+              <span className="text-xl font-bold text-white mt-1">{route.distanceKm} km</span>
+              <span className="text-[11px] text-gray-400 mt-1">
+                Outbound: {route.outboundDistanceKm || 0} km · Return: {route.returnDistanceKm || 0} km
+              </span>
+            </div>
+
+            <div className="bg-[#253745]/70 border border-white/5 rounded-xl p-3.5 flex flex-col">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <FaCar className="text-[#00C896]" size={12} /> Total Driving Time
+              </span>
+              <span className="text-xl font-bold text-[#00C896] mt-1">{formatDuration(route.durationMin)}</span>
+              <span className="text-[11px] text-gray-400 mt-1">Total drive duration</span>
+            </div>
+
+            <div className="bg-[#253745]/70 border border-white/5 rounded-xl p-3.5 flex flex-col">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <FaMapMarkerAlt className="text-[#00C896]" size={11} /> Destinations
+              </span>
+              <span className="text-xl font-bold text-white mt-1">{destinations.length} Stops</span>
+              <span className="text-[11px] text-gray-400 mt-1">Optimized TSP order</span>
+            </div>
+
+            <div className="bg-[#253745]/70 border border-white/5 rounded-xl p-3.5 flex flex-col">
+              <span className="text-[11px] text-gray-400 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <FaCalendarAlt className="text-[#00C896]" size={11} /> Trip Schedule
+              </span>
+              <span className="text-xl font-bold text-[#00C896] mt-1">
+                {(itinerary && itinerary.length) || tripDurationDays || 1} Day{((itinerary && itinerary.length) || tripDurationDays || 1) > 1 ? "s" : ""}
+              </span>
+              <span className="text-[11px] text-gray-400 mt-1">Day-by-day split</span>
+            </div>
           </div>
         </div>
 
@@ -1305,10 +1401,15 @@ const TourPreview = () => {
         </div>
 
         <div className="tour-preview-order-anim mb-8">
-          <h2 className="text-xl font-semibold mb-1">Trip Order</h2>
-          <p className="text-xs text-gray-400 mb-3">
-            Tap Guides, Hotels or Transport on any stop to add a booking to your cart.
-          </p>
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <FaRoute className="text-[#00C896]" /> Trip Order & Daily Itinerary
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Stops are sequenced for the shortest travel time. Tap Guides, Hotels, or Transport to customize bookings.
+            </p>
+          </div>
+
           <div className="flex flex-col gap-3">
             {(() => {
               const startRec = getRecommendationForLocation(startDistrict);
@@ -1316,27 +1417,29 @@ const TourPreview = () => {
               const startHotels = startRec?.hotels || [];
               const startTransports = startRec?.transports || [];
               return (
-                <div className="bg-[#253745] rounded-lg p-4">
+                <div className="bg-[#253745] border border-white/5 rounded-xl p-4 shadow-md">
                   <div className="flex justify-between items-center mb-3">
                     <span className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-wide text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full flex-shrink-0">
-                        Start
+                      <span className="text-[10px] uppercase tracking-wide text-[#11212D] bg-[#FFB020] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0">
+                        Start Point
                       </span>
-                      {startCoords?.address || startDistrict}
+                      <span className="font-semibold text-white text-sm md:text-base">
+                        {startCoords?.address || startDistrict || "Starting Location"}
+                      </span>
                     </span>
-                    <span className="text-sm text-gray-400">
-                      Total : {route.distanceKm} km
+                    <span className="text-xs text-[#00C896] font-medium bg-[#00C896]/10 px-2.5 py-1 rounded-full border border-[#00C896]/20">
+                      Total Route: {route.distanceKm} km
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div
-                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      className="bg-[#1a2530] hover:bg-[#223340] border border-white/5 rounded-lg p-3 cursor-pointer transition-colors"
                       onClick={() =>
                         startRec && setActiveGuideModal({ location: startRec.location, guides: startGuides })
                       }
                     >
-                      <p className="text-[11px] text-gray-500 mb-2">
-                        You can book a guide if you wish. Your guide will accompany you throughout your entire trip.
+                      <p className="text-[11px] text-gray-400 mb-2 leading-relaxed">
+                        Book a professional licensed guide for your entire journey.
                       </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaUserTie className="text-[#00C896] text-[12px] flex-shrink-0" />
@@ -1349,18 +1452,18 @@ const TourPreview = () => {
                         <p key={g._id} className="text-xs text-gray-400 truncate">{g.firstName} {g.lastName}</p>
                       ))}
                       {startGuides.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{startGuides.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startGuides.length - 2} more · click to view</p>
                       )}
                     </div>
                     <div
-                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      className="bg-[#1a2530] hover:bg-[#223340] border border-white/5 rounded-lg p-3 cursor-pointer transition-colors"
                       onClick={() =>
                         startRec &&
                         setActiveHotelModal({ location: startRec.location, hotels: startHotels, dayIndex: 0 })
                       }
                     >
-                      <p className="text-[11px] text-gray-500 mb-2">
-                        If you need accommodation at your destination, you can book a hotel that suits your needs.
+                      <p className="text-[11px] text-gray-400 mb-2 leading-relaxed">
+                        Accommodation near your departure point if starting early.
                       </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
@@ -1373,18 +1476,18 @@ const TourPreview = () => {
                         <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
                       ))}
                       {startHotels.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{startHotels.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startHotels.length - 2} more · click to view</p>
                       )}
                     </div>
                     <div
-                      className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
+                      className="bg-[#1a2530] hover:bg-[#223340] border border-white/5 rounded-lg p-3 cursor-pointer transition-colors"
                       onClick={() =>
                         startRec &&
                         setActiveTransportModal({ location: startRec.location, transports: startTransports })
                       }
                     >
-                      <p className="text-[11px] text-gray-500 mb-2">
-                        You can book a vehicle if you wish. Your driver will be available throughout your entire trip.
+                      <p className="text-[11px] text-gray-400 mb-2 leading-relaxed">
+                        Book a private vehicle with a driver for the full tour duration.
                       </p>
                       <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
                         <FaCar className="text-[#00C896] text-[12px] flex-shrink-0" />
@@ -1397,7 +1500,7 @@ const TourPreview = () => {
                         <p key={t._id} className="text-xs text-gray-400 truncate">{t.vehicleBrand} {t.vehicleModel}</p>
                       ))}
                       {startTransports.length > 2 && (
-                        <p className="text-xs text-[#00C896] mt-1">+{startTransports.length - 2} more · click to view</p>
+                        <p className="text-xs text-[#00C896] mt-1 font-medium">+{startTransports.length - 2} more · click to view</p>
                       )}
                     </div>
                   </div>
@@ -1414,32 +1517,44 @@ const TourPreview = () => {
               const destHotels = destRec?.hotels || [];
               const legDistance = legDistances[index];
 
+              // Driving time calculation with distance fallback
+              const displayDriveMinutes = (dayInfo.driveMinutes != null && dayInfo.driveMinutes > 0)
+                ? dayInfo.driveMinutes
+                : (legDistance != null && legDistance > 0)
+                  ? Math.max(10, Math.round((legDistance / 40) * 60))
+                  : (dayInfo.driveMinutes != null ? dayInfo.driveMinutes : null);
+
+              const destImage = dest.images?.[0] || dest.image;
+              const categoryName = typeof dest.category === "object" ? dest.category?.name : dest.category;
+
               return (
-                <React.Fragment key={dest.id || `stop-${index}`}>
+                <React.Fragment key={dest.id || dest._id || `stop-${index}`}>
                   {isNewDay && (
-                    <div className="flex items-center gap-3 mt-5 mb-1">
-                      <span className="text-xs font-bold uppercase tracking-wide text-[#11212D] bg-[#00C896] px-4 py-1.5 rounded-full whitespace-nowrap shadow-md">
+                    <div className="flex items-center gap-3 mt-6 mb-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#11212D] bg-[#00C896] px-4 py-1.5 rounded-full whitespace-nowrap shadow-md flex items-center gap-1.5">
+                        <FaCalendarAlt size={11} />
                         Day {String(dayIndex).padStart(2, "0")}
                       </span>
                       <div className="flex-1 h-px bg-[#00C896]/30" />
                     </div>
                   )}
 
-                  <div className="flex flex-col items-center gap-1 py-0.5">
-                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
-                    <div className="flex items-center gap-2.5 bg-[#11212D] border border-[#00C896]/30 rounded-full px-3.5 py-1.5 text-[11px] text-gray-300 whitespace-nowrap shadow-sm">
+                  {/* Connecting Leg Pill with Driving Time */}
+                  <div className="flex flex-col items-center gap-1 py-1">
+                    <div className="w-px h-3.5 border-l-2 border-dashed border-[#00C896]/40" />
+                    <div className="flex items-center gap-2.5 bg-[#11212D] border border-[#00C896]/40 rounded-full px-4 py-1.5 text-[11px] text-gray-200 whitespace-nowrap shadow-sm">
                       {/* Distance - Green Color */}
                       <span className="flex items-center gap-1 text-[#00C896] font-semibold">
                         <FaRulerHorizontal size={10} />
                         {legDistance != null ? `${legDistance.toFixed(1)} km` : "—"}
                       </span>
-                      
+
                       <span className="text-gray-600">·</span>
-                      
+
                       {/* Driving Time - Green Color */}
                       <span className="flex items-center gap-1 text-[#00C896] font-semibold">
-                        <FaCar size={10} />
-                        {dayInfo.driveMinutes != null ? formatDuration(dayInfo.driveMinutes) : "—"} Driving
+                        <FaCar size={11} />
+                        {displayDriveMinutes != null ? `${formatDuration(displayDriveMinutes)} Driving` : "— Driving"}
                       </span>
 
                       <span className="text-gray-600">·</span>
@@ -1450,63 +1565,113 @@ const TourPreview = () => {
                         Ready: 15m
                       </span>
                     </div>
-                    <div className="w-px h-3 border-l-2 border-dashed border-[#00C896]/40" />
+                    <div className="w-px h-3.5 border-l-2 border-dashed border-[#00C896]/40" />
                   </div>
 
-                  <div className="bg-[#253745] rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-                    <div>
-                      <span className="font-medium flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-[#00C896]/10 text-[#00C896] text-xs font-bold flex items-center justify-center flex-shrink-0">
-                          {index + 1}
-                        </span>
-                        {dest.name}
-                      </span>
-                      {dayInfo.timeSlot && (
-                        <div className="flex items-center gap-3 flex-wrap text-[11px] text-gray-500 mt-1 ml-8">
-                          <span className="flex items-center gap-1">
-                            <FaClock className="text-[#00C896]" size={10} />
-                            {dayInfo.timeSlot}
+                  {/* Destination Card */}
+                  <div className="bg-[#253745] hover:bg-[#283d4e] border border-white/5 hover:border-[#00C896]/30 rounded-xl p-4 transition-all duration-200 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center shadow-md">
+                    {/* Destination Info */}
+                    <div className="lg:col-span-7 flex items-start gap-3.5 min-w-0">
+                      {destImage ? (
+                        <img
+                          src={destImage}
+                          alt={dest.name}
+                          className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover flex-shrink-0 border border-white/10 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-[#1a2530] border border-white/10 flex items-center justify-center text-[#00C896] flex-shrink-0">
+                          <FaMapMarkedAlt size={22} />
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="w-5 h-5 rounded-full bg-[#00C896]/15 text-[#00C896] text-[11px] font-bold flex items-center justify-center flex-shrink-0">
+                            {index + 1}
                           </span>
-                          {dayInfo.visitMinutes != null && (
-                            <span className="flex items-center gap-1">
-                              <FaHourglassHalf className="text-[#00C896]" size={10} />
-                              {formatDuration(dayInfo.visitMinutes)} visit
+                          <h3 className="font-semibold text-white text-sm md:text-base truncate">
+                            {dest.name}
+                          </h3>
+                          {categoryName && (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#00C896]/10 text-[#00C896] border border-[#00C896]/20">
+                              {categoryName}
                             </span>
                           )}
-                          {dayInfo.isOvernightStart && (
-                            <span className="text-[#FFB020] font-medium">Fresh start after overnight stay</span>
+                        </div>
+
+                        {dest.location && (
+                          <p className="text-xs text-gray-400 flex items-center gap-1 mb-2">
+                            <FaMapMarkerAlt className="text-[#00C896]" size={10} />
+                            <span className="truncate">{dest.location}</span>
+                          </p>
+                        )}
+
+                        {dayInfo.timeSlot && (
+                          <div className="flex items-center gap-2 flex-wrap text-[11px] text-gray-400">
+                            <span className="flex items-center gap-1 bg-[#1a2530] px-2 py-0.5 rounded border border-white/5">
+                              <FaClock className="text-[#00C896]" size={10} />
+                              {dayInfo.timeSlot}
+                            </span>
+                            {dayInfo.visitMinutes != null && (
+                              <span className="flex items-center gap-1 bg-[#1a2530] px-2 py-0.5 rounded border border-white/5 text-[#00C896]">
+                                <FaHourglassHalf className="text-[#00C896]" size={10} />
+                                {formatDuration(dayInfo.visitMinutes)} visit
+                              </span>
+                            )}
+                            {dayInfo.isOvernightStart && (
+                              <span className="flex items-center gap-1 bg-[#FFB020]/15 text-[#FFB020] px-2 py-0.5 rounded border border-[#FFB020]/30 font-medium">
+                                <FaSun size={10} />
+                                Fresh start after overnight stay
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Accommodation or En-Route Stop */}
+                    <div className="lg:col-span-5">
+                      {dayInfo.isDayEnd ? (
+                        <div
+                          className="bg-[#1a2530] hover:bg-[#202f3c] border border-white/5 hover:border-[#00C896]/30 rounded-lg p-3 cursor-pointer transition-colors"
+                          onClick={() =>
+                            destRec &&
+                            setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
+                          }
+                        >
+                          <p className="text-sm font-medium mb-1 flex items-center justify-between gap-1.5">
+                            <span className="flex items-center gap-1.5">
+                              <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
+                              Hotels in {destRec?.location || dest.location} ({destHotels.length})
+                            </span>
+                            {hotelStayDates[dayIndex] && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-[#00C896] bg-[#00C896]/10 px-2 py-0.5 rounded-full border border-[#00C896]/20">
+                                <FaCheckCircle size={10} /> Booked
+                              </span>
+                            )}
+                          </p>
+                          {destHotels.length > 0 ? (
+                            <>
+                              {destHotels.slice(0, 2).map((h) => (
+                                <p key={h._id} className="text-xs text-gray-400 truncate">• {h.hotelName}</p>
+                              ))}
+                              {destHotels.length > 2 && (
+                                <p className="text-xs text-[#00C896] mt-1 font-medium">
+                                  +{destHotels.length - 2} more hotels · click to view
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-xs text-gray-500 italic">No hotels listed for this area</p>
                           )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-xs text-gray-400 italic lg:justify-end py-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#00C896]/70 flex-shrink-0" />
+                          <span>Same-day stop — continuing to next destination</span>
                         </div>
                       )}
                     </div>
-
-                    {dayInfo.isDayEnd ? (
-                      <div
-                        className="bg-[#1a2530] rounded-lg p-3 cursor-pointer hover:bg-[#2f4655] transition-colors"
-                        onClick={() =>
-                          destRec &&
-                          setActiveHotelModal({ location: destRec.location, hotels: destHotels, dayIndex })
-                        }
-                      >
-                        <p className="text-sm font-medium mb-1 flex items-center gap-1.5">
-                          <FaHotel className="text-[#00C896] text-[12px] flex-shrink-0" />
-                          Hotels ({destHotels.length})
-                          {hotelStayDates[dayIndex] && (
-                            <FaCheckCircle className="text-[#00C896] text-[11px]" title="Added to cart" />
-                          )}
-                        </p>
-                        {destHotels.slice(0, 2).map((h) => (
-                          <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
-                        ))}
-                        {destHotels.length > 2 && (
-                          <p className="text-xs text-[#00C896] mt-1">+{destHotels.length - 2} more · click to view</p>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-gray-500 italic md:text-right">
-                        Same-day stop — continuing to the next destination
-                      </p>
-                    )}
                   </div>
                 </React.Fragment>
               );
