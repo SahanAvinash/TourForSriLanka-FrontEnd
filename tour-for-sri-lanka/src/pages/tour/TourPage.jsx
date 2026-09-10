@@ -509,100 +509,66 @@ const TourPage = () => {
 
     y += overviewHeight + 12;
 
+    // --- DAY BY DAY TRIP ROUTE ---
     doc.setTextColor(...dark);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
-    doc.text("Trip Route", 14, y);
+    doc.text("Trip Itinerary (Day by Day)", 14, y);
 
-    y += 3;
+    y += 4;
 
-    const routeRows = (tour.destinations || []).map(
-      (destination, index) => [
-        `${index + 1}`,
-        destination.name || "-",
-        destination.location || "-",
-      ]
-    );
+    const groupedDestinations = (tour.destinations || []).reduce((acc, dest) => {
+      const day = dest.day || 1;
+      if (!acc[day]) acc[day] = [];
+      acc[day].push(dest);
+      return acc;
+    }, {});
 
-    autoTable(doc, {
-      startY: y + 4,
-      head: [["#", "Destination", "Location"]],
-      body: routeRows,
-      theme: "striped",
-      headStyles: {
-        fillColor: accent,
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 4,
-      },
-      margin: {
-        left: 14,
-        right: 14,
-      },
-    });
-
-    y = doc.lastAutoTable.finalY + 12;
-
-    const mappedDestinations = (tour.destinations || []).map((d) => ({
-      ...d,
-      lat: d.latitude,
-      lng: d.longitude,
-    }));
-    const startPoint =
-      tour.startLocation &&
-      typeof tour.startLocation.latitude === "number" &&
-      typeof tour.startLocation.longitude === "number"
-        ? { lat: tour.startLocation.latitude, lng: tour.startLocation.longitude }
-        : null;
-
-    const hasRouteCoords =
-      mappedDestinations.filter(
-        (destination) =>
-          typeof destination.lat === "number" &&
-          typeof destination.lng === "number"
-      ).length >= 2;
-
-    const hasRouteImage =
-      typeof tour.routeMapImage === "string" &&
-      tour.routeMapImage.startsWith("data:image");
-
-    if (hasRouteImage || hasRouteCoords) {
-      if (y > 210) {
+    Object.entries(groupedDestinations).forEach(([dayNum, dests]) => {
+      if (y > 250) {
         doc.addPage();
         y = 20;
       }
 
-      doc.setTextColor(...dark);
-      doc.setFontSize(13);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text("Route Map", 14, y);
+      doc.setTextColor(...accent);
+      doc.text(`Day ${String(dayNum).padStart(2, "0")}`, 14, y + 4);
+      y += 6;
 
-      y += 4;
+      const dayRows = dests.map((destination, index) => [
+        `${index + 1}`,
+        destination.name || "-",
+        destination.location || "-",
+        destination.timeSlot || "-",
+      ]);
 
-      const mapWidth = pageWidth - 28;
-      const mapHeight = 90;
+      autoTable(doc, {
+        startY: y,
+        head: [["#", "Destination", "Location", "Time Slot"]],
+        body: dayRows,
+        theme: "striped",
+        headStyles: {
+          fillColor: accent,
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 9.5,
+          cellPadding: 3.5,
+        },
+        margin: {
+          left: 14,
+          right: 14,
+        },
+      });
 
-      let imageDrawn = false;
-      if (hasRouteImage) {
-        try {
-          doc.addImage(tour.routeMapImage, "PNG", 14, y + 2, mapWidth, mapHeight);
-          imageDrawn = true;
-        } catch (err) {
-          console.error("Failed to embed route map image, falling back to diagram:", err);
-        }
-      }
+      y = doc.lastAutoTable.finalY + 8;
+    });
 
-      if (!imageDrawn) {
-        drawRouteDiagram(doc, 14, y + 2, mapWidth, mapHeight, mappedDestinations, startPoint);
-      }
+    y += 4;
 
-      y += mapHeight + 12;
-    }
-
-    if (y > 240) {
+    if (y > 230) {
       doc.addPage();
       y = 20;
     }
