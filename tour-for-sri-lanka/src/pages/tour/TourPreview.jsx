@@ -1449,7 +1449,14 @@ const TourPreview = () => {
                         )}
                       </p>
                       {startGuides.slice(0, 2).map((g) => (
-                        <p key={g._id} className="text-xs text-gray-400 truncate">{g.firstName} {g.lastName}</p>
+                        <p key={g._id} className="text-xs text-gray-400 truncate flex items-center gap-1.5">
+                          <img
+                            src={g.profilePic || "/guide_placeholder.jpg"}
+                            alt=""
+                            className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                          />
+                          <span className="truncate">{g.firstName} {g.lastName}</span>
+                        </p>
                       ))}
                       {startGuides.length > 2 && (
                         <p className="text-xs text-[#00C896] mt-1 font-medium">+{startGuides.length - 2} more · click to view</p>
