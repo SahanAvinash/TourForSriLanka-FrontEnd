@@ -1473,7 +1473,14 @@ const TourPreview = () => {
                         )}
                       </p>
                       {startHotels.slice(0, 2).map((h) => (
-                        <p key={h._id} className="text-xs text-gray-400 truncate">{h.hotelName}</p>
+                        <p key={h._id} className="text-xs text-gray-400 truncate flex items-center gap-1.5">
+                          <img
+                            src={h.images?.[0] || h.image || "/hotel_placeholder.jpg"}
+                            alt=""
+                            className="w-5 h-5 rounded object-cover flex-shrink-0"
+                          />
+                          <span className="truncate">{h.hotelName}</span>
+                        </p>
                       ))}
                       {startHotels.length > 2 && (
                         <p className="text-xs text-[#00C896] mt-1 font-medium">+{startHotels.length - 2} more · click to view</p>
@@ -1653,7 +1660,14 @@ const TourPreview = () => {
                           {destHotels.length > 0 ? (
                             <>
                               {destHotels.slice(0, 2).map((h) => (
-                                <p key={h._id} className="text-xs text-gray-400 truncate">• {h.hotelName}</p>
+                                <p key={h._id} className="text-xs text-gray-400 truncate flex items-center gap-1.5">
+                                  <img
+                                    src={h.images?.[0] || h.image || "/hotel_placeholder.jpg"}
+                                    alt=""
+                                    className="w-5 h-5 rounded object-cover flex-shrink-0"
+                                  />
+                                  <span className="truncate">{h.hotelName}</span>
+                                </p>
                               ))}
                               {destHotels.length > 2 && (
                                 <p className="text-xs text-[#00C896] mt-1 font-medium">
@@ -2098,29 +2112,40 @@ const TourPreview = () => {
 
               {hotelModalView === "list" && (
                 <div className="flex flex-col gap-3">
-                  {activeHotelModal.hotels.map((h) => (
-                    <div key={h._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
-                          {bookedRoomIds.size > 0 && (
-                            <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added" />
-                          )}
+                  {activeHotelModal.hotels.map((h) => {
+                    const hotelImage = h.images?.[0] || h.image || "/hotel_placeholder.jpg";
+                    return (
+                      <div key={h._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
+                        <img
+                          src={hotelImage}
+                          alt={h.hotelName}
+                          className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-white font-semibold text-sm truncate">{h.hotelName}</h4>
+                            {bookedRoomIds.size > 0 && (
+                              <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 text-gray-400 text-[11px] mt-1">
+                            <FaMapMarkerAlt className="text-[#00C896] text-[12px] flex-shrink-0" />
+                            <span className="truncate">{h.location}</span>
+                          </div>
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">{h.location}</p>
+                        <button
+                          onClick={() => {
+                            setSelectedHotel(h);
+                            setHotelModalView("rooms");
+                            fetchRoomsForHotel(h._id);
+                          }}
+                          className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors flex-shrink-0"
+                        >
+                          Rooms
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          setSelectedHotel(h);
-                          setHotelModalView("rooms");
-                          fetchRoomsForHotel(h._id);
-                        }}
-                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
-                      >
-                        Rooms
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -2129,7 +2154,14 @@ const TourPreview = () => {
                   <button onClick={() => setHotelModalView("list")} className="text-xs text-gray-400 mb-3">
                     ← Back to hotels
                   </button>
-                  <p className="text-sm font-semibold mb-3">{selectedHotel.hotelName} — Rooms</p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={selectedHotel.images?.[0] || selectedHotel.image || "/hotel_placeholder.jpg"}
+                      alt={selectedHotel.hotelName}
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <p className="text-sm font-semibold">{selectedHotel.hotelName} — Rooms</p>
+                  </div>
 
                   {roomsLoading ? (
                     <p className="text-xs text-gray-400 text-center py-4">Loading rooms...</p>
@@ -2169,7 +2201,14 @@ const TourPreview = () => {
                   <button onClick={() => setHotelModalView("rooms")} className="text-xs text-gray-400 mb-3">
                     ← Back to rooms
                   </button>
-                  <p className="text-sm font-semibold mb-3">{selectedRoom.roomType} ({selectedHotel.hotelName})</p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={selectedHotel.images?.[0] || selectedHotel.image || "/hotel_placeholder.jpg"}
+                      alt={selectedHotel.hotelName}
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <p className="text-sm font-semibold">{selectedRoom.roomType} ({selectedHotel.hotelName})</p>
+                  </div>
 
                   <div className="flex flex-col gap-3">
                     <div>
