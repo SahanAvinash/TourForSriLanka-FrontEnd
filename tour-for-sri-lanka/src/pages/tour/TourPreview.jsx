@@ -237,20 +237,34 @@ const TourPreview = () => {
   const [startingTour, setStartingTour] = useState(false);
   const [startTourError, setStartTourError] = useState("");
 
-  const calculateReturnDate = (startDate, days) => {
-    if (!startDate || !days) return "";
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + Number(days));
-    return date.toISOString().split("T")[0];
-  };
 
-  const calculateTripEndDate = (startDate, days) => {
-    if (!startDate || !days) return "";
-    const date = new Date(`${startDate}T00:00:00`);
-    if (Number.isNaN(date.getTime())) return "";
-    date.setDate(date.getDate() + Math.max(0, Number(days) - 1));
-    return date.toISOString().split("T")[0];
-  };
+const parseDateOnly = (dateStr) => {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+};
+
+const formatDateOnly = (date) => {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const addDaysToDateString = (dateStr, days) => {
+  const date = parseDateOnly(dateStr);
+  date.setUTCDate(date.getUTCDate() + Number(days));
+  return formatDateOnly(date);
+};
+
+const calculateReturnDate = (startDate, days) => {
+  if (!startDate || !days) return "";
+  return addDaysToDateString(startDate, Number(days));
+};
+
+const calculateTripEndDate = (startDate, days) => {
+  if (!startDate || !days) return "";
+  return addDaysToDateString(startDate, Math.max(0, Number(days) - 1));
+};
 
   const buildRoute = async (destinationIds, district, tripDurationDaysOverride, startCoordsOverride) => {
     setPhase("building-route");
@@ -1932,10 +1946,11 @@ const TourPreview = () => {
                         type="number"
                         min="1"
                         value={bookingForm.quantity}
-                        onChange={(e) => setBookingForm({ ...bookingForm, quantity: Number(e.target.value) })}
-                        className="w-full bg-[#253745] rounded-md px-3 py-2 text-sm outline-none"
+                        readOnly
+                        onChange={(e) => e.preventDefault()}
+                        className="w-full rounded-md px-3 py-2 text-sm outline-none text-white bg-[#1a2530] border border-white/5 cursor-not-allowed"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Pre-filled based on your {tripDays}-day trip — edit if needed.</p>
+                      <p className="text-xs text-gray-500 mt-1">Locked to your trip duration.Go back to the Tour Planner page to change it.</p>
                     </div>
 
                     <div>
