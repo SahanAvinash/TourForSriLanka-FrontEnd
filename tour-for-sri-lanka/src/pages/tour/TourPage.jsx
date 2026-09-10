@@ -422,6 +422,7 @@ const TourPage = () => {
   };
 
   const handleDownloadPdf = (tour) => {
+    console.log("Full Tour Object:", tour)
     if (!tour) return;
 
     const doc = new jsPDF();
