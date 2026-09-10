@@ -1094,6 +1094,15 @@ const calculateTripEndDate = (startDate, days) => {
       tourId = tourRes.data._id;
       createdTour = tourRes.data.tour;
       clearTrip();
+      [
+        "tourStartDistrict",
+        "tourStartDate",
+        "tourTripDuration",
+        "tourNumberOfGuests",
+        "tourStartAddress",
+        "tourStartLat",
+        "tourStartLng",
+      ].forEach((key) => sessionStorage.removeItem(key));
     } catch (err) {
       console.error("Failed to create tour:", err.response?.data);
       setStartTourError(err.response?.data?.message || "Failed to start your tour, please try again");
