@@ -422,7 +422,6 @@ const TourPage = () => {
   };
 
   const handleDownloadPdf = (tour) => {
-    console.log("Full Tour Object:", tour)
     if (!tour) return;
 
     const doc = new jsPDF();
@@ -472,7 +471,7 @@ const TourPage = () => {
     doc.setFillColor(37, 55, 69);
     doc.roundedRect(14, y, pageWidth - 28, overviewHeight, 3, 3, "F");
 
-    const budgetValue = tour.estimatedBudget || tour.budget || tour.totalCost || tour.totalPrice;
+    const budgetValue = tour.estimatedBudget || 0;
 
     const overviewRows = [
       [
@@ -571,7 +570,7 @@ const TourPage = () => {
 
     y += 4;
 
-    // --- BOOKINGS SECTION (Enhanced Table) ---
+    // --- BOOKINGS & REQUESTS SECTION (Mapped with Schema) ---
     if (y > 220) {
       doc.addPage();
       y = 20;
@@ -586,41 +585,50 @@ const TourPage = () => {
 
     const bookingRows = [];
 
-    if (tour.selectedGuide) {
-      const guideName = `${tour.selectedGuide.firstName || ""} ${tour.selectedGuide.lastName || ""}`.trim();
-      const guideMobile = tour.selectedGuide.mobile ? `Mobile: ${tour.selectedGuide.mobile}` : "";
-      const guideDetails = tour.guideBookingDetails ? `Notes: ${tour.guideBookingDetails}` : "";
+    // 1. Guide Booking Details
+    if (tour.guideBookingDetails && (tour.guideBookingDetails.name || tour.guideBudget > 0)) {
+      const g = tour.guideBookingDetails;
+      const gName = g.name ? `Guide Name: ${g.name}` : "";
+      const gMobile = g.mobile ? `Mobile: ${g.mobile}` : "";
+      const gDate = g.date ? `Date: ${g.date} (${g.quantity || 1} days, ${g.numberOfGuests || 1} Guests)` : "";
       
-      const detailsText = [guideName, guideMobile, guideDetails].filter(Boolean).join("\n");
-      const gBudget = tour.guideBudget ? `LKR ${Number(tour.guideBudget).toLocaleString()}` : "-";
+      const detailsText = [gName, gMobile, gDate].filter(Boolean).join("\n");
+      const gPrice = g.totalPrice || tour.guideBudget;
+      const gBudget = gPrice ? `LKR ${Number(gPrice).toLocaleString()}` : "-";
 
       bookingRows.push(["Tour Guide", detailsText, gBudget]);
     }
 
-    if (tour.selectedHotels?.length > 0) {
-      tour.selectedHotels.forEach((hotel, idx) => {
-        const hName = hotel.hotelName || "-";
+    // 2. Hotel Booking Details (Array)
+    if (tour.hotelBookingDetails && tour.hotelBookingDetails.length > 0) {
+      tour.hotelBookingDetails.forEach((hotel, idx) => {
+        const hName = hotel.hotelName ? `Hotel: ${hotel.hotelName}` : "";
         const hLoc = hotel.location ? `Location: ${hotel.location}` : "";
-        const hDetails = tour.hotelBookingDetails ? `Notes: ${tour.hotelBookingDetails}` : "";
+        const hRoom = hotel.roomType ? `Room Type: ${hotel.roomType}` : "";
+        const hDates = (hotel.checkInDate && hotel.checkOutDate) ? `Stay: ${hotel.checkInDate} to ${hotel.checkOutDate}` : "";
         
-        const detailsText = [`Hotel: ${hName}`, hLoc, hDetails].filter(Boolean).join("\n");
-        const hBudget = tour.hotelBudget ? `LKR ${Number(tour.hotelBudget).toLocaleString()}` : "-";
+        const detailsText = [hName, hLoc, hRoom, hDates].filter(Boolean).join("\n");
+        const hBudget = hotel.totalPrice ? `LKR ${Number(hotel.totalPrice).toLocaleString()}` : (tour.hotelBudget ? `LKR ${Number(tour.hotelBudget).toLocaleString()}` : "-");
 
         bookingRows.push([
-          `Hotel ${tour.selectedHotels.length > 1 ? `#${idx + 1}` : ""}`.trim(),
+          `Hotel ${tour.hotelBookingDetails.length > 1 ? `#${idx + 1}` : ""}`.trim(),
           detailsText,
           hBudget
         ]);
       });
     }
 
-    if (tour.selectedTransport) {
-      const vName = `${tour.selectedTransport.vehicleBrand || ""} ${tour.selectedTransport.vehicleModel || ""}`.trim();
-      const regNo = tour.selectedTransport.registrationNo ? `Reg No: ${tour.selectedTransport.registrationNo}` : "";
-      const tDetails = tour.transportBookingDetails ? `Notes: ${tour.transportBookingDetails}` : "";
+    // 3. Transport Booking Details
+    if (tour.transportBookingDetails && (tour.transportBookingDetails.vehicleBrand || tour.transportBudget > 0)) {
+      const t = tour.transportBookingDetails;
+      const vName = `Vehicle: ${t.vehicleBrand || ""} ${t.vehicleModel || ""}`.trim();
+      const regNo = t.registrationNo ? `Reg No: ${t.registrationNo}` : "";
+      const tDates = (t.pickupDate && t.returnDate) ? `Period: ${t.pickupDate} to ${t.returnDate}` : "";
+      const tGuests = t.numberOfGuests ? `Guests: ${t.numberOfGuests} | Bags: ${t.bags || 0}` : "";
 
-      const detailsText = [`Vehicle: ${vName}`, regNo, tDetails].filter(Boolean).join("\n");
-      const tBudget = tour.transportBudget ? `LKR ${Number(tour.transportBudget).toLocaleString()}` : "-";
+      const detailsText = [vName, regNo, tDates, tGuests].filter(Boolean).join("\n");
+      const tPrice = t.totalPrice || tour.transportBudget;
+      const tBudget = tPrice ? `LKR ${Number(tPrice).toLocaleString()}` : "-";
 
       bookingRows.push(["Transport / Vehicle", detailsText, tBudget]);
     }
@@ -641,9 +649,9 @@ const TourPage = () => {
           cellPadding: 4,
         },
         columnStyles: {
-          0: { cellWidth: 45 },
-          1: { cellWidth: 95 },
-          2: { cellWidth: 42 },
+          0: { cellWidth: 42 },
+          1: { cellWidth: 98 },
+          2: { cellWidth: 40 },
         },
         margin: {
           left: 14,
