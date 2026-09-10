@@ -15,7 +15,6 @@ export default function AdminTours() {
     axios
       .get(`${API_BASE_URL}/api/tour`, { headers: { Authorization: "Bearer " + token } })
       .then((res) => {
-        // Backend eken direct array ekak dunnath, object ekak (e.g. { tours: [...] }) dunnath safe widihata handle karai
         const responseData = res.data;
         if (Array.isArray(responseData)) {
           setTours(responseData);
@@ -84,54 +83,65 @@ export default function AdminTours() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((tour) => (
-                <tr
-                  key={tour._id}
-                  className="border-t border-[#253745] hover:bg-[#243b4a] transition-colors"
-                >
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.traveler ? `${tour.traveler.firstName || ""} ${tour.traveler.lastName || ""}` : "-"}
-                  </td>
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {(tour.destinations || []).map((d) => d.name).join(", ") || "-"}
-                  </td>
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.selectedGuide ? `${tour.selectedGuide.firstName || ""} ${tour.selectedGuide.lastName || ""}` : "-"}
-                  </td>
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {(tour.selectedHotels || []).map((h) => h.hotelName).join(", ") || "-"}
-                  </td>
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.selectedTransport
-                      ? `${tour.selectedTransport.vehicleBrand || ""} ${tour.selectedTransport.vehicleModel || ""}`
-                      : "-"}
-                  </td>
-                  <td className="text-[#CCD0CF] px-4 py-3 text-sm">
-                    {tour.totalDistanceKm ? `${tour.totalDistanceKm} km` : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span
-                      className={
-                        tour.status === "confirmed"
-                          ? "text-[#00C896] font-semibold"
-                          : tour.status === "cancelled"
-                          ? "text-red-400 font-semibold"
-                          : "text-yellow-400 font-semibold"
-                      }
-                    >
-                      {tour.status || "pending"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <button
-                      onClick={() => handleRemove(tour)}
-                      className="bg-red-500/80 text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition cursor-pointer"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((tour) => {
+                // Safe extraction helpers
+                const travelerName = tour.traveler 
+                  ? (typeof tour.traveler === 'object' ? `${tour.traveler.firstName || tour.traveler.name || ""} ${tour.traveler.lastName || ""}`.trim() : tour.traveler)
+                  : "-";
+
+                const guideName = tour.selectedGuide
+                  ? (typeof tour.selectedGuide === 'object' ? `${tour.selectedGuide.firstName || tour.selectedGuide.name || ""} ${tour.selectedGuide.lastName || ""}`.trim() : tour.selectedGuide)
+                  : "-";
+
+                const hotelsList = Array.isArray(tour.selectedHotels) && tour.selectedHotels.length > 0
+                  ? tour.selectedHotels.map(h => typeof h === 'object' ? (h.hotelName || h.name || h.title) : h).filter(Boolean).join(", ")
+                  : "-";
+
+                const transportName = tour.selectedTransport
+                  ? (typeof tour.selectedTransport === 'object' 
+                      ? `${tour.selectedTransport.vehicleBrand || tour.selectedTransport.brand || ""} ${tour.selectedTransport.vehicleModel || tour.selectedTransport.model || tour.selectedTransport.name || ""}`.trim() 
+                      : tour.selectedTransport)
+                  : "-";
+
+                return (
+                  <tr
+                    key={tour._id}
+                    className="border-t border-[#253745] hover:bg-[#243b4a] transition-colors"
+                  >
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">{travelerName || "-"}</td>
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">
+                      {(tour.destinations || []).map((d) => (typeof d === 'object' ? d.name : d)).join(", ") || "-"}
+                    </td>
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">{guideName || "-"}</td>
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">{hotelsList || "-"}</td>
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">{transportName || "-"}</td>
+                    <td className="text-[#CCD0CF] px-4 py-3 text-sm">
+                      {tour.totalDistanceKm ? `${tour.totalDistanceKm} km` : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span
+                        className={
+                          tour.status === "confirmed"
+                            ? "text-[#00C896] font-semibold"
+                            : tour.status === "cancelled"
+                            ? "text-red-400 font-semibold"
+                            : "text-yellow-400 font-semibold"
+                        }
+                      >
+                        {tour.status || "pending"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        onClick={() => handleRemove(tour)}
+                        className="bg-red-500/80 text-white px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={8} className="text-center text-[#CCD0CF] px-4 py-6">
