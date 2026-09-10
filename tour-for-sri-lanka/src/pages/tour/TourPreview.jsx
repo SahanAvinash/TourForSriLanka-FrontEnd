@@ -1513,7 +1513,14 @@ const TourPreview = () => {
                         )}
                       </p>
                       {startTransports.slice(0, 2).map((t) => (
-                        <p key={t._id} className="text-xs text-gray-400 truncate">{t.vehicleBrand} {t.vehicleModel}</p>
+                        <p key={t._id} className="text-xs text-gray-400 truncate flex items-center gap-1.5">
+                          <img
+                            src={t.addVehiclePhotos?.[0] || "/vehicle_placeholder.jpg"}
+                            alt=""
+                            className="w-5 h-5 rounded object-cover flex-shrink-0"
+                          />
+                          <span className="truncate">{t.vehicleBrand} {t.vehicleModel}</span>
+                        </p>
                       ))}
                       {startTransports.length > 2 && (
                         <p className="text-xs text-[#00C896] mt-1 font-medium">+{startTransports.length - 2} more · click to view</p>
@@ -2009,12 +2016,17 @@ const TourPreview = () => {
               {transportModalView === "list" && (
                 <div className="flex flex-col gap-3">
                   {activeTransportModal.transports.map((t) => (
-                    <div key={t._id} className="bg-[#1a2530] rounded-xl p-3 flex items-center gap-3">
+                    <div key={t._id} className="bg-[#1a2530] rounded-[14px] p-3 flex items-center gap-3">
+                      <img
+                        src={t.addVehiclePhotos?.[0] || "/vehicle_placeholder.jpg"}
+                        alt={`${t.vehicleBrand} ${t.vehicleModel}`}
+                        className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <h4 className="text-white font-semibold text-sm truncate">{t.vehicleBrand} {t.vehicleModel}</h4>
                           {bookedTransportIds.has(t._id) && (
-                            <FaCheckCircle className="text-[#00C896] text-[12px]" title="Added to cart" />
+                            <FaCheckCircle className="text-[#00C896] text-[12px] flex-shrink-0" title="Added to cart" />
                           )}
                         </div>
                         <p className="text-xs text-gray-400 mt-1">Capacity: {t.passengerCapacity} passengers</p>
@@ -2025,7 +2037,7 @@ const TourPreview = () => {
                           setTransportModalView("book");
                           fetchTransportEstimate(t._id);
                         }}
-                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors"
+                        className="border border-[#00C896] text-[#00C896] px-3.5 py-1.5 rounded-full text-xs hover:bg-[#00C896] hover:text-white transition-colors flex-shrink-0"
                       >
                         Book
                       </button>
@@ -2039,7 +2051,14 @@ const TourPreview = () => {
                   <button onClick={() => setTransportModalView("list")} className="text-xs text-gray-400 mb-3">
                     ← Back to vehicles
                   </button>
-                  <p className="text-sm font-semibold mb-3">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={selectedTransport.addVehiclePhotos?.[0] || "/vehicle_placeholder.jpg"}
+                      alt={`${selectedTransport.vehicleBrand} ${selectedTransport.vehicleModel}`}
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <p className="text-sm font-semibold">{selectedTransport.vehicleBrand} {selectedTransport.vehicleModel}</p>
+                  </div>
 
                   <div className="flex flex-col gap-3">
                     <div>
